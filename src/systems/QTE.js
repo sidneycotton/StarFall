@@ -84,6 +84,9 @@ export function qte(scene, opts) {
       } else if (type === 'mash') {
         progress = Math.min(1, progress + 1 / o.presses);
         sfx.qteTick({ p: progress });
+        // Checked here, not in the tick: the tick drains before it checks, so a
+        // full meter would otherwise always read just under 1.
+        if (progress >= 1) finish('success');
       } else if (type === 'rigged' && shown === 'mash') {
         progress = Math.min(o.cap, progress + 1 / o.presses);
         sfx.qteTick({ p: progress });
