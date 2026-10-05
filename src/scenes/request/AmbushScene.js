@@ -22,6 +22,7 @@ import { nextPart } from './parts.js';
 
 const PARAMS = new URLSearchParams(window.location.search);
 const A = REQUEST.ambush;
+const CC = REQUEST.cc;
 const PX_H = 2.06;
 const AVERT = 0.18;            // how far her head stays from Wallflower, always
 
@@ -204,6 +205,7 @@ export class AmbushScene extends Room {
     await wait(this, 1200);
 
     // The lights, from the far end.
+    ui.caption(CC.lights, 3200);
     ui.dialogue.play(timed(A.lights));
     for (const lamp of [...this.relay.lamps].reverse()) {
       await wait(this, 900);
@@ -216,6 +218,7 @@ export class AmbushScene extends Room {
 
     // Her.
     sfx.metalSet({ pan: 0.2 });
+    ui.caption(CC.her, 2600);
     this.setLight(this.px.glow, { power: 0.8 });
     await this.tween(this.px, { y: 0 }, 2600);
     this.tween(this.px.b, { alpha: 1 }, 1800);
@@ -272,6 +275,7 @@ export class AmbushScene extends Room {
     this.relay.bar.visible = false;
     this.relay.backLeaf.visible = false;
     sfx.doorSlide({ gain: 0.16 });
+    ui.caption(CC.backDoor, 1800);
     await this.move(d, RELAY.back.x, RELAY.D + 2.6, 2.6);
     // ...and there she is, outside, where he ran to. And still in here.
     this.echo.visible = true;
@@ -293,6 +297,7 @@ export class AmbushScene extends Room {
     await this.move(p, RELAY.side.x + 0.4, RELAY.side.z, 2);
     sfx.lowImpact({ gain: 0.5, freq: 40 });
     sfx.collapse?.();
+    ui.caption(CC.lintel, 2200);
     this.pose(p, 'f_paperweight_brace');
     await ui.dialogue.play(timed(A.paperweight));
     this.attend('scan');
@@ -330,6 +335,7 @@ export class AmbushScene extends Room {
     narrative.setFlag('ch3PowerCut', done);
     if (done) {
       sfx.lanternOut({ pan: 0.6 });
+      ui.caption(CC.power, 2000);
       this.setLight(this.boilerLight, { power: 0.08 });
       await ui.dialogue.play(timed(A.powerCut));
     }
@@ -393,6 +399,7 @@ export class AmbushScene extends Room {
     await this.pxWalk(door.x + side * 0.4, 2.2, 1.1);
     await this.pxWalk(door.x, -0.6, 1.1);
     sfx.doorSlide({ gain: 0.12, open: false });
+    ui.caption(CC.leaving, 2200);
     this.tween(px.b, { alpha: 0 }, 600);
     this.setLight(px.glow, { power: 0 });
     this.setLight(px.gaze, { power: 0 });

@@ -18,6 +18,7 @@ import { nextPart } from './parts.js';
 // in four corners of the square, and only one person sees all of it.
 
 const C = REQUEST.crowd;
+const CC = REQUEST.cc;
 const SCREEN_Z = 25;
 // Where the four of them are when it happens.
 const EV = {
@@ -275,6 +276,7 @@ export class CrowdScene extends Room {
     this.setFree(true, false);
     await wait(this, 1200);
     sfx.glassClink({ pitch: 0.7, gain: 0.08 });
+    ui.caption(CC.cup, 2600);
     await ui.dialogue.play(C.open.slice(0, 1));
     // Somebody walks into them.
     await this.jostle();
@@ -332,6 +334,7 @@ export class CrowdScene extends Room {
     sound.vigil.hush(0.15, 0.3);
     sfx.lowImpact({ gain: 0.6, freq: 36 });
     sfx.distantBoom({ gain: 0.35 });
+    ui.caption(CC.quake, 2600);
     if (!this.reduce) this.cameras.main.shake(2600, 0.012);
     this.lamps.forEach((l, i) => this.time.delayedCall(200 + i * 160, () => this.setLight(l, { on: 0.3 })));
     this.v.setBoardTexture(this.screen, 'cr_scr_static');
@@ -340,6 +343,7 @@ export class CrowdScene extends Room {
     await ui.dialogue.play(C.quake);
     this.lamps.forEach((l) => this.setLight(l, { on: 0.8 }));
     sound.sirens.start({ gain: 0.25, fadeIn: 4 });
+    ui.caption(CC.sirens, 2400);
     sound.vigil.hush(0.7, 0.6);
     // Everyone, at once, away from the screen.
     this.mode = 'surge';
@@ -393,6 +397,7 @@ export class CrowdScene extends Room {
     const P = EV.paperweight;
     await this.lookAt({ x: P.x - 0.3, y: 1.8, z: P.z }, 1400);
     sfx.metalSet({ pan: -0.6 });
+    ui.caption(CC.post, 2000);
     await new Promise((r) => this.tweens.add({ targets: this.post, a: 0.95, duration: 900, ease: 'Quad.easeIn', onComplete: r }));
     show(this, F.paperweight, 'f_paperweight_brace');
     sfx.tell({ pan: -0.6, ms: 400 });
@@ -403,6 +408,7 @@ export class CrowdScene extends Room {
     const L = EV.lukewarm;
     await this.lookAt({ x: L.x - 0.4, y: 1.2, z: L.z }, 1400);
     sfx.brakeHiss({ gain: 0.09, duration: 2.6 });
+    ui.caption(CC.steam, 2200);
     this.tweens.add({ targets: this, steamOn: 1, duration: 500 });
     await wait(this, 1100);
     show(this, F.lukewarm, 'f_lukewarm_held');
@@ -420,6 +426,7 @@ export class CrowdScene extends Room {
     await this.lookAt({ x: this.culvert.x, y: 1, z: this.culvert.z }, 900);
     await wait(this, 700);
     sfx.whoosh({ gain: 0.12, duration: 2.2 });
+    ui.caption(CC.water, 2400);
     sfx.lowImpact({ gain: 0.3, freq: 60 });
     this.tweens.add({ targets: this, waterOn: 1, duration: 500, ease: 'Quad.easeOut' });
     await ui.dialogue.play(C.others.dowser.slice(1));
@@ -429,8 +436,10 @@ export class CrowdScene extends Room {
     await this.lookAt({ x: H.x, y: 1.5, z: H.z + 0.4 }, 1400);
     this.hoard.shake = 1;
     sfx.bridgeGroan({ gain: 0.5, duration: 3 });
+    ui.caption(CC.hoarding, 1800);
     await wait(this, 1200);
     sfx.bell({ freq: 110, gain: 0.06, decay: 3, hall: 0.3, pan: -0.4 });
+    ui.caption(CC.hum, 2400);
     await new Promise((r) => this.tweens.add({ targets: this.hoard, shake: 0, duration: 2200, ease: 'Sine.easeOut', onComplete: r }));
     this.hoardPoly.points = this.hoardPts();
     this.hoardBand.points = this.hoardPts(1.2, 1.5);

@@ -6,6 +6,32 @@
 export const REQUEST = {
   title: { chapter: 'Chapter Three', sub: 'The Request' },
 
+  // Sound, for anyone who can't hear it. Shown with subtitles on.
+  cc: {
+    cup: '[ a cup, set down on a shoulder ]',
+    quake: '[ the ground, groaning ]',
+    sirens: '[ sirens ]',
+    post: '[ metal, falling ]',
+    steam: '[ steam, screaming ]',
+    water: '[ water, breaking through stone ]',
+    hoarding: '[ a hoarding, shaking ]',
+    hum: '[ someone humming, very low ]',
+    screens: '[ every screen, cutting out ]',
+    letter: '[ paper, sliding under the door ]',
+    door: '[ the door ]',
+    kettle: '[ the kettle, ticking as it cools ]',
+    officeDoor: '[ a stuck door, giving ]',
+    ringing: '[ ringing ]',
+    lights: '[ the lamps, going out one by one ]',
+    her: '[ footsteps that don\'t echo ]',
+    lintel: '[ the lintel, coming down ]',
+    backDoor: '[ the back door ]',
+    power: '[ the power, cut ]',
+    leaving: '[ the door, closing behind her ]',
+    car: '[ brakes; a car door ]',
+    broadcast: '[ every screen changes at once ]',
+  },
+
   // 3.1 — Vesper Plaza, the vigil, the minutes before the screens cut out.
   crowd: {
     place: 'Vesper Plaza · the seventh anniversary',

@@ -20,6 +20,7 @@ import { nextPart } from './parts.js';
 
 const PARAMS = new URLSearchParams(window.location.search);
 const R = REQUEST.relay;
+const CC = REQUEST.cc;
 const timed = (lines) => lines.map((l) => (l.auto ? l : { ...l, auto: Math.max(1700, l.text.length * 58 + 1200) }));
 
 // Where each of them is when the lights go (the ambush starts from here).
@@ -94,6 +95,7 @@ export class RelayScene extends Room {
   async arrive(id, to, lines, { pass = false } = {}) {
     const p = this.people[id];
     sfx.doorSlide({ gain: 0.14 });
+    ui.caption(CC.door, 1600);
     p.b.visible = true;
     p.x = OUT[0]; p.z = OUT[1];
     p.b.x = p.x; p.b.z = p.z;
@@ -142,6 +144,7 @@ export class RelayScene extends Room {
     walk(this, P.dowser, [END.dowser], 0.9);
     await ui.dialogue.play(timed(R.call.slice(0, 1)));
     sfx.ringback({ rings: 2 });
+    ui.caption(CC.ringing, 4600);
     await wait(this, 5200);
     await ui.dialogue.play(timed(R.call.slice(1)));
     await wait(this, 900);
@@ -186,6 +189,7 @@ export class RelayScene extends Room {
     for (const q of this.relay.kettle.polys) q.base = 0xb8d0e0;
     this.lightDirty = true;
     sfx.glassClink({ pitch: 0.4, gain: 0.08 });
+    ui.caption(CC.kettle, 2600);
     await ui.dialogue.play(timed(R.small.slice(0, 1)));
     walk(this, P.lukewarm, [[-2.0, 7.4], END.lukewarm], 0.9);
 
@@ -204,9 +208,11 @@ export class RelayScene extends Room {
     show(this, P.humdrum, 'f_humdrum_back');
     await ui.dialogue.play(timed(R.small.slice(2, 3)));
     sfx.bell({ freq: 110, gain: 0.05, decay: 1.6, hall: 0.3 });
+    ui.caption(CC.hum, 2000);
     await wait(this, 1500);
     this.officeDoor.visible = false;
     sfx.doorSlide({ gain: 0.1 });
+    ui.caption(CC.officeDoor, 2000);
     await wait(this, 800);
     walk(this, P.humdrum, [[-2.0, 5.9], END.humdrum], 0.9);
     this.moth.pinned = false;

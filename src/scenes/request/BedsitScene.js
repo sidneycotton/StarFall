@@ -14,6 +14,7 @@ import { nextPart } from './parts.js';
 // Room: x -1.8..1.8, z 0..4.2. Door in the near wall, window in the far one.
 
 const B = REQUEST.bedsit;
+const CC = REQUEST.cc;
 const W = 1.8;
 const D = 4.2;
 const H = 2.5;
@@ -153,6 +154,7 @@ export class BedsitScene extends Room {
     await this.until(() => !this.busy && !ui.dialogue.active);
     await wait(this, 1400);
     sfx.sheetPull();
+    ui.caption(CC.letter, 2800);
     this.letterPoly.visible = true;
     await wait(this, 600);
     ui.hint(B.letterHint, 5000);

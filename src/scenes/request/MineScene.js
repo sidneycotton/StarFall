@@ -15,6 +15,7 @@ import { nextPart } from './parts.js';
 // Two places in one world: the road at x≈60, the waiting room at the origin.
 
 const M = REQUEST.mine;
+const CC = REQUEST.cc;
 const ROAD = { x: 60, z: 0 };
 const TV = { x: -0.4, y: 1.45, z: 4.9 };
 // The row of chairs, facing the screen. Wallflower has the end one.
@@ -197,6 +198,7 @@ export class MineScene extends Room {
     this.fx.set({ fade: 1 });
     await wait(this, 800);
     sfx.brakeHiss({ gain: 0.06, duration: 1.6 });
+    ui.caption(CC.car, 2600);
     for (const q of this.headlamps) { q.base = 0xfff8e0; q.fill = 0xfff8e0; }
     this.lightDirty = true;
     this.tweens.add({ targets: this.carLight, power: 1.6, duration: 900, onUpdate: () => { this.lightDirty = true; } });
@@ -226,10 +228,11 @@ export class MineScene extends Room {
 
     // Every screen, the same thing.
     if (AUTOPLAY) this.lookAt({ x: TV.x, y: TV.y + 0.3, z: TV.z }, 1200);
-    ui.caption(M.crawl, 4200);
     sfx.glitch({ gain: 0.3 });
+    ui.caption(CC.broadcast, 2200);
     this.v.setBoardTexture(this.tv, 'mn_tv_px');
     this.setLight(this.tvLight, { color: 0xa890e0, power: 0.7 });
+    this.time.delayedCall(2300, () => ui.caption(M.crawl, 4000));
     sound.room.stop(0.6);
     await wait(this, 4400);
     await ui.dialogue.play(M.broadcast.slice(0, 1));
