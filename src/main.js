@@ -25,6 +25,7 @@ import { TramScene } from './scenes/TramScene.js';
 import { SpanScene } from './scenes/SpanScene.js';
 import { RequestScene } from './scenes/RequestScene.js';
 import { AmbushScene } from './scenes/request/AmbushScene.js';
+import { CrowdScene } from './scenes/request/CrowdScene.js';
 import { BedsitScene } from './scenes/request/BedsitScene.js';
 import { RelayScene } from './scenes/request/RelayScene.js';
 import { partStart } from './scenes/request/parts.js';
@@ -51,7 +52,7 @@ const game = new Phaser.Game({
   audio: { noAudio: true },
   input: { gamepad: false },
   pipeline: { CinematicPipeline },
-  scene: [BootScene, PenthouseScene, SeerCallScene, ChamberScene, TitleScene, VigilScene, TramScene, SpanScene, SkyScene, RequestScene, BedsitScene, RelayScene, AmbushScene],
+  scene: [BootScene, PenthouseScene, SeerCallScene, ChamberScene, TitleScene, VigilScene, TramScene, SpanScene, SkyScene, RequestScene, CrowdScene, BedsitScene, RelayScene, AmbushScene],
 });
 
 ui.init(game);

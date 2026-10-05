@@ -7,6 +7,7 @@ import { ui } from '../../ui/UI.js';
 export const REQUEST_PARTS = ['crowd', 'bedsit', 'relay', 'ambush', 'mine'];
 
 const OWN_SCENE = {
+  crowd: 'Crowd',
   bedsit: 'Bedsit',
   relay: 'Relay',
   ambush: 'Ambush',

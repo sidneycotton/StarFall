@@ -416,6 +416,11 @@ export function registerFive(scene) {
     paintTexture(scene, `f_crowd${i}`, W, H, (ctx, w, h) => person(ctx, w, h, c));
     paintTexture(scene, `f_crowd${i}_back`, W, H, (ctx, w, h) => person(ctx, w, h, { ...c, back: true }));
   });
+  // A girl of about seven, painted to the same scale as everyone else.
+  const kid = { coat: '#c8a040', coat2: '#d8b458', legs: '#3a3a5a', skin: '#e0b090', hair: '#4a2a18', style: 'braids', s: 0.62, broad: 0.9 };
+  paintTexture(scene, 'f_child', W, H, (ctx, w, h) => person(ctx, w, h, kid));
+  paintTexture(scene, 'f_child_back', W, H, (ctx, w, h) => person(ctx, w, h, { ...kid, back: true }));
+  paintTexture(scene, 'f_child_hurt', W, H, (ctx, w, h) => person(ctx, w, h, { ...kid, pose: 'hurt' }));
   paintTexture(scene, 'f_px', 420, 1060, (ctx, w, h) => parallaxNear(ctx, w, h));
   paintTexture(scene, 'f_px_back', 420, 1060, (ctx, w, h) => parallaxNear(ctx, w, h, { back: true }));
   paintTexture(scene, 'f_px_reach', 420, 1060, (ctx, w, h) => parallaxNear(ctx, w, h, { reach: true }));
