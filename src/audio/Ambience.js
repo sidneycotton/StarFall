@@ -524,3 +524,75 @@ export class VigilCrowd extends Layer {
     this.fadeTo(level, time);
   }
 }
+
+// Inside Tram 6: traction motor, wheels on rail, the carriage's own hum, and
+// the night outside when the doors are open. The scene drives speed.
+export class TramAmbience extends Layer {
+  start({ gain = 1, fadeIn = 2 } = {}) {
+    if (!A.ready || this.running) return this;
+    const out = this.begin(A.amb, gain, fadeIn);
+    // Carriage hum: a constant, slightly resonant room.
+    const room = this.track(A.noiseSource(A.brown));
+    const rf = this.track(A.filter('lowpass', 180, 1.2));
+    const rg = this.track(A.gain(0.05));
+    A.chain(room, rf, rg, out);
+    // Traction motor: a low buzz and a whine, both rising with speed.
+    this.motor = this.track(A.osc('sawtooth', 36));
+    const mf = this.track(A.filter('lowpass', 160, 1.4));
+    this.motorG = this.track(A.gain(0.004));
+    A.chain(this.motor, mf, this.motorG, out);
+    this.whine = this.track(A.osc('sine', 220));
+    this.whineG = this.track(A.gain(0.0001));
+    A.chain(this.whine, this.whineG, out);
+    // Wheels on rail: a rumbling band.
+    const roll = this.track(A.noiseSource(A.pink));
+    this.rollF = this.track(A.filter('bandpass', 240, 0.8));
+    this.rollG = this.track(A.gain(0.0001));
+    A.chain(roll, this.rollF, this.rollG, out);
+    // Outside: wind and the river, heard through the open doors.
+    const air = this.track(A.noiseSource(A.pink));
+    const af = this.track(A.filter('bandpass', 600, 0.5));
+    this.airG = this.track(A.gain(0.008));
+    A.chain(air, af, this.airG, out);
+    room.start(); this.motor.start(); this.whine.start(); roll.start(); air.start();
+    this.out = out;
+    return this;
+  }
+
+  // v in metres per second (0..~11).
+  setSpeed(v) {
+    if (!this.running) return;
+    const t = A.now;
+    const k = Math.min(1, v / 11);
+    this.motor.frequency.setTargetAtTime(36 + k * 34, t, 0.3);
+    this.motorG.gain.setTargetAtTime(0.004 + k * 0.03, t, 0.3);
+    this.whine.frequency.setTargetAtTime(220 + k * 520, t, 0.3);
+    this.whineG.gain.setTargetAtTime(0.0001 + k * 0.006, t, 0.4);
+    this.rollF.frequency.setTargetAtTime(160 + k * 300, t, 0.3);
+    this.rollG.gain.setTargetAtTime(0.0001 + k * 0.08, t, 0.3);
+  }
+
+  setOpen(open) {
+    if (!this.running) return;
+    this.airG.gain.setTargetAtTime(open ? 0.06 : 0.008, A.now, 0.5);
+  }
+
+  // Rail joint: a double knock, front bogie then back.
+  clack(gain = 1) {
+    if (!this.running) return;
+    const t = A.now;
+    [0, 0.11].forEach((d, i) => {
+      const n = A.noiseSource(A.noise, false);
+      const f = A.filter('bandpass', 900 - i * 200, 1.5);
+      const g = A.gain();
+      A.chain(n, f, g, this.out);
+      A.env(g.gain, t + d, 0.05 * gain, 0.002, 0.06);
+      n.start(t + d); n.stop(t + d + 0.1);
+      const o = A.osc('sine', 80);
+      const og = A.gain();
+      A.chain(o, og, this.out);
+      A.env(og.gain, t + d, 0.06 * gain, 0.002, 0.09);
+      o.start(t + d); o.stop(t + d + 0.12);
+    });
+  }
+}

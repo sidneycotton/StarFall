@@ -1,4 +1,4 @@
-import { RoomTone, Sirens, ConvergenceAlarm, PartyLoop, VisionDrone, HelmetBreath, CallTone, ArchiveHiss, BridgeAmbience, SkyWind, VigilCrowd } from './Ambience.js';
+import { RoomTone, Sirens, ConvergenceAlarm, PartyLoop, VisionDrone, HelmetBreath, CallTone, ArchiveHiss, BridgeAmbience, SkyWind, VigilCrowd, TramAmbience } from './Ambience.js';
 import { RunCue, ChamberPad, DuelCue } from './Music.js';
 import { audio } from './AudioEngine.js';
 
@@ -19,10 +19,11 @@ export const sound = {
   bridge: new BridgeAmbience(),
   skyWind: new SkyWind(),
   vigil: new VigilCrowd(),
+  tram: new TramAmbience(),
   duel: new DuelCue(),
 
   stopAll(fade = 0.5) {
-    ['room', 'sirens', 'alarm', 'party', 'vision', 'breath', 'callTone', 'hiss', 'bridge', 'skyWind', 'vigil'].forEach((k) => this[k].stop(fade));
+    ['room', 'sirens', 'alarm', 'party', 'vision', 'breath', 'callTone', 'hiss', 'bridge', 'skyWind', 'vigil', 'tram'].forEach((k) => this[k].stop(fade));
     this.run.stop(fade);
     this.duel.stop(fade);
     this.chamber.stop(fade);
@@ -40,6 +41,7 @@ export const sound = {
     this.bridge = new BridgeAmbience();
     this.skyWind = new SkyWind();
     this.vigil = new VigilCrowd();
+    this.tram = new TramAmbience();
     this.duel = new DuelCue();
     audio.setArchive(false, 0.05);
     audio.setHelmet(false, 0.05);

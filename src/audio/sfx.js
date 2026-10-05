@@ -641,3 +641,65 @@ export function lanternOut({ pan = 0 } = {}) {
 export function flyBy({ pan = 0, gain = 0.08 } = {}) {
   whoosh({ pan, gain, duration: 0.9 });
 }
+
+// A dispatch radio: a squelch, a burst of static, then the channel.
+export function radio({ open = true, gain = 0.06 } = {}) {
+  if (!ok()) return;
+  const t = A.now;
+  const dest = out(A.sfx, 0.2, 0.05);
+  const n = A.noiseSource(A.noise, false);
+  const f = A.filter('bandpass', 2200, 1.1);
+  const g = A.gain();
+  A.chain(n, f, g, dest);
+  A.env(g.gain, t, gain, 0.005, open ? 0.25 : 0.12, open ? 0.05 : 0);
+  n.start(t); n.stop(t + 0.5);
+  const o = A.osc('square', open ? 1450 : 1100);
+  const og = A.gain();
+  A.chain(o, A.filter('lowpass', 2400), og, dest);
+  A.env(og.gain, t, gain * 0.25, 0.004, 0.06);
+  o.start(t); o.stop(t + 0.12);
+}
+
+// The tram's foot gong: two strikes.
+export function tramGong({ gain = 0.1 } = {}) {
+  bell({ freq: 880, gain, decay: 1.6, ratio: 2.76, index: 1.2, hall: 0.1 });
+  bell({ freq: 880, when: 0.28, gain: gain * 0.8, decay: 2, ratio: 2.76, index: 1.2, hall: 0.1 });
+}
+
+// Ticket punch: a small steel snap.
+export function punch() {
+  if (!ok()) return;
+  const t = A.now;
+  const n = A.noiseSource(A.noise, false);
+  const g = A.gain();
+  A.chain(n, A.filter('highpass', 3000), g, out(A.sfx, 0.3, 0.05));
+  A.env(g.gain, t, 0.08, 0.001, 0.03);
+  n.start(t); n.stop(t + 0.06);
+}
+
+// Air brakes letting go, or biting.
+export function brakeHiss({ gain = 0.05, duration = 1.2 } = {}) {
+  if (!ok()) return;
+  const t = A.now;
+  const n = A.noiseSource(A.noise, false);
+  const f = A.filter('highpass', 2500);
+  const g = A.gain();
+  A.chain(n, f, g, out(A.sfx, 0, 0.1));
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(gain, t + 0.05);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+  n.start(t); n.stop(t + duration + 0.1);
+}
+
+// The world going quiet: a held high tone, the kind you hear in your own head.
+export function hush({ duration = 6, gain = 0.02 } = {}) {
+  if (!ok()) return;
+  const t = A.now;
+  const o = A.osc('sine', 6200);
+  const g = A.gain();
+  A.chain(o, g, out(A.voice, 0, 0));
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(gain, t + duration * 0.4);
+  g.gain.linearRampToValueAtTime(0.0001, t + duration);
+  o.start(t); o.stop(t + duration + 0.1);
+}

@@ -46,6 +46,8 @@ export const STAGES = [
   'boot', 'wake', 'explore', 'equip', 'call', 'aftermath', 'run', 'chamber', 'title', 'end',
   // Chapter Two — The Starfall Record.
   'vigil', 'record', 'duel', 'span', 'sky', 'vigilEnd', 'ch2end',
+  // Chapter Two rework prototype: the last tram.
+  'tram',
 ];
 
 // Stages that leave a checkpoint behind, and which chapter each belongs to.

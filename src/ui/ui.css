@@ -167,6 +167,9 @@ button:focus-visible { outline: 1px solid var(--umbral); outline-offset: 4px; }
 .dlg.aureate .dlg-speaker { color: var(--aureate); }
 .dlg.meridian .dlg-speaker { color: var(--meridian); }
 .dlg.other .dlg-speaker { color: #d9a6b4; }
+.dlg.mortal .dlg-speaker { color: #d8c4a4; }
+.dlg.radio .dlg-speaker { color: #a8bcc4; letter-spacing: 0.18em; }
+.dlg.radio .dlg-text { letter-spacing: 0.01em; color: rgba(222,230,234,0.92); }
 .dlg-next {
   position: absolute; left: 50%; bottom: calc(var(--u) * -3);
   width: 7px; height: 7px; margin-left: -3.5px;

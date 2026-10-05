@@ -18,4 +18,13 @@ export const SPEAKERS = {
   star: { name: 'Star', style: 'aureate star', sigil: '<svg viewBox="0 0 20 20"><path d="M10 1 L11.6 8.4 L19 10 L11.6 11.6 L10 19 L8.4 11.6 L1 10 L8.4 8.4 Z" fill="currentColor"/></svg>', voice: null },
   record: { name: 'The Record', style: 'meridian record', sigil: SIGILS.meridian, voice: null },
   crowd: { name: '', style: 'whisper crowd', sigil: null, voice: null },
+  // Tram 6. Mortal voices: no sigils.
+  ines: { name: 'Ines', style: 'mortal', sigil: null, voice: null },
+  inesThought: { name: '', style: 'whisper', sigil: null, voice: null },
+  dispatch: { name: 'Hollin Yard', style: 'mortal radio', sigil: null, voice: null },
+  teo: { name: 'Teo', style: 'mortal', sigil: null, voice: null },
+  mara: { name: 'Mara', style: 'mortal', sigil: null, voice: null },
+  nell: { name: 'Nell', style: 'mortal', sigil: null, voice: null },
+  sami: { name: 'Sami', style: 'mortal', sigil: null, voice: null },
+  aurelio: { name: 'Aurelio', style: 'mortal', sigil: null, voice: null },
 };
