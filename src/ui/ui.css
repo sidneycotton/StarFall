@@ -266,7 +266,9 @@ button:focus-visible { outline: 1px solid var(--umbral); outline-offset: 4px; }
   z-index: 9;
   padding-left: 0.3em;
 }
-.act.on { opacity: 1; pointer-events: auto; }
+.act.on { opacity: 1; }
+/* #ui > * switches pointer events off; the buttons sit directly under #ui, so they need the id to win. */
+#ui .act.on { pointer-events: auto; }
 
 /* ---------- Corner controls ---------- */
 .corner {
