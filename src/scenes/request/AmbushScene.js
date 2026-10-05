@@ -22,7 +22,7 @@ import { nextPart } from './parts.js';
 
 const PARAMS = new URLSearchParams(window.location.search);
 const A = REQUEST.ambush;
-const PX_H = 1.98;
+const PX_H = 2.06;
 const AVERT = 0.18;            // how far her head stays from Wallflower, always
 
 // Lines in here play over the action, so none of them waits for a button.
@@ -51,24 +51,24 @@ export class AmbushScene extends Room {
     this.hunting = false;
 
     // The four, where they were when the lights went.
-    const at = (key, x, z, h = 1.72) => ({ key, x, z, b: this.figure(key, { x, z, h }), hurt: 0 });
+    const at = (key, x, z, h = 1.75) => ({ key, x, z, b: this.figure(key, { x, z, h }), hurt: 0 });
     this.people = {
-      humdrum: at('sp_sleeper_a', 0.6, 5.5),
-      dowser: at('sp_sami_a', 2.8, 8.4),
-      paperweight: at('sp_nell_a', -3.4, 6.1, 1.62),
-      lukewarm: at('sp_mara_a', 3.9, 5.7, 1.66),
+      humdrum: at('f_humdrum', 0.6, 5.5),
+      dowser: at('f_dowser', 2.8, 8.4),
+      paperweight: at('f_paperweight', -3.4, 6.1),
+      lukewarm: at('f_lukewarm', 3.9, 5.7),
     };
 
     // Her: a board, a glow where she stands, a cold patch where she looks.
     const px = { x: RELAY.hatch.x, z: RELAY.hatch.z, y: -0.8, look: null, scan: 0, walk: null };
-    px.b = this.figure('sp_px', { x: px.x, z: px.z, h: PX_H, lit: false });
+    px.b = this.figure('f_px', { x: px.x, z: px.z, h: PX_H, lit: false });
     px.b.alpha = 0;
     px.w = this.still.watch({ id: 'parallax', x: px.x, z: px.z, yaw: Math.PI, fov: 1.5, range: 13, on: false });
     px.glow = this.light({ x: px.x, y: 1.2, z: px.z, power: 0, radius: 1.6, color: 0x8a6cff });
     px.gaze = this.light({ x: px.x, y: 0.3, z: px.z, power: 0, radius: 1.2, color: 0x9a6cff });
     this.px = px;
     // The other one. Out past the back door, for a moment.
-    this.echo = this.figure('sp_px', { x: RELAY.back.x + 0.4, z: RELAY.D + 3.2, h: PX_H, lit: false });
+    this.echo = this.figure('f_px_back', { x: RELAY.back.x + 0.4, z: RELAY.D + 3.2, h: PX_H, lit: false });
     this.echo.visible = false;
     this.boilerLight = this.light({ x: 4.4, y: 0.8, z: 5.7, power: 0.35, radius: 1.8, color: 0xff7a40 });
 
@@ -121,7 +121,7 @@ export class AmbushScene extends Room {
     }
     // Never quite at Wallflower.
     const off = wrap(want - this.bearing());
-    if (Math.abs(off) < AVERT) want = this.bearing() + (off >= 0 ? AVERT : -AVERT);
+    if (!px.meet && Math.abs(off) < AVERT) want = this.bearing() + (off >= 0 ? AVERT : -AVERT);
     px.w.turnToward(want, px.look === 'scan' ? 0.9 : 2.2, dt);
     px.w.x = px.x;
     px.w.z = px.z;
@@ -178,8 +178,15 @@ export class AmbushScene extends Room {
     this.seeing = false;
   }
 
+  // Swap a person's picture, keeping where they stand.
+  pose(p, key) {
+    this.v.setBoardTexture(p.b, key);
+  }
+
   hurt(p) {
     p.hurt++;
+    if (p === this.people.lukewarm) this.pose(p, 'f_lukewarm_hurt');
+    if (p === this.people.humdrum) this.pose(p, 'f_humdrum_hurt');
     sfx.lowImpact({ gain: 0.45, freq: 52 });
     sfx.cloth({ gain: 0.1, duration: 0.4 });
     this.fx.flash({ r: 0.5, g: 0.3, b: 1, peak: 0.12, release: 500 });
@@ -235,7 +242,7 @@ export class AmbushScene extends Room {
     await ui.dialogue.play(timed(A.humdrum.slice(0, 2)));
     sfx.lowImpact({ gain: 0.6, freq: 60 });
     sfx.cloth({ gain: 0.14 });
-    h.b.h *= 0.7;
+    this.pose(h, 'f_humdrum_hurt');
     await ui.dialogue.play(timed(A.humdrum.slice(2)));
     this.attend('scan');
     await wait(this, 2200);
@@ -246,6 +253,7 @@ export class AmbushScene extends Room {
     ui.dialogue.play(timed(A.dowser.slice(0, 1)));
     // He runs for the back door; she lets him.
     this.attend(d);
+    this.pose(d, 'f_dowser_run');
     await this.move(d, RELAY.back.x - 0.2, RELAY.D - 0.6, 2.2);
     ui.dialogue.play(timed(A.dowser.slice(1)));
     this.attend('scan');
@@ -283,7 +291,7 @@ export class AmbushScene extends Room {
     await this.move(p, RELAY.side.x + 0.4, RELAY.side.z, 2);
     sfx.lowImpact({ gain: 0.5, freq: 40 });
     sfx.collapse?.();
-    p.b.h *= 0.82;
+    this.pose(p, 'f_paperweight_brace');
     await ui.dialogue.play(timed(A.paperweight));
     this.attend('scan');
     this.px.scanBase = -Math.PI * 0.6;
@@ -292,7 +300,9 @@ export class AmbushScene extends Room {
     const pulled = await this.task(pull, 30000);
     narrative.setFlag('ch3PaperweightPulled', pulled);
     if (pulled) {
+      this.pose(p, 'f_paperweight_back');
       await this.move(p, -4.6, 6.9, 1.2);
+      this.pose(p, 'f_paperweight_sit');
       ui.dialogue.play(timed(A.pulled));
     } else {
       sfx.lowImpact({ gain: 0.7, freq: 36 });
@@ -307,6 +317,7 @@ export class AmbushScene extends Room {
     this.attend(l);
     await this.pxWalk(l.x - 0.7, l.z - 0.3);
     await this.move(l, RELAY.boiler.x0 - 0.25, 5.7, 1.4);
+    this.pose(l, 'f_lukewarm_held');
     this.setLight(this.boilerLight, { power: 0.9, radius: 2.4 });
     await ui.dialogue.play(timed(A.lukewarm));
     this.attend('scan');
@@ -354,7 +365,14 @@ export class AmbushScene extends Room {
       const d = Math.hypot(dx, dz);
       const go = Math.min(1.4, Math.max(0, d - 1.4));
       await this.walkTo(this.pos.x + (dx / d) * go, this.pos.z + (dz / d) * go, { speed: 1 });
+      // The only time all evening her head comes all the way round.
+      this.px.meet = true;
+      this.attend(this.pos);
+      await wait(this, 2200);
       await ui.dialogue.play(timed(A.step));
+      this.pose(this.people.lukewarm, 'f_lukewarm_hurt');
+      await wait(this, 1600);
+      this.px.meet = false;
     } else {
       this.setFree(true, false);
       await ui.dialogue.play(timed(A.stay));

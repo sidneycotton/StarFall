@@ -17,12 +17,13 @@ import { registerBridge } from '../art/bridge.js';
 import { registerVigil } from '../art/vigil.js';
 import { registerTram } from '../art/tram.js';
 import { registerSpan } from '../art/span.js';
+import { registerFive } from '../art/five.js';
 import { partStart, startPart } from './request/parts.js';
 
 // Paints every texture (there are no image files), waits for fonts, then
 // shows a quiet start prompt — audio needs a user gesture before sound can come first.
 
-const PAINTERS = [registerLights, registerCity, registerKit, registerBedroom, registerLounge, registerParallax, registerSanctum, registerSeers, registerVision, registerChamber, registerStar, registerBridge, registerVigil, registerTram, registerSpan];
+const PAINTERS = [registerLights, registerCity, registerKit, registerBedroom, registerLounge, registerParallax, registerSanctum, registerSeers, registerVision, registerChamber, registerStar, registerBridge, registerVigil, registerTram, registerSpan, registerFive];
 
 const START_SCENE = {
   wake: ['Penthouse', { start: 'wake' }],
