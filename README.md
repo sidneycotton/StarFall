@@ -14,6 +14,11 @@ npm run dev        # http://localhost:5173
 npm run build && npm run preview
 ```
 
+**Live build:** https://sidneycotton.github.io/StarFall/ — GitHub Pages serves this
+branch's root, so `index.html` + `assets/` at the root are the committed build.
+The dev entry is `app/index.html`. After changing the game, run `npm run publish`
+(build + copy to root) and commit the result to update the live page.
+
 Headphones recommended. Sound starts after the first click/tap (browser audio policy).
 
 ### Controls
@@ -52,6 +57,7 @@ sound on/mute, master and music volume, restart.
 
 ```
 src/
+  (app/index.html)        dev entry; root index.html + assets/ are the published build
   main.js                 game config, global pause/restart
   config.js               design space (1600×900), palettes, stage list
   core/                   EventBus, Settings, NarrativeState (save-ready story state), storage
