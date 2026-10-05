@@ -1,6 +1,6 @@
 # STARFALL
 
-Chapter One: *What Survives* · Chapter Two: *The Starfall Record*
+Chapter One: *What Survives* · Chapter Two: *The Starfall Record* · Chapter Three: *The Request* (in progress)
 
 A playable cinematic narrative game (two chapters so far, ≈25 minutes in all).
 Celestial neo-noir, illustrated science fantasy. Built with Phaser 3, Web Audio
@@ -42,7 +42,8 @@ quick-time events and combat), restart.
 ### Jumping to a section (for review)
 
 `?stage=wake|explore|call|aftermath|chamber|title` (Chapter One) or
-`?stage=vigil|tram|span|sky|vigilEnd|title2` (Chapter Two) starts at that section
+`?stage=vigil|tram|span|sky|vigilEnd|title2` (Chapter Two) or
+`?stage=crowd|bedsit|relay|ambush|mine|title3` (Chapter Three, in progress) starts at that section
 (add `&auto` to skip the start prompt, `&autoplay` to auto-advance dialogue).
 
 ## The sequence

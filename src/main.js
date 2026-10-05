@@ -23,6 +23,7 @@ import { VigilScene } from './scenes/VigilScene.js';
 import { SkyScene } from './scenes/SkyScene.js';
 import { TramScene } from './scenes/TramScene.js';
 import { SpanScene } from './scenes/SpanScene.js';
+import { RequestScene } from './scenes/RequestScene.js';
 
 // STARFALL. Entry point: game config, the DOM UI layer and the
 // few global behaviours (pause, restart) that sit above individual scenes.
@@ -46,7 +47,7 @@ const game = new Phaser.Game({
   audio: { noAudio: true },
   input: { gamepad: false },
   pipeline: { CinematicPipeline },
-  scene: [BootScene, PenthouseScene, SeerCallScene, ChamberScene, TitleScene, VigilScene, TramScene, SpanScene, SkyScene],
+  scene: [BootScene, PenthouseScene, SeerCallScene, ChamberScene, TitleScene, VigilScene, TramScene, SpanScene, SkyScene, RequestScene],
 });
 
 ui.init(game);
@@ -70,7 +71,8 @@ bus.on('game:restart', (opts = {}) => {
   ui.record.reset();
   sound.stopAll(0.3);
   narrative.beginNewRun();
-  if (chapter >= 2) narrative.beginChapterTwo();
+  if (chapter === 2) narrative.beginChapterTwo();
+  if (chapter >= 3) narrative.beginChapterThree();
   game.scene.getScenes(false).forEach((s) => {
     if (s.scene.key === 'Boot' || !s.scene.isActive()) return;
     s.tweens.timeScale = 1;
@@ -78,7 +80,11 @@ bus.on('game:restart', (opts = {}) => {
     s.scene.stop();
   });
   if (audio.ctx) audio.ctx.resume();
-  setTimeout(() => (chapter >= 2 ? game.scene.start('Vigil', {}) : game.scene.start('Penthouse', { start: 'wake' })), 400);
+  setTimeout(() => {
+    if (chapter >= 3) game.scene.start('Request', { part: 'crowd' });
+    else if (chapter === 2) game.scene.start('Vigil', {});
+    else game.scene.start('Penthouse', { start: 'wake' });
+  }, 400);
 });
 
 // Debug handle for automated playtesting (harmless in production).

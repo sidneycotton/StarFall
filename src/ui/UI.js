@@ -171,7 +171,9 @@ class UIRoot {
     this.titleChapter = n;
     this.title.querySelector('.chapter').textContent = chapter;
     this.title.querySelector('.sub').textContent = sub;
-    this.title.querySelector('.next').style.display = next ? '' : 'none';
+    const btn = this.title.querySelector('.next');
+    btn.style.display = next ? '' : 'none';
+    if (next) btn.textContent = typeof next === 'string' ? next : 'Chapter Two';
   }
 
   titleStep(step) {

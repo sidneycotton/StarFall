@@ -28,4 +28,14 @@ export const SPEAKERS = {
   sami: { name: 'Sami', style: 'mortal', sigil: null, voice: null },
   aurelio: { name: 'Aurelio', style: 'mortal', sigil: null, voice: null },
   sleeper: { name: '', style: 'mortal', sigil: null, voice: null },
+  // Chapter Three. The five, unregistered as far as anyone can tell.
+  wallflower: { name: 'Wallflower', style: 'mortal', sigil: null, voice: null },
+  wallflowerThought: { name: '', style: 'whisper', sigil: null, voice: null },
+  dowser: { name: 'Dowser', style: 'mortal', sigil: null, voice: null },
+  paperweight: { name: 'Paperweight', style: 'mortal', sigil: null, voice: null },
+  humdrum: { name: 'Humdrum', style: 'mortal', sigil: null, voice: null },
+  lukewarm: { name: 'Lukewarm', style: 'mortal', sigil: null, voice: null },
+  lodestar: { name: 'Lodestar', style: 'aureate', sigil: SIGILS.aureate, voice: null },
+  lodestarPhone: { name: 'Lodestar', style: 'mortal radio', sigil: null, voice: null },
+  crowdChild: { name: '', style: 'mortal', sigil: null, voice: null },
 };

@@ -74,11 +74,13 @@ class NarrativeStateStore {
       playthroughs: this.data.playthroughs,
       everExaminedFigurine: this.data.flags.starFigurineExamined || this.data.flags.everExaminedFigurine,
       ch2Seen: this.data.flags.ch2Seen || 0,
+      ch3Seen: this.data.flags.ch3Seen || 0,
     };
     this.data = structuredClone(FRESH);
     this.data.playthroughs = keep.playthroughs;
     this.data.flags.everExaminedFigurine = Boolean(keep.everExaminedFigurine);
     this.data.flags.ch2Seen = keep.ch2Seen;
+    this.data.flags.ch3Seen = keep.ch3Seen;
     this.persist();
   }
 
@@ -103,6 +105,21 @@ class NarrativeStateStore {
     this.persist();
   }
 
+  // Chapter Three: what Wallflower did at the relay station.
+  beginChapterThree() {
+    this.data.flags.ch3Completed = false;
+    this.data.flags.ch3Counted = false;
+    this.data.flags.ch3SteppedForward = false;
+    this.persist();
+  }
+
+  completeChapterThree() {
+    this.data.flags.ch3Completed = true;
+    this.data.flags.ch3Seen = (this.data.flags.ch3Seen || 0) + 1;
+    this.data.checkpoint = null;
+    this.persist();
+  }
+
   // The Record remembers which witness the player chose to believe.
   setRecord(key, value) {
     this.data.record[key] = value;
@@ -114,7 +131,10 @@ class NarrativeStateStore {
   }
 
   get chapter() {
-    return CHECKPOINTS[this.data.checkpoint] || (STAGES.indexOf(this.data.stage) >= STAGES.indexOf('vigil') ? 2 : 1);
+    if (CHECKPOINTS[this.data.checkpoint]) return CHECKPOINTS[this.data.checkpoint];
+    const i = STAGES.indexOf(this.data.stage);
+    if (i >= STAGES.indexOf('crowd')) return 3;
+    return i >= STAGES.indexOf('vigil') ? 2 : 1;
   }
 
   persist() {

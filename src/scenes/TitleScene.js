@@ -22,8 +22,11 @@ export class TitleScene extends Phaser.Scene {
     this.fx = new ScreenFX(this);
     this.fx.set({ grain: 0.05, aberration: 0.4, vignette: 0.6 });
     ui.resetTitle();
-    if (data.chapter === 2) {
-      ui.setTitle('Chapter Two', 'The Starfall Record', 2, { next: false });
+    if (data.chapter === 3) {
+      ui.setTitle('Chapter Three', 'The Request', 3, { next: false });
+      narrative.completeChapterThree();
+    } else if (data.chapter === 2) {
+      ui.setTitle('Chapter Two', 'The Starfall Record', 2, { next: 'Chapter Three' });
       narrative.completeChapterTwo();
     } else {
       ui.setTitle('Chapter One', 'What Survives', 1);

@@ -1,0 +1,256 @@
+// Chapter Three — The Request. Everything is seen by Wallflower, who is very
+// hard to see. Nobody in this chapter is looking at them, until somebody is.
+//
+// `auto` lines play over the action without stopping it.
+
+export const REQUEST = {
+  title: { chapter: 'Chapter Three', sub: 'The Request' },
+
+  // 3.1 — Vesper Plaza, the vigil, the minutes before the screens cut out.
+  crowd: {
+    place: 'Vesper Plaza · the seventh anniversary',
+    open: [
+      { id: 'rq_c1', speaker: 'wallflowerThought', text: 'Every year I stand at the back, and every year somebody puts a drink down on me.', auto: 4200 },
+      { id: 'rq_c2', speaker: 'crowd', text: '—oh, sorry, I didn\'t— sorry.', auto: 2200 },
+      { id: 'rq_c3', speaker: 'wallflowerThought', text: 'They never finish the apology. They forget, halfway, who it was for.', auto: 4000 },
+    ],
+    stillHint: 'Let go of everything — stand still',
+    stillHintTouch: 'Let go — stand still',
+    moveHint: (k) => `${k} — move`,
+    stillLearned: [
+      { id: 'rq_c4', speaker: 'wallflowerThought', text: 'There. The crowd goes round me like water round a post.', auto: 3600 },
+    ],
+    quake: [
+      { id: 'rq_q1', speaker: 'crowd', text: 'What was—', auto: 900 },
+      { id: 'rq_q2', speaker: 'crowd', text: 'Get back! Get BACK—', auto: 1400 },
+    ],
+    child: {
+      prompt: 'Pull her out',
+      lines: [
+        { id: 'rq_k1', speaker: 'wallflower', text: 'I\'ve got you. Hold on to my coat.', auto: 2400 },
+        { id: 'rq_k2', speaker: 'crowdChild', text: 'Where did you come from?', auto: 2400 },
+        { id: 'rq_k3', speaker: 'wallflowerThought', text: 'She looked right at me. Nobody does that.', auto: 3000 },
+      ],
+    },
+    // Four other people doing something impossible, in four places at once.
+    // Nobody else sees any of it.
+    others: {
+      paperweight: [
+        { id: 'rq_o1', speaker: 'wallflowerThought', text: 'A lamp post came down on a pram, and stopped. A woman was holding one hand under it. Not touching it. Under it.', auto: 5200 },
+      ],
+      lukewarm: [
+        { id: 'rq_o2', speaker: 'wallflowerThought', text: 'The steam main burst and a woman put her hand flat on it. The steam came out cold.', auto: 4600 },
+      ],
+      dowser: [
+        { id: 'rq_o3', speaker: 'dowser', text: 'Not that way — the water\'s coming up that way!', auto: 2600 },
+        { id: 'rq_o4', speaker: 'wallflowerThought', text: 'Nothing was coming up. Then the culvert went, exactly where he\'d pointed.', auto: 4200 },
+      ],
+      humdrum: [
+        { id: 'rq_o5', speaker: 'wallflowerThought', text: 'A man had his ear against the hoarding, humming. It stopped shaking. Then it stopped humming back.', auto: 4800 },
+      ],
+    },
+    after: [
+      { id: 'rq_a1', speaker: 'wallflowerThought', text: 'Nobody thanked any of them. None of them saw each other.', auto: 3800 },
+      { id: 'rq_a2', speaker: 'wallflowerThought', text: 'I saw all four.', auto: 2600 },
+    ],
+    screen: 'ASTRONOMICAL EVENT UNDER INVESTIGATION',
+  },
+
+  // 3.2 — The bedsit, the next morning.
+  bedsit: {
+    place: 'Cinder Street · the next morning',
+    open: [
+      { id: 'rq_b1', speaker: 'wallflowerThought', text: 'Four hours\' sleep. The building was still ticking from the quake.', auto: 3600 },
+    ],
+    items: {
+      card: {
+        label: 'Registration card',
+        lines: [
+          { id: 'rq_i1', speaker: 'wallflowerThought', text: 'REG —·————. They never finished issuing the number. The clerk kept forgetting I was at the counter.' },
+        ],
+      },
+      rejection: {
+        label: 'Letter',
+        lines: [
+          { id: 'rq_i2', speaker: 'wallflowerThought', text: '"We regret that the Guild was unable to observe the applicant\'s ability during assessment."' },
+          { id: 'rq_i3', speaker: 'wallflowerThought', text: 'That was the ability.' },
+        ],
+      },
+      phone: {
+        label: 'Phone',
+        lines: [
+          { id: 'rq_i4', speaker: 'wallflowerThought', text: 'No missed calls. There never are. I check anyway.' },
+        ],
+      },
+      mirror: {
+        label: 'Mirror',
+        lines: [
+          { id: 'rq_i5', speaker: 'wallflowerThought', text: 'I don\'t look for long. If I stand still in front of it, it gets hard to find me.' },
+        ],
+      },
+      window: {
+        label: 'Window',
+        lines: [
+          { id: 'rq_i6', speaker: 'wallflowerThought', text: 'Every screen on the street is showing the sky from last night. Nobody can say what it was.' },
+        ],
+      },
+    },
+    letterHint: 'Something under the door',
+    letter: {
+      label: 'Letter',
+      text: [
+        'Wallflower —',
+        'I saw what you did in the plaza last night. I don\'t think anyone else did.',
+        'I need help that the Guild won\'t give me. Tonight, the old Aureate relay station on the Sere road. Come alone. There will be others.',
+        '— Lodestar',
+      ],
+      after: [
+        { id: 'rq_l1', speaker: 'wallflowerThought', text: 'Somebody wrote to Wallflower. Nobody has ever written to Wallflower.', auto: 3600 },
+        { id: 'rq_l2', speaker: 'wallflowerThought', text: 'It was under my door. Nobody knows where I live.', auto: 3600 },
+      ],
+    },
+  },
+
+  // 3.3 — The relay station on the Sere road, at dusk.
+  relay: {
+    place: 'Aureate Relay 9 · the Sere road · dusk',
+    open: [
+      { id: 'rq_r1', speaker: 'wallflowerThought', text: 'First one here. I stood by the door, so I\'d see who came.', auto: 3600 },
+    ],
+    arrivals: [
+      [
+        { id: 'rq_r2', speaker: 'dowser', text: 'Hello? …Lodestar?', auto: 2000 },
+        { id: 'rq_r3', speaker: 'dowser', text: 'Place smells of dry wells.', auto: 2400 },
+      ],
+      [
+        { id: 'rq_r4', speaker: 'paperweight', text: 'Are you Lodestar? You\'re not Lodestar.', auto: 2400 },
+        { id: 'rq_r5', speaker: 'dowser', text: 'Got one of these?', auto: 1800 },
+        { id: 'rq_r6', speaker: 'paperweight', text: 'Same handwriting. Same everything.', auto: 2400 },
+      ],
+      [
+        { id: 'rq_r7', speaker: 'humdrum', text: 'Evening. Is this the— is this it?', auto: 2400 },
+        { id: 'rq_r8', speaker: 'lukewarm', text: 'If it isn\'t, I\'m going home, I\'ve a shift at six.', auto: 2800 },
+      ],
+    ],
+    introductions: [
+      { id: 'rq_n1', speaker: 'dowser', text: 'Dowser. Plumbing co-op, Ward Eleven.' },
+      { id: 'rq_n2', speaker: 'paperweight', text: 'Paperweight. Parties, mostly.' },
+      { id: 'rq_n3', speaker: 'humdrum', text: 'Humdrum. I do glasses.' },
+      { id: 'rq_n4', speaker: 'lukewarm', text: 'Lukewarm. Don\'t.' },
+      { id: 'rq_n5', speaker: 'humdrum', text: 'So that\'s the four of us.' },
+    ],
+    // Wallflower is standing by the door. They have to move to be counted.
+    countHint: 'Step forward',
+    counted: [
+      { id: 'rq_n6', speaker: 'wallflower', text: 'Five.' },
+      { id: 'rq_n7', speaker: 'paperweight', text: 'Oh my— how long have you been there?', pause: 200 },
+      { id: 'rq_n8', speaker: 'wallflower', text: 'First.' },
+      { id: 'rq_n9', speaker: 'lukewarm', text: '…Right. Five.' },
+    ],
+    notCounted: [
+      { id: 'rq_n10', speaker: 'wallflowerThought', text: 'I left it too long. It\'s always too long, and then it\'s too late to say.', auto: 3800 },
+    ],
+    // What they do with their hands while they wait.
+    small: [
+      { id: 'rq_s1', speaker: 'lukewarm', text: 'Kettle\'s stone cold. Oh. No, that was me. Sorry.', auto: 3000 },
+      { id: 'rq_s2', speaker: 'paperweight', text: 'There. He\'ll stay put a minute.', auto: 2400 },
+      { id: 'rq_s3', speaker: 'humdrum', text: 'Door\'s stuck. Hang on.', auto: 1800 },
+      { id: 'rq_s4', speaker: 'dowser', text: 'Why do I keep looking at the desert?', auto: 2600 },
+    ],
+    call: [
+      { id: 'rq_p1', speaker: 'dowser', text: 'She\'s on the registry. I\'ll ring her.', auto: 2400 },
+      { id: 'rq_p2', speaker: 'lodestarPhone', text: '…Hello? Who is this? How did you get this number?', pause: 1600 },
+      { id: 'rq_p3', speaker: 'dowser', text: 'We got your letter. The relay station.' },
+      { id: 'rq_p4', speaker: 'lodestarPhone', text: 'What letter? I haven\'t sent anyone a letter.' },
+      { id: 'rq_p5', speaker: 'lodestarPhone', text: 'Where did you say you were?' },
+    ],
+  },
+
+  // 3.4 — The ambush. Survival, not victory.
+  ambush: {
+    lights: [
+      { id: 'rq_x1', speaker: 'wallflowerThought', text: 'The lights went out one at a time, from the far end. Not a fault. Somebody walking.', auto: 4400 },
+    ],
+    arrive: [
+      { id: 'rq_x2', speaker: 'parallax', text: 'Five letters. Five of you. Nobody ever believes a letter any more.', voiceGain: 0.07 },
+      { id: 'rq_x3', speaker: 'lukewarm', text: 'Oh no. No, no—', auto: 1400 },
+      { id: 'rq_x4', speaker: 'parallax', text: 'Sit down. All of you. This won\'t take long, and then it will.', voiceGain: 0.07 },
+    ],
+    // The four try their powers, at a scale they have never tried them at.
+    humdrum: [
+      { id: 'rq_h1', speaker: 'humdrum', text: '—', auto: 600 },
+      { id: 'rq_h2', speaker: 'parallax', text: 'You hum with your hands. Everybody thinks it\'s the throat.', voiceGain: 0.07 },
+      { id: 'rq_h3', speaker: 'parallax', text: 'Not any more.', voiceGain: 0.07 },
+    ],
+    dowser: [
+      { id: 'rq_d1', speaker: 'dowser', text: 'Back door— everyone, the back—', auto: 1600 },
+      { id: 'rq_d2', speaker: 'parallax', text: 'You always run downhill. Water does.', voiceGain: 0.07 },
+    ],
+    paperweight: [
+      { id: 'rq_w1', speaker: 'paperweight', text: 'Stay— stay THERE—', auto: 1600 },
+      { id: 'rq_w2', speaker: 'parallax', text: 'A minute. You can hold anything for a minute. Then what?', voiceGain: 0.07 },
+    ],
+    lukewarm: [
+      { id: 'rq_u1', speaker: 'parallax', text: 'Room temperature. Show me how much room.', voiceGain: 0.07 },
+      { id: 'rq_u2', speaker: 'lukewarm', text: 'Let go— let GO of me—', auto: 1600 },
+    ],
+    // Wallflower moves only when the helmet is turned away.
+    stillHint: 'Stand still',
+    moveHint: 'Move while she looks away',
+    seen: [
+      { id: 'rq_e1', speaker: 'parallax', text: '…', voiceGain: 0.05, auto: 1400 },
+      { id: 'rq_e2', speaker: 'wallflowerThought', text: 'She turned to the air where I\'d been. Then back, to whoever was nearest.', auto: 3800 },
+    ],
+    tasks: {
+      power: { label: 'Cut the power' },
+      bar: { label: 'Kick the bar loose' },
+      drag: { label: 'Pull her out of the doorway' },
+    },
+    // The one choice.
+    choose: (stay, step) => `${stay} — stay still · ${step} — step forward`,
+    chooseTouch: 'Stay still · or step forward',
+    stay: [
+      { id: 'rq_y1', speaker: 'wallflowerThought', text: 'I didn\'t move. I didn\'t breathe.', auto: 2600 },
+      { id: 'rq_y2', speaker: 'lukewarm', text: '—', auto: 1600 },
+      { id: 'rq_y3', speaker: 'parallax', text: 'Four.', voiceGain: 0.07 },
+    ],
+    step: [
+      { id: 'rq_z1', speaker: 'wallflower', text: 'Put her down.' },
+      { id: 'rq_z2', speaker: 'parallax', text: '…', voiceGain: 0.05, pause: 1400 },
+      { id: 'rq_z3', speaker: 'parallax', text: 'Five.', voiceGain: 0.07, pause: 900 },
+    ],
+    leave: [
+      { id: 'rq_v1', speaker: 'parallax', text: 'Go home. Sleep if you can. I\'ll be in touch.', voiceGain: 0.07 },
+      { id: 'rq_v2', speaker: 'wallflowerThought', text: 'She stepped over the broken stair without looking down.', auto: 3400 },
+    ],
+  },
+
+  // 3.5 — The hospital. Mine.
+  mine: {
+    place: 'Vesper General · 03:10',
+    lodestar: [
+      { id: 'rq_m1', speaker: 'lodestar', text: 'I came as fast as— oh, God. Oh, your hand.', auto: 2600 },
+      { id: 'rq_m2', speaker: 'lodestar', text: 'Get in the car. All of you. No, don\'t argue, get in.', auto: 3000 },
+      { id: 'rq_m3', speaker: 'wallflowerThought', text: 'She held the door for five. She didn\'t count. She just waited until it felt right.', auto: 4200 },
+    ],
+    waiting: [
+      { id: 'rq_g1', speaker: 'paperweight', text: 'Why us? We\'re nobody. We\'re a party trick and a plumber.', auto: 3200 },
+      { id: 'rq_g2', speaker: 'dowser', text: 'Plumbing co-op.', auto: 1800 },
+    ],
+    crawl: 'Parallax seen for the first time in seven years · on the anniversary of the Starfall',
+    broadcast: [
+      { id: 'rq_bc1', speaker: 'parallax', text: 'Vesper. You remember me.', voiceGain: 0.08 },
+      { id: 'rq_bc2', speaker: 'parallax', text: 'These five are mine.', voiceGain: 0.08, pause: 800 },
+    ],
+    fifthBlank: 'REG —·————',
+    fifthSeen: 'RELAY 9 · CAM 2 · 23:58',
+    close: [
+      { id: 'rq_f1', speaker: 'humdrum', text: 'Five? There\'s four of us.', auto: 2400 },
+      { id: 'rq_f2', speaker: 'wallflowerThought', text: 'I was in the chair next to him.', auto: 3000 },
+    ],
+    closeSeen: [
+      { id: 'rq_f3', speaker: 'lukewarm', text: 'That\'s you. On the telly. That\'s you.', auto: 2600 },
+      { id: 'rq_f4', speaker: 'wallflowerThought', text: 'The first time anyone ever put my face on a screen.', auto: 3400 },
+    ],
+  },
+};

@@ -40,14 +40,22 @@ const START_SCENE = {
   // Saves from before the Record and the duel were retired.
   record: ['Tram', {}],
   duel: ['Tram', {}],
+  crowd: ['Request', { part: 'crowd' }],
+  bedsit: ['Request', { part: 'bedsit' }],
+  relay: ['Request', { part: 'relay' }],
+  ambush: ['Request', { part: 'ambush' }],
+  mine: ['Request', { part: 'mine' }],
+  title3: ['Title', { chapter: 3 }],
 };
 
 const CHAPTER_TWO = ['vigil', 'tram', 'span', 'sky', 'vigilEnd', 'title2', 'record', 'duel'];
+const CHAPTER_THREE = ['crowd', 'bedsit', 'relay', 'ambush', 'mine', 'title3'];
 
 const CHECKPOINT_LABEL = {
   call: 'The Call', run: 'After', chamber: 'The Chamber',
   vigil: 'The Vigil', tram: 'Tram 6', span: 'The Centre Span', sky: 'The West Tower',
   record: 'Tram 6', duel: 'Tram 6',
+  crowd: 'The Crowd', bedsit: 'The Letter', relay: 'Relay 9', ambush: 'Relay 9', mine: 'Vesper General',
 };
 
 export class BootScene extends Phaser.Scene {
@@ -83,6 +91,7 @@ export class BootScene extends Phaser.Scene {
         audio.unlock();
         narrative.beginNewRun();
         if (CHAPTER_TWO.includes(debugStage)) narrative.beginChapterTwo();
+        if (CHAPTER_THREE.includes(debugStage)) narrative.beginChapterThree();
         const [key, data] = START_SCENE[debugStage];
         this.scene.start(key, data);
       };
@@ -93,12 +102,17 @@ export class BootScene extends Phaser.Scene {
 
     const cp = narrative.data.checkpoint;
     const flags = narrative.data.flags;
-    const done = CHAPTER_TWO.includes(cp) ? flags.ch2Completed : flags.completed;
+    const done = CHAPTER_THREE.includes(cp) ? flags.ch3Completed
+      : CHAPTER_TWO.includes(cp) ? flags.ch2Completed : flags.completed;
     const canContinue = Boolean(cp && cp !== 'wake' && CHECKPOINT_LABEL[cp] && !done);
     const chapters = [
       { label: 'Chapter One', go: () => begin(() => this.scene.start('Penthouse', { start: 'wake' }), true) },
       { label: 'Chapter Two', go: () => begin(() => { narrative.beginChapterTwo(); this.scene.start('Vigil', {}); }, true) },
     ];
+    // Chapter Three opens once Chapter Two has been seen through.
+    if (flags.ch2Seen || flags.ch3Seen) {
+      chapters.push({ label: 'Chapter Three', go: () => begin(() => { narrative.beginChapterThree(); this.scene.start('Request', { part: 'crowd' }); }, true) });
+    }
     const begin = async (fn, fresh) => {
       await audio.unlock();
       if (fresh) narrative.beginNewRun();

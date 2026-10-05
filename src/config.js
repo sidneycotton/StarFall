@@ -47,12 +47,16 @@ export const STAGES = [
   // Chapter Two — The Starfall Record: the vigil, the last tram, the span,
   // the sky over it. ('record' and 'duel' belong to retired scenes.)
   'vigil', 'record', 'duel', 'tram', 'span', 'sky', 'vigilEnd', 'ch2end',
+  // Chapter Three — The Request: the crowd, the letter, the relay station,
+  // the ambush, the broadcast.
+  'crowd', 'bedsit', 'relay', 'ambush', 'mine', 'ch3end',
 ];
 
 // Stages that leave a checkpoint behind, and which chapter each belongs to.
 export const CHECKPOINTS = {
   wake: 1, call: 1, run: 1, chamber: 1,
   vigil: 2, tram: 2, span: 2, sky: 2,
+  crowd: 3, bedsit: 3, relay: 3, ambush: 3, mine: 3,
 };
 
 export const IS_TOUCH = typeof window !== 'undefined'
