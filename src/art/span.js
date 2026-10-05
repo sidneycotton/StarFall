@@ -72,7 +72,25 @@ function registerPeople(scene) {
     paintTexture(scene, `${key}_a`, W, H, (ctx, w, h) => standing(ctx, w, h, { ...o, phase: 1 }));
     paintTexture(scene, `${key}_b`, W, H, (ctx, w, h) => standing(ctx, w, h, { ...o, phase: -1 }));
   };
-  two('sp_mara', { coat: '#3a3638', skin: '#c08a6a', hair: '#2a1a16', hairStyle: 'bun', legs: '#3e6a68', long: 60 });
+  // Mara: scrubs under the long coat, the lanyard, the bun coming down after a double shift.
+  two('sp_mara', {
+    coat: '#3a3638', skin: '#c08a6a', hair: '#2a1a16', hairStyle: 'bun', legs: '#3e6a68', long: 60,
+    torso: (c) => {
+      poly(c, [[-30, -206], [-6, -206], [-2, -40], [-34, -40]], '#4e8480');
+      blob(c, [[-30, -206], [-18, -160], [-6, -206]]);
+      c.fillStyle = '#3a6a66'; c.fill();
+      line(c, -26, -204, -20, -128, '#c8c0a0', 2);
+      line(c, -10, -204, -20, -128, '#c8c0a0', 2);
+      roundRect(c, -28, -130, 16, 20, 2, '#e8e4dc');
+    },
+    front: (c, hx, hy) => {
+      ellipse(c, hx + 34, hy - 26, 22, 19, '#2a1a16');
+      c.fillStyle = '#2a1a16';
+      blob(c, [[hx + 24, hy - 14], [hx + 40, hy - 12], [hx + 34, hy + 46], [hx + 22, hy + 40]]);
+      c.fill();
+      line(c, hx - 18, hy - 30, hx - 26, hy + 14, '#2a1a16', 3);
+    },
+  });
   two('sp_nell', { coat: '#6a2a34', skin: '#d6a48a', hair: '#6a3a22', hairStyle: 'long', legs: '#22202a', long: 40 });
   two('sp_sami', { coat: '#2a3446', skin: '#8a5a44', hair: '#141012', legs: '#2a2a30' });
   two('sp_sleeper', {

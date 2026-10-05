@@ -479,12 +479,12 @@ export class SpanScene extends TramScene {
     }
   }
 
-  sitAurelio(b) {
+  sitAurelio(b, at = [5.6, -74]) {
     if (b.sat) return;
     b.sat = true;
     this.v.setBoardTexture(b, 'sp_aurelio_sit');
     b.h = 1.6;
-    b.x = 5.6; b.z = -74;
+    if (at) { b.x = at[0]; b.z = at[1]; }
     b.img.setFlipX(false);
     this.riders.push({ b, y0: ROAD });
     this.movers = this.movers.filter((m) => m.b !== b);
@@ -882,8 +882,14 @@ export class SpanScene extends TramScene {
   // --- west ---------------------------------------------------------------------------
   async runWest() {
     // Aurelio is on his bollard, whether or not he walked all the way.
+    // Aurelio sits down wherever he has got to. He was never going to make it.
     const au = this.people.aurelio;
-    if (au.visible) { this.toOutside(au); this.sitAurelio(au); }
+    if (au.visible) {
+      if (au.x < W + 0.15) au.x = 5.0;
+      this.toOutside(au);
+      this.sitAurelio(au, au.sat ? null : [5.0, au.z]);
+    }
+    const auZ = au.visible ? au.z : -64;
     this.phase = 'run';
     this.free = true;
     await this.turnTo(Math.PI, 0, 900);
@@ -893,8 +899,8 @@ export class SpanScene extends TramScene {
     ui.touch.setMovement(true);
     this.events.on('update', this.runStep, this);
     this.runCues = [
-      { z: -22, fn: () => this.runDuck() },
-      { z: -64, fn: () => ui.dialogue.play(SPAN.aurelio) },
+      { z: Math.min(-22, auZ - 14), fn: () => this.runDuck() },
+      { z: auZ + 4, fn: () => ui.dialogue.play(SPAN.aurelio) },
       { z: -140, fn: () => this.startCollapse() },
     ];
     await new Promise((resolve) => { this.onSafe = resolve; });

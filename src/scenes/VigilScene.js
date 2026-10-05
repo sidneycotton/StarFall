@@ -21,7 +21,7 @@ import { SPAN_RECORD } from '../data/span.js';
 
 const ADD = Phaser.BlendModes.ADD;
 const GROUND = 760;
-const SCREEN = { x: 2180, y: 300, w: 900, h: 520 };
+const SCREEN = { x: 1980, y: 300, w: 900, h: 520 };
 
 export class VigilScene extends Phaser.Scene {
   constructor() {
@@ -210,7 +210,9 @@ export class VigilScene extends Phaser.Scene {
     this.screenGlow.setAlpha(0.28);
     // The names, in four columns, rising slowly.
     this.screenBody.removeAll(true);
-    const names = theNames(311);
+    // 311, and one of them is someone you met. Nobody from the tower is on it.
+    const names = theNames(360).filter((n) => !/^(Ines|Mara|Teo) /.test(n)).slice(0, 310);
+    names.splice(187, 0, 'Aurelio Orsini');
     const cols = 4;
     const per = Math.ceil(names.length / cols);
     const head = this.add.text(0, -200, '311', { fontFamily: 'Cormorant Garamond', fontSize: '44px', color: '#e8dcc0' }).setOrigin(0.5);
