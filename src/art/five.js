@@ -405,6 +405,7 @@ export function registerFive(scene) {
     paintTexture(scene, `f_${id}`, W, H, (ctx, w, h) => person(ctx, w, h, o));
     paintTexture(scene, `f_${id}_back`, W, H, (ctx, w, h) => person(ctx, w, h, { ...o, back: true, over: undefined }));
     paintTexture(scene, `f_${id}_sit`, W, H, (ctx, w, h) => person(ctx, w, h, { ...o, pose: 'sit', over: undefined }));
+    paintTexture(scene, `f_${id}_sitback`, W, H, (ctx, w, h) => person(ctx, w, h, { ...o, pose: 'sit', back: true, over: undefined }));
   }
   const L = LOOKS;
   paintTexture(scene, 'f_humdrum_hurt', W, H, (ctx, w, h) => person(ctx, w, h, { ...L.humdrum, pose: 'hurt' }));
