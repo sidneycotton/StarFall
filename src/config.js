@@ -44,16 +44,15 @@ export const PALETTE = {
 // Narrative stages, in order. Used for checkpoints and debug jumps (?stage=run).
 export const STAGES = [
   'boot', 'wake', 'explore', 'equip', 'call', 'aftermath', 'run', 'chamber', 'title', 'end',
-  // Chapter Two — The Starfall Record.
-  'vigil', 'record', 'duel', 'span', 'sky', 'vigilEnd', 'ch2end',
-  // Chapter Two rework prototype: the last tram.
-  'tram',
+  // Chapter Two — The Starfall Record: the vigil, the last tram, the span,
+  // the sky over it. ('record' and 'duel' belong to retired scenes.)
+  'vigil', 'record', 'duel', 'tram', 'span', 'sky', 'vigilEnd', 'ch2end',
 ];
 
 // Stages that leave a checkpoint behind, and which chapter each belongs to.
 export const CHECKPOINTS = {
   wake: 1, call: 1, run: 1, chamber: 1,
-  vigil: 2, record: 2, duel: 2, sky: 2, tram: 2, span: 2,
+  vigil: 2, tram: 2, span: 2, sky: 2,
 };
 
 export const IS_TOUCH = typeof window !== 'undefined'

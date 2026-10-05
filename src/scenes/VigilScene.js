@@ -180,7 +180,8 @@ export class VigilScene extends Phaser.Scene {
   // Before the names: what the people from Tram 6 said, years on.
   async witnesses() {
     const R = SPAN_RECORD;
-    const quotes = [narrative.record('sleeper') === 'woke' ? R.sleeperWoke : R.sleeperLeft, R.aurelio, R.teo, R.nurse, R.engineer, R.mirror];
+    const quotes = [narrative.record('sleeper') === 'woke' ? R.sleeperWoke : R.sleeperLeft, R.aurelio, R.teo, R.nurse, R.engineer, R.mirror,
+      narrative.record('skyLook') === 'covered' ? R.skyCovered : R.skyLooked, R.cape];
     for (const q of quotes) {
       const text = this.add.text(0, -14, `\u201c${q.text}\u201d`, {
         fontFamily: 'Cormorant Garamond', fontSize: '30px', color: '#e8dcc0', align: 'center', lineSpacing: 6,

@@ -17,6 +17,7 @@ import { PlayerController } from '../entities/PlayerController.js';
 import { addPainted, rng } from '../art/paint.js';
 import { RECORD } from '../data/record.js';
 
+// Retired: no longer registered in main.js; Chapter Two now goes Tram → Span → Sky.
 // The Starfall Record: the Lantern Bridge, reconstructed from public footage.
 // You play Star — three rescues as the span fails, then Parallax. Twice the
 // sources disagree and the player decides which account the Record follows.

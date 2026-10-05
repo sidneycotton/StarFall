@@ -42,7 +42,7 @@ quick-time events and combat), restart.
 ### Jumping to a section (for review)
 
 `?stage=wake|explore|call|aftermath|chamber|title` (Chapter One) or
-`?stage=vigil|record|duel|sky|vigilEnd|title2` (Chapter Two) starts at that section
+`?stage=vigil|tram|span|sky|vigilEnd|title2` (Chapter Two) starts at that section
 (add `&auto` to skip the start prompt, `&autoplay` to auto-advance dialogue).
 
 ## The sequence
@@ -60,15 +60,13 @@ quick-time events and combat), restart.
 
 ### Chapter Two — The Starfall Record
 
-Seven years later. The city gathers in Vesper Plaza for the anniversary, and the
-Civic Network plays the Record: a reconstruction of the night on the Lantern Bridge,
-assembled from 1,412 public sources. You play it — as Star.
+Seven years later. The city gathers in Vesper Plaza for the anniversary, where the
+Civic Network reads out what 1,412 witnesses saw that night. One of them drove the last tram.
 
 1. **The vigil** — walk through the crowd beneath her statue.
-2. **The Lantern Bridge** — three rescues as the bridge fails (hold, timed and mash prompts).
-3. **Parallax** — a duel: read the visor's flare, dodge, strike when he's open.
-   Where witnesses disagree, the Record asks which account it should follow.
-4. **Above the cloud** — what the helicopter could not follow.
+2. **Tram 6** — Ines's last run across the Lantern Bridge: tickets, passengers, the stop at Midspan.
+3. **The span** — two lights overhead, and the bridge giving way beneath them.
+4. **The West Tower** — 23:44, seen from below. One choice: keep looking, or cover Teo's eyes.
 5. **The names.**
 
 ## Architecture
@@ -96,7 +94,8 @@ src/
                           Panels (settings, history), prompts, captions, HUD, title,
                           RecordOverlay (timecode, sources, witness notes, choices)
   scenes/                 Boot, Penthouse (+ layout / world / lighting), SeerCall (+ Feed),
-                          Chamber, Title, Vigil, Record (the bridge), Sky
+                          Chamber, Title, Vigil, Tram, Span (the bridge), Sky (the West Tower);
+                          Record, Overhead (retired, unregistered)
   data/                   script, speakers, heroes, record
 ```
 

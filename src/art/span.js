@@ -1,4 +1,4 @@
-import { paintTexture, lin, rad, rgba, glow, poly, ellipse, blob, roundRect, line } from './paint.js';
+import { paintTexture, rng, lin, rad, rgba, glow, poly, ellipse, blob, roundRect, line } from './paint.js';
 import { head, shadeHex } from './tram.js';
 
 // The centre span after the tram stops: the same passengers on their feet,
@@ -308,8 +308,31 @@ function registerHands(scene) {
   });
 }
 
+// The cloud they went into, seen from underneath. Painted pale so a tint
+// can light it from inside; its belly is the heavy part.
+function registerCloud(scene) {
+  [3, 11, 29].forEach((seed, n) => {
+    paintTexture(scene, `sp_cloud${n}`, 640, 360, (ctx, w, h) => {
+      const r = rng(seed);
+      for (let i = 0; i < 34; i++) {
+        const x = w * (0.18 + r() * 0.64);
+        const y = h * (0.3 + r() * 0.45);
+        const rr = 50 + r() * 90;
+        ctx.fillStyle = rad(ctx, x, y, rr, [[0, rgba('#ffffff', 0.5)], [0.6, rgba('#e4e4ee', 0.3)], [1, rgba('#d8d8e8', 0)]]);
+        ctx.beginPath(); ctx.arc(x, y, rr, 0, Math.PI * 2); ctx.fill();
+      }
+      // The underside, darker where it is thickest.
+      ctx.globalCompositeOperation = 'source-atop';
+      ctx.fillStyle = lin(ctx, 0, 0, 0, h, [[0, rgba('#ffffff', 0)], [0.55, rgba('#9a9aae', 0.25)], [1, rgba('#6a6a80', 0.5)]]);
+      ctx.fillRect(0, 0, w, h);
+      ctx.globalCompositeOperation = 'source-over';
+    }, { scale: 0.5 });
+  });
+}
+
 export function registerSpan(scene) {
   registerPeople(scene);
   registerGods(scene);
   registerHands(scene);
+  registerCloud(scene);
 }

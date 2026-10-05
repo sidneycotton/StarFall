@@ -20,7 +20,6 @@ import { SeerCallScene } from './scenes/SeerCallScene.js';
 import { ChamberScene } from './scenes/ChamberScene.js';
 import { TitleScene } from './scenes/TitleScene.js';
 import { VigilScene } from './scenes/VigilScene.js';
-import { RecordScene } from './scenes/RecordScene.js';
 import { SkyScene } from './scenes/SkyScene.js';
 import { TramScene } from './scenes/TramScene.js';
 import { SpanScene } from './scenes/SpanScene.js';
@@ -47,7 +46,7 @@ const game = new Phaser.Game({
   audio: { noAudio: true },
   input: { gamepad: false },
   pipeline: { CinematicPipeline },
-  scene: [BootScene, PenthouseScene, SeerCallScene, ChamberScene, TitleScene, VigilScene, RecordScene, SkyScene, TramScene, SpanScene],
+  scene: [BootScene, PenthouseScene, SeerCallScene, ChamberScene, TitleScene, VigilScene, TramScene, SpanScene, SkyScene],
 });
 
 ui.init(game);

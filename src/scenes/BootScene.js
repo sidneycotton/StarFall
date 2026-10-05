@@ -14,7 +14,6 @@ import { registerVision } from '../art/vision.js';
 import { registerChamber } from '../art/chamber.js';
 import { registerStar } from '../art/star.js';
 import { registerBridge } from '../art/bridge.js';
-import { registerSky } from '../art/sky.js';
 import { registerVigil } from '../art/vigil.js';
 import { registerTram } from '../art/tram.js';
 import { registerSpan } from '../art/span.js';
@@ -22,7 +21,7 @@ import { registerSpan } from '../art/span.js';
 // Paints every texture (there are no image files), waits for fonts, then
 // shows a quiet start prompt — audio needs a user gesture before sound can come first.
 
-const PAINTERS = [registerLights, registerCity, registerKit, registerBedroom, registerLounge, registerParallax, registerSanctum, registerSeers, registerVision, registerChamber, registerStar, registerBridge, registerSky, registerVigil, registerTram, registerSpan];
+const PAINTERS = [registerLights, registerCity, registerKit, registerBedroom, registerLounge, registerParallax, registerSanctum, registerSeers, registerVision, registerChamber, registerStar, registerBridge, registerVigil, registerTram, registerSpan];
 
 const START_SCENE = {
   wake: ['Penthouse', { start: 'wake' }],
@@ -33,21 +32,22 @@ const START_SCENE = {
   chamber: ['Chamber', {}],
   title: ['Title', {}],
   vigil: ['Vigil', {}],
-  record: ['Record', {}],
-  duel: ['Record', { start: 'duel' }],
   sky: ['Sky', {}],
   vigilEnd: ['Vigil', { end: true }],
   title2: ['Title', { chapter: 2 }],
   tram: ['Tram', {}],
   span: ['Span', {}],
+  // Saves from before the Record and the duel were retired.
+  record: ['Tram', {}],
+  duel: ['Tram', {}],
 };
 
-const CHAPTER_TWO = ['vigil', 'record', 'duel', 'sky', 'vigilEnd', 'title2', 'tram', 'span'];
+const CHAPTER_TWO = ['vigil', 'tram', 'span', 'sky', 'vigilEnd', 'title2', 'record', 'duel'];
 
 const CHECKPOINT_LABEL = {
   call: 'The Call', run: 'After', chamber: 'The Chamber',
-  vigil: 'The Vigil', record: 'The Lantern Bridge', duel: 'Parallax', sky: 'Above the Cloud',
-  tram: 'Tram 6', span: 'The Centre Span',
+  vigil: 'The Vigil', tram: 'Tram 6', span: 'The Centre Span', sky: 'The West Tower',
+  record: 'Tram 6', duel: 'Tram 6',
 };
 
 export class BootScene extends Phaser.Scene {

@@ -123,7 +123,53 @@ export const SPAN = {
   rise: [
     { id: 'sp_u1', speaker: 'teo', text: 'Mum. They\'re going up.', auto: 2400 },
   ],
-  time: '23:41:07',
+};
+
+// The west tower, a few minutes later. The cloud, and what came out of it.
+export const SKYFALL = {
+  time: '23:44',
+  open: [
+    { id: 'sf_o1', speaker: 'inesThought', text: 'Three minutes. Nobody on the tower said a word for three minutes.', auto: 4200 },
+  ],
+  flashes: [
+    { id: 'sf_f1', speaker: 'teo', text: 'They went in the cloud.', auto: 2400 },
+    { id: 'sf_f2', speaker: 'teo', text: 'Is she winning?', auto: 2200 },
+    { id: 'sf_f3', speaker: 'mara', text: '…I don\'t know, love.', auto: 2600 },
+  ],
+  still: [
+    { id: 'sf_s1', speaker: 'inesThought', text: 'Then nothing. Long enough to hope.', auto: 3400 },
+  ],
+  down: [
+    { id: 'sf_d1', speaker: 'teo', text: 'There—', auto: 1400 },
+    { id: 'sf_d2', speaker: 'inesThought', text: 'She came down out of it slowly, holding him. The way you hold someone who has stopped fighting.', auto: 5200 },
+    { id: 'sf_d3', speaker: 'inesThought', text: 'Or someone you aren\'t going to let go of.', auto: 3600 },
+  ],
+  swell: [
+    { id: 'sf_w1', speaker: 'inesThought', text: 'She was getting brighter. Not like a lamp. Like a fire that\'s decided something.', auto: 4800 },
+    { id: 'sf_w2', speaker: 'teo', text: 'Mum, she\'s too bright—', auto: 1800 },
+  ],
+  choose: (look, cover) => `${look} — keep looking · ${cover} — cover his eyes`,
+  chooseTouch: 'Keep looking · or cover his eyes',
+  look: [
+    { id: 'sf_l1', speaker: 'inesThought', text: 'I didn\'t look away. Somebody had to see it.', auto: 3200 },
+  ],
+  cover: [
+    { id: 'sf_c1', speaker: 'teo', text: 'I can\'t see—', auto: 1500 },
+    { id: 'sf_c2', speaker: 'ines', text: 'I know. I know.', auto: 2000 },
+  ],
+  after: [
+    { id: 'sf_a1', speaker: 'teo', text: 'Where is she?', auto: 2400 },
+    { id: 'sf_a2', speaker: 'inesThought', text: 'There was nothing up there. Not her. Not him. A hole in the cloud, and the stars through it.', auto: 5200 },
+    { id: 'sf_a3', speaker: 'mara', text: 'She took him with her.', auto: 2800 },
+  ],
+  fall: [
+    { id: 'sf_x1', speaker: 'inesThought', text: 'I only ever saw one thing fall. Slowly. Burning at the edges, like a coat.', auto: 5200 },
+  ],
+  close: [
+    { id: 'sf_z1', speaker: 'inesThought', text: 'Everyone tells me she saved the rest of us.', auto: 3600 },
+    { id: 'sf_z2', speaker: 'inesThought', text: 'Nobody has ever told me what from.', auto: 4200 },
+  ],
+  card: ['Star was not found.', 'Parallax was not seen again.'],
 };
 
 // What the Record says about Tram 6, seven years on. Keyed by what happened.
@@ -135,4 +181,7 @@ export const SPAN_RECORD = {
   nurse: { wit: 'WITNESS 31 · NURSE, TRAM 4', text: 'She could have caught it. She looked at the bridge, and then she looked at him.' },
   engineer: { wit: 'WITNESS 140 · CITY STRUCTURAL ENGINEER', text: 'Nobody could have held that span. I have run the numbers for seven years. Nobody.' },
   mirror: { wit: 'WITNESS 07 · STUDENT', text: 'They moved the same. Like they\'d rehearsed it. I don\'t know why that\'s the thing I remember.' },
+  skyLooked: { wit: 'WITNESS 212 · TRAM CONDUCTOR', text: 'I watched all of it. People ask me if she looked sorry. She was too bright to have a face.' },
+  skyCovered: { wit: 'WITNESS 19 · AGE 9 AT THE TIME', text: 'The driver put my face in her coat. I saw it anyway, through my eyelids. Everything went red, then white.' },
+  cape: { wit: 'WITNESS 402 · FISHERMAN, AUREATE QUAY', text: 'Her cape came down in the harbour at four in the morning. Just the cape. I gave it to the Guard. I wish I\'d kept it.' },
 };

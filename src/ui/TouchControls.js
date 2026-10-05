@@ -98,10 +98,17 @@ export class TouchControls {
     this.act.classList.toggle('on', on && this.touchSeen);
   }
 
+  // The second button on its own, for a two-way choice.
+  setDodge(on, label = 'Dodge') {
+    this.dodge.textContent = label;
+    this.dodge.classList.toggle('on', on && this.touchSeen);
+  }
+
   // Strike + Dodge, for the duels.
   setCombat(on) {
     this.combat = on;
     this.setAction(on, on ? 'Strike' : 'Use');
+    this.dodge.textContent = 'Dodge';
     this.dodge.classList.toggle('on', on && this.touchSeen);
   }
 

@@ -3,7 +3,6 @@ import { VIEW_W, VIEW_H } from '../config.js';
 import { ui } from '../ui/UI.js';
 import { narrative } from '../core/NarrativeState.js';
 import { sound } from '../audio/soundscape.js';
-import { audio } from '../audio/AudioEngine.js';
 import * as sfx from '../audio/sfx.js';
 import { wait } from '../systems/Cutscene.js';
 import { input } from '../systems/Input.js';
@@ -23,6 +22,8 @@ const CX = VIEW_W / 2;
 const AUTOPLAY = new URLSearchParams(window.location.search).has('autoplay');
 
 const SAFE = TOWERS[0] - 2 - STOP;   // just past the west tower, local z
+const CLOUD_Y = 150;                 // the underside of the cloud
+const CLOUD = { x: 0, z: 30 };       // over the gap where the span was
 const RUN_X = 3.0;                   // her line down the deck, clear of the tram
 const RUN_V = 7;
 
@@ -36,9 +37,11 @@ function angleLerp(a, b, t) {
   return a + d * t;
 }
 
+export { SAFE, CLOUD, CLOUD_Y };
+
 export class SpanScene extends TramScene {
-  constructor() {
-    super('Span');
+  constructor(key = 'Span') {
+    super(key);
   }
 
   create() {
@@ -81,6 +84,7 @@ export class SpanScene extends TramScene {
 
     this.buildGods();
     this.buildSpanHands();
+    this.buildCloud();
 
     // Threads of light from her to the hangers, for as long as she holds it.
     this.threads = [];
@@ -121,6 +125,100 @@ export class SpanScene extends TramScene {
     this.clashA = 0;
     // Her light, on the deck under her.
     this.pool = v.poly([[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]], { fill: 0x7a5a2a, alpha: 0, ground: true, fog: false });
+  }
+
+  // The cloud they go up into: a ceiling of puffs over the river, dark until
+  // something inside it lights it. Lights are { p | fn, color, i, r }.
+  buildCloud() {
+    const v = this.v;
+    const r = Phaser.Math.RND;
+    r.sow(['cloud']);
+    this.cloudK = 0;
+    this.cloudLights = [];
+    this.puffs = [];
+    for (let i = 0; i < 170; i++) {
+      const a = r.frac() * Math.PI * 2;
+      const d = Math.sqrt(r.frac()) * 520;
+      const x = CLOUD.x + Math.cos(a) * d * 1.2;
+      const z = CLOUD.z - 60 + Math.sin(a) * d;
+      const b = v.board(`sp_cloud${i % 3}`, { layer: 'outside', world: false, anchor: 0.5, x, y: CLOUD_Y + r.frac() * 22 + d * 0.03, z, h: 70 + r.frac() * 80, alpha: 0 });
+      b.fog = false;
+      b.img.setFlipX(r.frac() < 0.5);
+      this.puffs.push({ b, a: 0.75 + r.frac() * 0.25 });
+    }
+    // Above the puffs, a lid, in tiles so a hole can be torn in it.
+    this.lid = [];
+    const Y = CLOUD_Y + 30;
+    for (let x = -700; x < 700; x += 100) {
+      for (let z = -700; z < 800; z += 100) {
+        const p = v.poly([[x, Y, z], [x + 100, Y, z], [x + 100, Y, z + 100], [x, Y, z + 100]], { fill: 0x0c0a14, alpha: 0, fog: false });
+        p.c = { x: x + 50, y: Y, z: z + 50 };
+        this.lid.push(p);
+      }
+    }
+  }
+
+  // Tear the middle out of it: what's left after the light, and a few
+  // stars through the gap.
+  tearCloud(R) {
+    const gone = (q) => Math.hypot(q.x - CLOUD.x, q.z - CLOUD.z) < R * (0.8 + Math.random() * 0.4);
+    this.puffs.forEach((p) => { if (gone(p.b)) p.gone = true; });
+    const r = Phaser.Math.RND;
+    this.gapStars = [];
+    for (let i = 0; i < 36; i++) {
+      const a = r.frac() * Math.PI * 2;
+      const d = Math.sqrt(r.frac()) * R * 0.8;
+      const b = this.v.board('light_core', { layer: 'outside', world: false, anchor: 0.5, x: CLOUD.x + Math.cos(a) * d, y: CLOUD_Y + 29, z: CLOUD.z + Math.sin(a) * d * 0.8, h: 0.5 + r.frac() * 0.9, blend: ADD, tint: 0xe8e2ff, alpha: 0 });
+      b.fog = false;
+      this.gapStars.push({ b, a: 0.4 + r.frac() * 0.6, tw: r.frac() * 10 });
+    }
+    this.tweens.add({ targets: this, gapK: 1, duration: 9000, delay: 2500 });
+  }
+
+  updateCloud(dt) {
+    const K = this.cloudK;
+    const lit = this.cloudLights.filter((l) => l.i > 0.01);
+    this.cloudLights.forEach((l) => { if (l.decay) l.i *= Math.exp(-dt * l.decay); });
+    this.cloudLights = this.cloudLights.filter((l) => !l.decay || l.i > 0.01);
+    const shade = (q, base, gain) => {
+      let rr = (base >> 16) & 255, gg = (base >> 8) & 255, bb = base & 255;
+      for (const l of lit) {
+        const p = l.fn ? l.fn() : l.p;
+        const d = Math.hypot(q.x - p.x, (q.y - p.y) * 1.6, q.z - p.z);
+        const k = l.i * gain * Math.exp(-(d / l.r) * (d / l.r));
+        rr += ((l.color >> 16) & 255) * k; gg += ((l.color >> 8) & 255) * k; bb += (l.color & 255) * k;
+      }
+      return (Math.min(255, rr) << 16) | (Math.min(255, gg) << 8) | Math.min(255, bb);
+    };
+    this.puffs.forEach((p) => {
+      if (p.gone) p.a = Math.max(0, p.a - dt * 0.6);
+      p.b.alpha = K * p.a;
+      p.b.visible = p.b.alpha > 0.01;
+      if (p.b.visible) p.b.img.setTint(shade(p.b, 0x1e1b2a, 1));
+    });
+    (this.gapStars || []).forEach((g) => {
+      g.b.alpha = (this.gapK || 0) * g.a * (0.75 + 0.25 * Math.sin(this.time.now / 700 + g.tw));
+    });
+    this.lid.forEach((p) => {
+      p.alpha = K;
+      if (K > 0.01 && p.visible) p.fill = shade(p.c, 0x0c0a14, 0.5);
+    });
+  }
+
+  // A flash somewhere inside it, heard a moment later.
+  cloudFlash(color = 0xffd890, i = 1.4) {
+    const r = Phaser.Math.RND;
+    const p = { x: CLOUD.x + r.realInRange(-140, 140), y: CLOUD_Y + 10 + r.frac() * 15, z: CLOUD.z + r.realInRange(-90, 120) };
+    this.cloudLights.push({ p, color, i, r: 90 + r.frac() * 60, decay: 2.2 + r.frac() * 2 });
+    const cam = this.v.cam;
+    const d = Math.hypot(p.x - cam.x, p.y - cam.y, p.z - cam.z);
+    const sp = this.v.project(p.x, p.y, p.z, false);
+    const pan = sp ? clamp((sp.x - CX) / CX, -1, 1) * 0.6 : 0;
+    this.time.delayedCall((d / 343) * 1000, () => {
+      if (!this.sys.isActive()) return;
+      sfx.distantBoom({ pan, gain: 0.12 + 0.18 * i / 1.4 });
+    });
+    return p;
   }
 
   buildSpanHands() {
@@ -177,19 +275,21 @@ export class SpanScene extends TramScene {
       const back = (k) => ({ x: p.x + (dx / d) * k, y: p.y + (dy / d) * k, z: p.z + (dz / d) * k });
       const set = (b, q, h) => { b.x = q.x; b.y = q.y; b.z = q.z; if (h) b.h = h; };
       set(g.body, p);
+      const k = g.boost ?? 1;
       if (g === this.star) {
-        set(g.glow, back(0.35), 9 + d * 0.09);
-        set(g.haze, back(0.6), 30 + d * 0.15);
+        set(g.glow, back(0.35), (9 + d * 0.09) * k);
+        set(g.haze, back(0.6), (30 + d * 0.15) * k);
         g.glow.alpha = 0.6 + Math.sin(time / 260) * 0.05;
-        g.haze.alpha = 0.16 * clamp((d - 3) / 12, 0.1, 1);
+        g.haze.alpha = g.hazeA ?? 0.16 * clamp((d - 3) / 12, 0.1, 1);
       } else {
-        set(g.glow, back(0.35), 6 + d * 0.05);
-        set(g.hole, back(0.7), 7 + d * 0.07);
+        set(g.glow, back(0.35), (6 + d * 0.05) * k);
+        set(g.hole, back(0.7), (7 + d * 0.07) * k);
       }
       return d;
     };
     place(this.star);
     place(this.px);
+    this.afterGods?.(dt, time);
 
     // Clash light, where they met.
     this.clashA *= Math.exp(-dt * 4.5);
@@ -920,38 +1020,43 @@ export class SpanScene extends TramScene {
   }
 
   async rise() {
-    // Up, the two of them, turning around one another like a reflection.
+    // Up, the two of them, turning around one another like a reflection,
+    // into the cloud that has come down over the river.
     const t0 = this.time.now;
     const c = { ...this.fight.c };
     const pathFor = (s) => () => {
       const u = (this.time.now - t0) / 1000;
-      const R = Math.max(0.6, 22 - u * 1.9);
+      const R = Math.max(0.6, 22 - u * 2.2);
       const a = u * (1.1 + u * 0.12);
-      return { x: c.x + s * Math.cos(a) * R, y: c.y + u * u * 0.7 + u * 2, z: c.z + Math.sin(a) * R * 0.5 };
+      return { x: c.x + s * Math.cos(a) * R, y: Math.min(CLOUD_Y + 24, c.y + u * u * 1.1 + u * 3), z: c.z + Math.sin(a) * R * 0.5 };
     };
     this.star.fn = pathFor(1);
     this.px.fn = pathFor(-1);
     this.moveGod(this.star, this.star.fn, 1400, 'fn');
     this.moveGod(this.px, this.px.fn, 1400, 'fn');
     this.trackPoint(() => this.mid(), 1.6);
+    this.tweens.add({ targets: this, cloudK: 1, duration: 6000, ease: 'Sine.easeInOut' });
+    this.cloudLights.push({ fn: () => this.star.p, color: 0xffd890, i: 0.9, r: 70 });
+    this.cloudLights.push({ fn: () => this.px.p, color: 0x7b5cc0, i: 0.5, r: 50 });
     sound.bridge.setWind(1, 6);
     sfx.whoosh({ gain: 0.1, duration: 6 });
     await wait(this, 2200);
     await ui.dialogue.play(SPAN.rise);
-    await wait(this, 4200);
-    // White.
-    this.fx.tween({ exposure: 2.4, desat: 0.6 }, 1800, 'Quad.easeIn');
-    this.fx.flash({ peak: 1, attack: 1700, release: 200 });
-    sfx.lightStrike({ gain: 0.6, hit: true });
-    await wait(this, 1750);
-    this.fx.set({ fade: 1, exposure: 1 });
-    sound.bridge.stop(0.05);
-    audio.cutWorld(0.02);
-    await wait(this, 2200);
-    ui.caption(SPAN.time, 3800);
-    await wait(this, 4600);
-    audio.restoreWorld(0.5);
-    this.scene.start('Vigil', { end: true });
+    // Gone into it. The cloud lights up from inside, and keeps lighting.
+    await new Promise((resolve) => {
+      const chk = () => { if (this.mid().y > CLOUD_Y + 5) { this.events.off('update', chk); resolve(); } };
+      this.events.on('update', chk);
+    });
+    [this.star, this.px].forEach((g) => Object.values(g).forEach((b) => { if (b && b.img) b.visible = false; }));
+    this.trackPoint(() => ({ x: CLOUD.x, y: CLOUD_Y, z: CLOUD.z }), 0.8);
+    for (let i = 0; i < 4; i++) {
+      this.cloudFlash(i % 2 ? 0x8a6ad0 : 0xffd890, 1.2 + Math.random() * 0.5);
+      await wait(this, 700 + Math.random() * 900);
+    }
+    this.fx.fadeTo(1, 2600);
+    sound.bridge.setWind(0.4, 2.5);
+    await wait(this, 3000);
+    this.scene.start('Sky', {});
   }
 
   // --- frame ------------------------------------------------------------------------
@@ -965,6 +1070,7 @@ export class SpanScene extends TramScene {
     this.updateGods(dt, time);
     this.updateMovers(dt);
     this.updateCollapse(dt, time);
+    this.updateCloud(dt);
 
     // Before the fall: the whole centre span sags, more every second.
     if (this.lurch && !this.collapseFree) {
