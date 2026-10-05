@@ -498,6 +498,8 @@ input[type=range]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 
 .start .chapters { display: flex; gap: 10px; align-items: center; color: var(--faint); font-family: var(--sans); font-size: max(10px, calc(var(--u) * 1.05)); }
 .start .chapters button { font-family: var(--sans); font-weight: 300; letter-spacing: 0.3em; text-transform: uppercase; font-size: inherit; color: var(--faint); padding: 10px 8px; }
 .start .chapters button:hover { color: var(--aureate); }
+.start .fullscreen { font-family: var(--sans); font-weight: 300; letter-spacing: 0.3em; text-transform: uppercase; font-size: max(10px, calc(var(--u) * 1.05)); color: var(--faint); padding: 10px 8px; }
+.start .fullscreen:hover { color: var(--aureate); }
 
 /* Dialogue: Star is recovered audio; the Record speaks plainly. */
 .dlg.star .dlg-text { color: #f6ecd6; text-shadow: 0 0 18px rgba(217,180,106,0.35), 0 1px 12px #000; }

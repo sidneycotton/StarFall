@@ -1,8 +1,8 @@
 # STARFALL
 
-Chapter One: *What Survives* · Chapter Two: *The Starfall Record* · Chapter Three: *The Request* (in progress)
+Chapter One: *What Survives* · Chapter Two: *The Starfall Record* · Chapter Three: *The Request*
 
-A playable cinematic narrative game (two chapters so far, ≈25 minutes in all).
+A playable cinematic narrative game (three chapters so far, ≈50 minutes in all).
 Celestial neo-noir, illustrated science fantasy. Built with Phaser 3, Web Audio
 and a DOM/CSS UI layer. There are **no image or audio files**: every texture
 is painted procedurally to canvas at boot, and every sound is synthesised.
@@ -43,7 +43,7 @@ quick-time events and combat), restart.
 
 `?stage=wake|explore|call|aftermath|chamber|title` (Chapter One) or
 `?stage=vigil|tram|span|sky|vigilEnd|title2` (Chapter Two) or
-`?stage=crowd|bedsit|relay|ambush|mine|title3` (Chapter Three, in progress) starts at that section
+`?stage=crowd|bedsit|relay|ambush|mine|title3` (Chapter Three) starts at that section
 (add `&auto` to skip the start prompt, `&autoplay` to auto-advance dialogue).
 
 ## The sequence
@@ -70,6 +70,18 @@ Civic Network reads out what 1,412 witnesses saw that night. One of them drove t
 4. **The West Tower** — 23:44, seen from below. One choice: keep looking, or cover Teo's eyes.
 5. **The names.**
 
+### Chapter Three — The Request
+
+The night of the anniversary, in first person, as someone nobody looks at twice.
+
+1. **The crowd** — Vesper Plaza, before the screens change. Stand still long enough
+   and the ground answers. Four strangers do something they can't explain.
+2. **The bedsit** — a card, a rejection, a phone, a mirror. Then paper under the door.
+3. **Relay 9** — a disused substation at dusk. Four people come in past you and say
+   their names to each other. Whether you are one of them is up to you.
+4. **The lights** — they go out one by one.
+5. **The waiting room** — every screen changes at once.
+
 ## Architecture
 
 ```
@@ -94,10 +106,13 @@ src/
   ui/                     DOM overlay: Dialogue (typewriter subtitles), TouchControls,
                           Panels (settings, history), prompts, captions, HUD, title,
                           RecordOverlay (timecode, sources, witness notes, choices)
+  fp/                     Room (first-person base scene: faces, boxes, figures, lights,
+                          spots, walking, stillness) on a small View3D software projector
   scenes/                 Boot, Penthouse (+ layout / world / lighting), SeerCall (+ Feed),
                           Chamber, Title, Vigil, Tram, Span (the bridge), Sky (the West Tower);
+                          request/ (Crowd, Bedsit, Relay, Ambush, Mine);
                           Record, Overhead (retired, unregistered)
-  data/                   script, speakers, heroes, record
+  data/                   script, speakers, heroes, record, request
 ```
 
 Design notes:

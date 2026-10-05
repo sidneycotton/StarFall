@@ -17,6 +17,23 @@ function el(parent, cls, html = '') {
   return d;
 }
 
+// Fullscreen for the whole page (canvas and DOM UI together). Where the API is
+// missing (iPhone Safari) the button is simply not offered.
+const fsElement = () => document.fullscreenElement || document.webkitFullscreenElement;
+const isFullscreen = () => Boolean(fsElement());
+const canFullscreen = () => Boolean(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+function toggleFullscreen() {
+  const root = document.documentElement;
+  if (isFullscreen()) {
+    (document.exitFullscreen || document.webkitExitFullscreen)?.call(document);
+    return;
+  }
+  const req = root.requestFullscreen || root.webkitRequestFullscreen;
+  Promise.resolve(req?.call(root, { navigationUI: 'hide' }))
+    .then(() => screen.orientation?.lock?.('landscape'))
+    .catch(() => {});
+}
+
 class UIRoot {
   init(game) {
     this.game = game;
@@ -84,7 +101,16 @@ class UIRoot {
       <button class="begin">Begin</button>
       ${canContinue ? `<button class="continue">Continue · ${checkpointLabel}</button>` : ''}
       ${chapters.length ? `<div class="chapters">${chapters.map((c, i) => `<button data-i="${i}">${c.label}</button>`).join('<span>·</span>')}</div>` : ''}
+      ${canFullscreen() ? '<button class="fullscreen"></button>' : ''}
       <div class="note">Headphones recommended.</div>`);
+    const fs = this.start.querySelector('.fullscreen');
+    if (fs) {
+      const label = () => { fs.textContent = isFullscreen() ? 'Exit fullscreen' : 'Fullscreen'; };
+      label();
+      document.addEventListener('fullscreenchange', label);
+      document.addEventListener('webkitfullscreenchange', label);
+      fs.addEventListener('click', (e) => { e.stopPropagation(); toggleFullscreen(); });
+    }
     this.start.querySelector('.begin').addEventListener('click', (e) => { e.stopPropagation(); onBegin(); });
     this.start.querySelector('.continue')?.addEventListener('click', (e) => { e.stopPropagation(); onContinue(); });
     this.start.querySelectorAll('.chapters button').forEach((b) => {
