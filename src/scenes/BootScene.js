@@ -17,11 +17,12 @@ import { registerBridge } from '../art/bridge.js';
 import { registerSky } from '../art/sky.js';
 import { registerVigil } from '../art/vigil.js';
 import { registerTram } from '../art/tram.js';
+import { registerSpan } from '../art/span.js';
 
 // Paints every texture (there are no image files), waits for fonts, then
 // shows a quiet start prompt — audio needs a user gesture before sound can come first.
 
-const PAINTERS = [registerLights, registerCity, registerKit, registerBedroom, registerLounge, registerParallax, registerSanctum, registerSeers, registerVision, registerChamber, registerStar, registerBridge, registerSky, registerVigil, registerTram];
+const PAINTERS = [registerLights, registerCity, registerKit, registerBedroom, registerLounge, registerParallax, registerSanctum, registerSeers, registerVision, registerChamber, registerStar, registerBridge, registerSky, registerVigil, registerTram, registerSpan];
 
 const START_SCENE = {
   wake: ['Penthouse', { start: 'wake' }],
@@ -38,13 +39,15 @@ const START_SCENE = {
   vigilEnd: ['Vigil', { end: true }],
   title2: ['Title', { chapter: 2 }],
   tram: ['Tram', {}],
+  span: ['Span', {}],
 };
 
-const CHAPTER_TWO = ['vigil', 'record', 'duel', 'sky', 'vigilEnd', 'title2', 'tram'];
+const CHAPTER_TWO = ['vigil', 'record', 'duel', 'sky', 'vigilEnd', 'title2', 'tram', 'span'];
 
 const CHECKPOINT_LABEL = {
   call: 'The Call', run: 'After', chamber: 'The Chamber',
   vigil: 'The Vigil', record: 'The Lantern Bridge', duel: 'Parallax', sky: 'Above the Cloud',
+  tram: 'Tram 6', span: 'The Centre Span',
 };
 
 export class BootScene extends Phaser.Scene {

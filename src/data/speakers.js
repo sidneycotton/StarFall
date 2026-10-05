@@ -27,4 +27,5 @@ export const SPEAKERS = {
   nell: { name: 'Nell', style: 'mortal', sigil: null, voice: null },
   sami: { name: 'Sami', style: 'mortal', sigil: null, voice: null },
   aurelio: { name: 'Aurelio', style: 'mortal', sigil: null, voice: null },
+  sleeper: { name: '', style: 'mortal', sigil: null, voice: null },
 };

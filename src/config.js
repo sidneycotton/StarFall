@@ -53,7 +53,7 @@ export const STAGES = [
 // Stages that leave a checkpoint behind, and which chapter each belongs to.
 export const CHECKPOINTS = {
   wake: 1, call: 1, run: 1, chamber: 1,
-  vigil: 2, record: 2, duel: 2, sky: 2,
+  vigil: 2, record: 2, duel: 2, sky: 2, tram: 2, span: 2,
 };
 
 export const IS_TOUCH = typeof window !== 'undefined'

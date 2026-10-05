@@ -36,7 +36,7 @@ export const TRAM = {
       first: [
         { id: 'tr_ma1', speaker: 'ines', text: 'Tickets, please.' },
         { id: 'tr_ma2', speaker: 'mara', text: 'One and a half. Sorry — he\'s the half.' },
-        { id: 'tr_ma3', speaker: 'teo', text: 'I\'m seven.' },
+        { id: 'tr_ma3', speaker: 'teo', text: 'I\'m nine.' },
         { id: 'tr_ma4', speaker: 'mara', text: 'He\'s the half. Twelve hours at Saint Ondine and then he fell asleep in the break room, so now he\'s awake forever.' },
         { id: 'tr_ma5', speaker: 'teo', text: 'Who lights them?' },
         { id: 'tr_ma6', speaker: 'ines', text: 'The lanterns?' },

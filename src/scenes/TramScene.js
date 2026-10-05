@@ -39,12 +39,15 @@ const START = -110;
 const STOP = 320;           // Lantern Midspan
 const TOWERS = [120, 520];
 const CRUISE = 10;
+const SEG = 8;              // centre-span deck segment length
 
 const CAB = { x: 0.05, z: 0.55 };
 const DOORWAY = { x: 1.12, z: -0.95 };
 
 // Where the gold light and the hole in the stars hang (world space).
 const SKY_C = { x: 230, y: 135, z: STOP + 110 };
+
+export const TRAM_GEOM = { EYE, W, REAR, FRONT, ROOF, DOOR, ROAD, WALK, STOP, TOWERS, DOORWAY, CAB, SEG };
 
 const hex = (s) => parseInt(s.slice(1), 16);
 function mixInt(a, b, t) {
@@ -61,12 +64,18 @@ function angleLerp(a, b, t) {
 }
 
 export class TramScene extends Phaser.Scene {
-  constructor() {
-    super('Tram');
+  constructor(key = 'Tram') {
+    super(key);
   }
 
   create() {
     narrative.setStage('tram');
+    this.setup();
+    this.run();
+  }
+
+  // The world, the tram and everyone in it. Shared with what comes after.
+  setup() {
     this.tweens.timeScale = 1;
     this.time.timeScale = 1;
     this.cameras.main.setBackgroundColor('#03020a');
@@ -83,6 +92,8 @@ export class TramScene extends Phaser.Scene {
     this.v.shell.fog = { color: 0x120d0c, dist: 14 };
 
     this.speed = 0;
+    this.eye = EYE;
+    this.roll = 0;
     this.targetSpeed = 0;
     this.travelled = 0;
     this.doorOpen = 0;
@@ -105,7 +116,6 @@ export class TramScene extends Phaser.Scene {
 
     window.__tram = this;
     this.events.once('shutdown', () => this.teardown());
-    this.run();
   }
 
   // --- world ------------------------------------------------------------------
@@ -145,14 +155,27 @@ export class TramScene extends Phaser.Scene {
     const v = this.v;
     const W0 = { world: true, layer: 'outside' };
     // Road, walkways, rails.
-    v.poly([[-5, ROAD, -500], [5, ROAD, -500], [5, ROAD, 1100], [-5, ROAD, 1100]], { ...W0, fill: 0x16121a, ground: true });
-    [-1, 1].forEach((s) => {
-      v.poly([[s * 5, WALK, -500], [s * 7.8, WALK, -500], [s * 7.8, WALK, 1100], [s * 5, WALK, 1100]], { ...W0, fill: 0x221a24, ground: true });
-      v.poly([[s * 5, ROAD, -500], [s * 5, WALK, -500], [s * 5, WALK, 1100], [s * 5, ROAD, 1100]], { ...W0, fill: 0x2a2030, ground: true });
-      v.line([[s * 0.72, ROAD + 0.01, -500], [s * 0.72, ROAD + 0.01, 1100]], { color: 0x8a7468, alpha: 0.55, width: 2 });
-      v.line([[s * 7.8, 0.9, -500], [s * 7.8, 0.9, 1100]], { color: 0x3a3040, alpha: 1, width: 3 });
-      v.line([[s * 7.8, 0.45, -500], [s * 7.8, 0.45, 1100]], { color: 0x2a2230, alpha: 1, width: 2 });
-    });
+    // The deck, in pieces: the side spans whole, the centre span between the
+    // towers in short segments (they don't stay together).
+    const cuts = [-500, TOWERS[0] + 4];
+    for (let z = TOWERS[0] + 4 + SEG; z < TOWERS[1] - 4; z += SEG) cuts.push(z);
+    cuts.push(TOWERS[1] - 4, 1100);
+    this.deckSegs = [];
+    for (let i = 0; i < cuts.length - 1; i++) {
+      const z0 = cuts[i], z1 = cuts[i + 1];
+      const items = [];
+      items.push(v.poly([[-5, ROAD, z0], [5, ROAD, z0], [5, ROAD, z1], [-5, ROAD, z1]], { ...W0, fill: 0x16121a, ground: true }));
+      [-1, 1].forEach((s) => {
+        items.push(v.poly([[s * 5, WALK, z0], [s * 7.8, WALK, z0], [s * 7.8, WALK, z1], [s * 5, WALK, z1]], { ...W0, fill: 0x221a24, ground: true }));
+        items.push(v.poly([[s * 5, ROAD, z0], [s * 5, WALK, z0], [s * 5, WALK, z1], [s * 5, ROAD, z1]], { ...W0, fill: 0x2a2030, ground: true }));
+        items.push(v.line([[s * 0.72, ROAD + 0.01, z0], [s * 0.72, ROAD + 0.01, z1]], { color: 0x8a7468, alpha: 0.55, width: 2 }));
+        items.push(v.line([[s * 7.8, 0.9, z0], [s * 7.8, 0.9, z1]], { color: 0x3a3040, alpha: 1, width: 3 }));
+        items.push(v.line([[s * 7.8, 0.45, z0], [s * 7.8, 0.45, z1]], { color: 0x2a2230, alpha: 1, width: 2 }));
+      });
+      items.forEach((it) => { it.orig = it.points.map((pt) => [...pt]); });
+      const centre = z0 >= TOWERS[0] && z1 <= TOWERS[1];
+      this.deckSegs.push({ z0, z1, items, centre, drop: 0, bank: 0, pitch: 0, vy: 0 });
+    }
     // Expansion joints and balusters, recycled around the tram so the deck
     // reads as moving.
     this.joints = [];
@@ -195,6 +218,8 @@ export class TramScene extends Phaser.Scene {
       this.box(g, -7.9, 7.9, 8.4, 9.1, T - 0.4, T + 0.4, { front: 0x241c2a, side: 0x241c2a, back: 0x141018, bottom: 0x18121c });
     });
 
+    this.hangers = [];
+    this.cableY = (z) => cableY(z);
     // Main cables: anchored at the banks, over the tower tops, sagging to
     // midspan. Hangers drop to the rail.
     const cableY = (z) => {
@@ -210,7 +235,10 @@ export class TramScene extends Phaser.Scene {
         for (let z = -360; z <= 1000; z += 10) pts.push([s * x, cableY(z), z]);
         v.line(pts, { color: i ? 0x2c2434 : 0x3a3044, width: i ? 2 : 3 });
       });
-      for (let z = TOWERS[0] + 8; z < TOWERS[1]; z += 8) v.line([[s * 8.5, cableY(z), z], [s * 7.8, 0.9, z]], { color: 0x2a2232, width: 1 });
+      for (let z = TOWERS[0] + 8; z < TOWERS[1]; z += 8) {
+        const l = v.line([[s * 8.5, cableY(z), z], [s * 7.8, 0.9, z]], { color: 0x2a2232, width: 1 });
+        this.hangers.push({ s, z, l, top: [s * 8.5, cableY(z), z], snapped: 0 });
+      }
     });
 
     // Lantern Midspan: the shelter, and a ladder left against a post.
@@ -651,9 +679,8 @@ export class TramScene extends Phaser.Scene {
     this.fx.set({ fade: 1 });
     this.free = false;
     ui.touch.setMovement(false);
-    await wait(this, 3200);
-    await ui.chapterCard('Chapter Two', 'The Starfall Record', 4800);
-    ui.caption('End of the prototype.', 6000);
+    await wait(this, 2600);
+    this.scene.start('Span', {});
   }
 
   // --- frame ------------------------------------------------------------------------
@@ -715,8 +742,8 @@ export class TramScene extends Phaser.Scene {
     const sway = this.speed / CRUISE;
     cam.yaw = this.base.yaw + this.soft.yaw;
     cam.pitch = clamp(this.base.pitch + this.soft.pitch, -0.75, 1.35);
-    cam.roll = Math.sin(t * 1.7) * 0.006 * sway;
-    cam.y = EYE + Math.sin(t * 6.1) * 0.006 * sway;
+    cam.roll = Math.sin(t * 1.7) * 0.006 * sway + this.roll;
+    cam.y = this.eye + Math.sin(t * 6.1) * 0.006 * sway;
 
     // Doors and frost.
     const lz0 = DOOR[0] - this.doorOpen * 0.58;
@@ -791,18 +818,48 @@ export class TramScene extends Phaser.Scene {
   }
 
   updateRecycled() {
-    const o = this.v.offset;
+    const o = this.v.offset + this.v.cam.z;
     const base = Math.floor((o - 30) / 8) * 8;
     this.joints.forEach((p, i) => {
       const z = base + i * 8;
       p.points[0][2] = z; p.points[1][2] = z; p.points[2][2] = z + 0.14; p.points[3][2] = z + 0.14;
+      const dy = this.deckShift(0, z);
+      p.points.forEach((pt) => { pt[1] = ROAD + dy; });
+      p.visible = dy > -30;
     });
     const bb = Math.floor((o - 40) / 2) * 2;
     for (let i = 0; i < this.balusters.length; i += 2) {
       const z = bb + (i / 2) * 2;
-      this.balusters[i].l.points.forEach((pt) => { pt[2] = z; });
-      this.balusters[i + 1].l.points.forEach((pt) => { pt[2] = z; });
+      [this.balusters[i], this.balusters[i + 1]].forEach(({ s, l }) => {
+        const dy = this.deckShift(s * 7.8, z);
+        l.points[0][2] = z; l.points[1][2] = z;
+        l.points[0][1] = WALK + dy; l.points[1][1] = 0.9 + dy;
+        l.visible = dy > -30;
+      });
     }
+  }
+
+  // How far the deck has moved down at (x, z): nothing, until it fails.
+  segAt(z) {
+    if (z < TOWERS[0] || z > TOWERS[1]) return null;
+    return this.deckSegs.find((g) => z >= g.z0 && z < g.z1) || null;
+  }
+
+  deckShift(x, z) {
+    const g = this.segAt(z);
+    if (!g) return 0;
+    return -g.drop - x * g.bank + (z - (g.z0 + g.z1) / 2) * g.pitch;
+  }
+
+  // Re-seat a segment's pieces after it has moved.
+  applySeg(g) {
+    g.items.forEach((it) => {
+      it.points.forEach((pt, i) => {
+        const o = it.orig[i];
+        pt[1] = o[1] - g.drop - o[0] * g.bank + (o[2] - (g.z0 + g.z1) / 2) * g.pitch;
+      });
+      it.visible = g.drop < 60;
+    });
   }
 
   updateSky(dt, time) {

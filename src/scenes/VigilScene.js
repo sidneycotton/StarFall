@@ -13,6 +13,7 @@ import { wait } from '../systems/Cutscene.js';
 import { addPainted, rng } from '../art/paint.js';
 import { VIGIL_W } from '../art/vigil.js';
 import { VIGIL, theNames } from '../data/record.js';
+import { SPAN_RECORD } from '../data/span.js';
 
 // Vesper Plaza, seven years after the Starfall. The player is nobody in
 // particular: a slow drift through the crowd toward the civic screen.
@@ -173,7 +174,29 @@ export class VigilScene extends Phaser.Scene {
     this.fx.tween({ fade: 1 }, 1400);
     sound.vigil.stop(2);
     await wait(this, 1600);
-    this.scene.start('Record', {});
+    this.scene.start('Tram', {});
+  }
+
+  // Before the names: what the people from Tram 6 said, years on.
+  async witnesses() {
+    const R = SPAN_RECORD;
+    const quotes = [narrative.record('sleeper') === 'woke' ? R.sleeperWoke : R.sleeperLeft, R.aurelio, R.teo, R.nurse, R.engineer, R.mirror];
+    for (const q of quotes) {
+      const text = this.add.text(0, -14, `\u201c${q.text}\u201d`, {
+        fontFamily: 'Cormorant Garamond', fontSize: '30px', color: '#e8dcc0', align: 'center', lineSpacing: 6,
+        wordWrap: { width: 760 },
+      }).setOrigin(0.5, 1).setAlpha(0);
+      const wit = this.add.text(0, 24, q.wit, {
+        fontFamily: 'Jost', fontSize: '15px', color: '#9fb4b9', letterSpacing: 3, align: 'center',
+      }).setOrigin(0.5, 0).setAlpha(0);
+      this.screenBody.add([text, wit]);
+      this.tweens.add({ targets: [text, wit], alpha: 1, duration: 1100 });
+      await wait(this, 1100 + 2600 + q.text.length * 38);
+      this.tweens.add({ targets: [text, wit], alpha: 0, duration: 900 });
+      await wait(this, 1200);
+      text.destroy();
+      wit.destroy();
+    }
   }
 
   // The Record ends where it began: the names, a child's question, and then
@@ -197,8 +220,13 @@ export class VigilScene extends Phaser.Scene {
       }).setOrigin(0.5, 0);
       scroll.add(txt);
     }
+    scroll.setAlpha(0);
+    head.setAlpha(0);
     this.screenBody.add([scroll, head]);
     await this.fx.fadeTo(0, 2600);
+    await this.witnesses();
+    scroll.setAlpha(1);
+    this.tweens.add({ targets: head, alpha: 1, duration: 1200 });
     elegy();
     this.tweens.add({ targets: scroll, y: -per * 37 - 200, duration: 52000, ease: 'Linear' });
     this.tweens.add({ targets: head, alpha: 0, duration: 3000, delay: 4000 });

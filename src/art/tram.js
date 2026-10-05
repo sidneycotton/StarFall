@@ -20,7 +20,7 @@ function shade(ctx, path, top, bottom, x0 = 0, x1 = 0) {
   ctx.fillStyle = x1 ? lin(ctx, x0, 0, x1, 0, [[0, bottom], [0.55, top], [1, bottom]]) : lin(ctx, 0, path[0], 0, path[1], [[0, top], [1, bottom]]);
 }
 
-function head(ctx, x, y, r, { skin, hair, style = 'short', tilt = 0, face = -1, eyes = true }) {
+export function head(ctx, x, y, r, { skin, hair, style = 'short', tilt = 0, face = -1, eyes = true }) {
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(tilt);
@@ -76,7 +76,7 @@ function head(ctx, x, y, r, { skin, hair, style = 'short', tilt = 0, face = -1, 
   ctx.restore();
 }
 
-function shadeHex(hex, amt) {
+export function shadeHex(hex, amt) {
   const n = parseInt(hex.slice(1), 16);
   const f = (v) => Math.max(0, Math.min(255, Math.round(amt < 0 ? v * (1 + amt) : v + (255 - v) * amt)));
   const r = f((n >> 16) & 255), g = f((n >> 8) & 255), b = f(n & 255);
