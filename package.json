@@ -1,0 +1,20 @@
+{
+  "name": "starfall",
+  "private": true,
+  "version": "0.1.0",
+  "description": "STARFALL — Chapter One opening sequence. A cinematic 2D narrative vertical slice.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview --host"
+  },
+  "dependencies": {
+    "@fontsource/cormorant-garamond": "^5.3.0",
+    "@fontsource/jost": "^5.3.0",
+    "phaser": "3.90.0"
+  },
+  "devDependencies": {
+    "vite": "^6.3.0"
+  }
+}
