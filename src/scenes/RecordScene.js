@@ -431,7 +431,7 @@ export class RecordScene extends Phaser.Scene {
     // Light runs up the cable from her hands.
     const beam = this.add.image(SPOT.hanger + 12, DECK - 260, 'light_beam').setOrigin(0.5, 1).setBlendMode(ADD).setTint(0xffe2a0).setScale(0.3, 0.4).setAlpha(0).setDepth(51);
     const res = await qte(this, {
-      type: 'mash', label: RECORD.r3.prompt, presses: 14, limit: 6000, x: VIEW_W * 0.5, y: VIEW_H * 0.3,
+      type: 'mash', label: RECORD.r3.prompt, presses: 12, limit: 7500, x: VIEW_W * 0.5, y: VIEW_H * 0.3,
       onProgress: (p) => {
         beam.setAlpha(p * 0.7);
         this.star.radiance = p;
