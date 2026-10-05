@@ -120,6 +120,7 @@ export class SeerCallScene extends Phaser.Scene {
 
   // ------------------------------------------------------------------ helpers
   say(line) {
+    if (!this.sys.isActive()) return new Promise(() => {});
     return ui.dialogue.play([line]);
   }
 

@@ -80,7 +80,9 @@ export class PenthouseScene extends Phaser.Scene {
     return 1.14;
   }
 
+  // Dialogue only plays while this scene is alive (a restart can interrupt a cutscene).
   say(lines) {
+    if (!this.sys.isActive()) return new Promise(() => {});
     return ui.dialogue.play(lines);
   }
 
@@ -204,6 +206,8 @@ export class PenthouseScene extends Phaser.Scene {
     this.interactions.setEnabled(true);
     this.cameraDir.follow(this.rig, { lag: 0.035, lead: 150, zoom: 1.12, blend: 2000 });
     this.time.delayedCall(9000, () => ui.panels.showCorner(true));
+    // The Glass at the far end pulses with the three-tone alarm: its source.
+    this.lighting.setSeerPoints([0.7, 0.7, 0.7]);
 
     let warnedNear = false;
     this.stageUpdate = () => {
