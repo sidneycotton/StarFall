@@ -225,14 +225,16 @@ export class PenthouseWorld {
     this.sleeper = this.img(bedLeft + 450, 500, 'sleeper', 0, 0, D.back + 2);
     this.sleeperSit = this.img(bedLeft + 520, 420, 'sleeper_sit', 0, 0, D.back + 2).setAlpha(0);
     // A fold of sheet that can be drawn up over her shoulder.
-    this.sheetCover = s.add.image(bedLeft + 650, 590, 'light_soft').setTint(0x3a1844).setScale(0.9, 0.35).setAlpha(0).setDepth(D.back + 3);
+    this.bedFold = this.img(L.bed, 790, 'bed_fold', 0.5, 1, D.back + 4);
+    this.sheetCover = this.img(bedLeft + 648, 616, 'sheet_pull', 0.5, 1, D.back + 3).setAlpha(0);
 
     this.nightstand = this.img(L.nightstand, 785, 'nightstand', 0.5, 1, D.prop);
     this.relay = this.img(L.nightstand - 36, 716, 'relay', 0.5, 1, D.prop + 1);
     this.relayLed = s.add.image(L.nightstand - 36, 701, 'light_core').setScale(0.32).setBlendMode(ADD).setTint(0xff2a3a).setAlpha(0).setDepth(D.prop + 2);
     this.relayHalo = s.add.image(L.nightstand - 36, 701, 'light_soft').setScale(1.4).setBlendMode(ADD).setTint(0xff2030).setAlpha(0).setDepth(D.light);
     this.glass = this.img(L.nightstand + 26, 716, 'glass', 0.5, 1, D.prop + 3);
-    this.arm = this.img(bedLeft + 105, 598, 'px_arm_hang', 0.45, 0.02, D.prop + 2).setRotation(0.12);
+    // Hangs from the mattress edge, behind the bed's front corner.
+    this.arm = this.img(bedLeft + 88, 600, 'px_arm_hang', 0.5, 0.02, D.back - 1).setRotation(0.1);
 
     this.lampL = this.img(L.lampL, 790, 'floor_lamp', 0.5, 1, D.back + 1);
     this.lampR = this.img(L.lampR, 790, 'floor_lamp', 0.5, 1, D.back + 1);

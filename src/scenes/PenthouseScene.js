@@ -244,7 +244,8 @@ export class PenthouseScene extends Phaser.Scene {
     this.inspect('sleeper', 4010, 570, { once: true, range: 110, run: async (def) => {
       await this.rig.pose('lean', 800);
       sfx.sheetPull();
-      tween(this, { targets: w.sheetCover, alpha: 0.9, scaleY: 0.45, duration: 1100, ease: 'Sine.easeOut' });
+      w.sheetCover.y += 14;
+      tween(this, { targets: w.sheetCover, alpha: 1, y: w.sheetCover.y - 14, duration: 1100, ease: 'Sine.easeOut' });
       narrative.setFlag('sleeperCovered');
       await wait(this, 900);
       await this.rig.pose(null, 900);

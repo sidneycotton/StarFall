@@ -12,57 +12,6 @@ const DUVET_HI = '#6a3a7c';
 const SKIN = '#9a7484';
 const SKIN_SH = '#3c2532';
 
-function duvetFolds(ctx, x0, x1, y0, y1, seed) {
-  const r = rng(seed);
-  ctx.save();
-  for (let i = 0; i < 9; i++) {
-    const x = x0 + r() * (x1 - x0);
-    const y = y0 + r() * (y1 - y0);
-    const len = 40 + r() * 120;
-    ctx.strokeStyle = rgba(DUVET_HI, 0.25 + r() * 0.35);
-    ctx.lineWidth = 1 + r() * 2.5;
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.quadraticCurveTo(x + len * 0.5, y - 10 + r() * 20, x + len, y + (r() - 0.5) * 30);
-    ctx.stroke();
-  }
-  ctx.restore();
-}
-
-// Hair spread across a pillow: a soft mass with tapered locks spilling out of it.
-function hairMass(ctx, cx, cy, rx, ry, dark, mid, hi, seed, dir = 0, count = 5) {
-  const r = rng(seed);
-  ctx.fillStyle = lin(ctx, 0, cy - ry, 0, cy + ry, [[0, mid], [1, dark]]);
-  ctx.beginPath();
-  ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
-  ctx.fill();
-  // Locks fall one way only, like hair dragged across a pillow by sleep.
-  for (let i = 0; i < count; i++) {
-    const a = dir + (r() - 0.5) * 0.9;
-    const x0 = cx + Math.cos(a) * rx * 0.6;
-    const y0 = cy + Math.sin(a) * ry * 0.6;
-    const len = rx * (0.35 + r() * 0.4);
-    const x1 = x0 + Math.cos(a) * len;
-    const y1 = y0 + Math.sin(a) * len * 0.45 + 6;
-    const wdt = 8 + r() * 8;
-    ctx.fillStyle = r() < 0.5 ? dark : mid;
-    ctx.beginPath();
-    ctx.moveTo(x0 - wdt, y0);
-    ctx.quadraticCurveTo((x0 + x1) / 2, (y0 + y1) / 2 - 6, x1, y1);
-    ctx.quadraticCurveTo((x0 + x1) / 2, (y0 + y1) / 2 + 6, x0 + wdt, y0);
-    ctx.fill();
-  }
-  ctx.strokeStyle = hi;
-  ctx.lineWidth = 0.8;
-  for (let i = 0; i < 5; i++) {
-    const x = cx - rx * 0.6 + r() * rx * 1.2;
-    ctx.beginPath();
-    ctx.moveTo(x, cy - ry * 0.7);
-    ctx.bezierCurveTo(x + 10, cy - ry * 0.2, x - 8, cy + ry * 0.2, x + 6, cy + ry * 0.7);
-    ctx.stroke();
-  }
-}
-
 export function registerBedroom(scene) {
   // 900×520, origin bottom-centre. Headboard centre (450, 290).
   paintTexture(scene, 'bed', 900, 520, (ctx, w, h) => {
@@ -105,19 +54,32 @@ export function registerBedroom(scene) {
       ctx.restore();
     });
 
-    // Duvet: deep plum satin pulled into the middle, spilling over the foot.
-    ctx.fillStyle = lin(ctx, 0, back + 40, 0, front + 60, [[0, '#3a1844'], [0.5, DUVET], [1, '#180a1e']]);
+    // Duvet: deep plum satin, pulled up to the shoulders. Broad soft folds only.
+    ctx.fillStyle = lin(ctx, 0, back + 60, 0, front + 60, [[0, '#3a1844'], [0.5, DUVET], [1, '#160a1c']]);
     ctx.beginPath();
-    ctx.moveTo(cx - 380, front - 10);
-    ctx.quadraticCurveTo(cx - 360, back + 70, cx - 240, back + 66);
-    ctx.quadraticCurveTo(cx - 40, back + 40, cx + 120, back + 70);
-    ctx.quadraticCurveTo(cx + 330, back + 60, cx + 385, front - 6);
+    ctx.moveTo(cx - 372, front - 10);
+    ctx.lineTo(cx - 356, back + 68);
+    ctx.lineTo(cx + 356, back + 68);
+    ctx.lineTo(cx + 380, front - 6);
     ctx.lineTo(cx + 395, front + 52);
-    ctx.quadraticCurveTo(cx + 200, front + 70, cx + 40, front + 48);
-    ctx.quadraticCurveTo(cx - 160, front + 74, cx - 395, front + 50);
+    ctx.quadraticCurveTo(cx + 200, front + 66, cx + 40, front + 50);
+    ctx.quadraticCurveTo(cx - 160, front + 68, cx - 395, front + 50);
     ctx.closePath();
     ctx.fill();
-    duvetFolds(ctx, cx - 340, cx + 300, back + 80, front + 20, 3);
+    ctx.save();
+    ctx.clip();
+    // Satin catches the lamp in long, slow highlights running toward the foot.
+    [[cx - 300, 0.10], [cx - 20, 0.07], [cx + 280, 0.09]].forEach(([x, a]) => {
+      ctx.fillStyle = lin(ctx, x - 50, 0, x + 50, 0, [[0, rgba(DUVET_HI, 0)], [0.5, rgba('#9a6ab8', a)], [1, rgba(DUVET_HI, 0)]]);
+      ctx.beginPath();
+      ctx.moveTo(x - 20, back + 70); ctx.lineTo(x + 20, back + 70); ctx.lineTo(x * 1.0 + (x - cx) * 0.18 + 40, front + 60); ctx.lineTo(x + (x - cx) * 0.18 - 40, front + 60);
+      ctx.closePath();
+      ctx.fill();
+    });
+    // The duvet spilling over the foot edge.
+    ctx.fillStyle = lin(ctx, 0, front - 4, 0, front + 50, [[0, rgba('#8a5aa8', 0.22)], [0.3, rgba('#000', 0)], [1, rgba('#000', 0.35)]]);
+    ctx.fillRect(cx - 400, front - 4, 800, 60);
+    ctx.restore();
 
     // Front face of the bed and its plinth.
     ctx.fillStyle = lin(ctx, 0, front + 40, 0, h, [[0, '#120816'], [1, '#050307']]);
@@ -128,114 +90,188 @@ export function registerBedroom(scene) {
     ctx.fillRect(cx - 380, h - 32, 760, 32);
   });
 
-  // Parallax asleep, face down, turned away; the arm is a separate sprite.
-  // Painted at 2× because the opening frames it in close-up.
-  paintTexture(scene, 'px_lying', 380, 220, (ctx, w, h) => {
-    // Duvet hump over the body, its ridge following the spine.
-    ctx.fillStyle = lin(ctx, 0, 80, 0, h, [[0, '#4a2258'], [0.35, DUVET], [1, '#12061a']]);
+  // The turned-down sheet across both sleepers, drawn above them so their
+  // shoulders disappear under it. Same frame as the bed.
+  paintTexture(scene, 'bed_fold', 900, 520, (ctx) => {
+    const cx = 450; const y0 = 336; const y1 = 354;
+    const edge = (x) => y0 + Math.sin(x / 37) * 2 + Math.sin(x / 13) * 0.8;
+    ctx.fillStyle = lin(ctx, 0, y1, 0, y1 + 16, [[0, rgba('#000', 0.45)], [1, rgba('#000', 0)]]);
+    ctx.fillRect(cx - 360, y1, 720, 16);
+    ctx.fillStyle = lin(ctx, 0, y0 - 2, 0, y1, [[0, '#d2c4e0'], [0.4, '#a898bc'], [1, '#5e4e72']]);
     ctx.beginPath();
-    ctx.moveTo(10, h);
-    ctx.bezierCurveTo(30, 120, 120, 104, 200, 108);
-    ctx.bezierCurveTo(290, 110, 350, 130, 372, h);
+    ctx.moveTo(cx - 357, edge(cx - 357));
+    for (let x = cx - 357; x <= cx + 357; x += 6) ctx.lineTo(x, edge(x));
+    ctx.lineTo(cx + 360, y1);
+    ctx.lineTo(cx - 360, y1);
     ctx.closePath();
     ctx.fill();
-    ctx.strokeStyle = rgba('#9a6ab8', 0.35);
-    ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(40, 150); ctx.bezierCurveTo(110, 112, 220, 110, 330, 138); ctx.stroke();
-    duvetFolds(ctx, 40, 320, 140, 200, 9);
-    // Bare upper back in violet half-light.
-    ctx.fillStyle = lin(ctx, 0, 52, 0, 126, [[0, '#7a5872'], [0.45, '#4a2e44'], [1, '#22121e']]);
-    ctx.beginPath();
-    ctx.moveTo(78, 118);
-    ctx.bezierCurveTo(78, 84, 110, 64, 160, 62);
-    ctx.bezierCurveTo(210, 60, 260, 66, 286, 92);
-    ctx.bezierCurveTo(296, 104, 292, 116, 284, 122);
-    ctx.bezierCurveTo(220, 112, 140, 112, 78, 118);
-    ctx.fill();
-    // Rim light along the top of the shoulders.
-    ctx.strokeStyle = rgba('#d6b4e6', 0.55);
-    ctx.lineWidth = 1.2;
-    ctx.beginPath(); ctx.moveTo(84, 96); ctx.bezierCurveTo(110, 70, 150, 63, 190, 62); ctx.stroke();
-    // The groove of the spine, barely there.
-    line(ctx, 188, 68, 190, 112, rgba('#1a0c16', 0.35), 1.2);
-    // The scar: small, pale, four-rayed. Never mentioned.
-    line(ctx, 228, 80, 240, 92, rgba('#e9dbe6', 0.45), 1);
-    line(ctx, 240, 80, 228, 92, rgba('#e9dbe6', 0.3), 0.8);
-    line(ctx, 234, 76, 234, 96, rgba('#e9dbe6', 0.2), 0.7);
-    // Head turned into the pillow: only dark hair shows.
-    hairMass(ctx, 194, 40, 50, 26, '#0a070d', '#1e1628', rgba('#a77bff', 0.28), 4, Math.PI * 0.75, 4);
-    // A fold of pillow pushed up against the face.
-    ctx.fillStyle = lin(ctx, 0, 40, 0, 80, [[0, '#b8aac8'], [1, '#4a3a58']]);
-    blob(ctx, [[236, 40], [290, 34], [320, 52], [300, 72], [246, 70]]);
-    ctx.fill();
+    // Two soft rucks where the sleepers' shoulders push the sheet up.
+    [[cx - 245, 1], [cx + 195, 0.8]].forEach(([x, k]) => {
+      ctx.fillStyle = lin(ctx, 0, y0 - 8, 0, y0 + 6, [[0, '#d8cae6'], [1, '#a898bc']]);
+      ctx.beginPath();
+      ctx.ellipse(x, y0 + 2, 70 * k, 7, 0, Math.PI, 0);
+      ctx.fill();
+    });
   }, { scale: 2 });
 
-  // The hanging arm: pivot at the shoulder (top), hand at the bottom.
-  paintTexture(scene, 'px_arm_hang', 60, 200, (ctx) => {
-    ctx.fillStyle = lin(ctx, 10, 0, 50, 0, [[0, '#2a1626'], [0.6, '#5a3a52'], [1, '#7a5872']]);
+  // Parallax asleep: face down, head turned away, bare shoulders above the sheet.
+  // Local frame: (0,0) = bed (20, 230). The sheet's fold sits at y≈108.
+  paintTexture(scene, 'px_lying', 380, 220, (ctx) => {
+    const S = { hi: '#a07ea0', mid: '#5e3e58', sh: '#2a1626', rim: '#d6b4e6' };
+    // The body's length under the duvet: a low ridge running toward the foot.
+    ctx.fillStyle = lin(ctx, 120, 0, 260, 0, [[0, rgba('#000', 0)], [0.35, rgba('#000', 0.28)], [0.5, rgba('#9a6ab8', 0.16)], [0.75, rgba('#000', 0)]]);
     ctx.beginPath();
-    ctx.moveTo(14, 2);
-    ctx.bezierCurveTo(30, -2, 44, 4, 42, 22);
-    ctx.lineTo(38, 92);
-    ctx.quadraticCurveTo(40, 100, 37, 108);
-    ctx.lineTo(33, 160);
-    ctx.lineTo(25, 160);
-    ctx.lineTo(22, 108);
-    ctx.quadraticCurveTo(18, 98, 19, 90);
-    ctx.lineTo(12, 22);
+    ctx.moveTo(110, 116); ctx.lineTo(300, 116); ctx.lineTo(270, 220); ctx.lineTo(60, 220);
     ctx.closePath();
     ctx.fill();
-    // Hand, relaxed, fingers together.
-    ctx.fillStyle = lin(ctx, 0, 156, 0, 196, [[0, '#5a3a52'], [1, '#2a1626']]);
+    // Near arm: from the shoulder out to the mattress edge (the rest hangs over it).
+    ctx.fillStyle = lin(ctx, 0, 90, 0, 122, [[0, S.hi], [0.5, S.mid], [1, S.sh]]);
     ctx.beginPath();
-    ctx.moveTo(24, 156);
-    ctx.lineTo(35, 156);
-    ctx.quadraticCurveTo(41, 172, 37, 192);
-    ctx.quadraticCurveTo(31, 198, 27, 192);
-    ctx.quadraticCurveTo(21, 176, 24, 156);
+    ctx.moveTo(126, 92);
+    ctx.quadraticCurveTo(96, 94, 66, 102);
+    ctx.lineTo(64, 124);
+    ctx.quadraticCurveTo(98, 118, 130, 118);
+    ctx.closePath();
     ctx.fill();
-    line(ctx, 30, 176, 31, 192, rgba('#1a0c16', 0.5), 0.8);
-    // Rim light down the lit edge.
-    ctx.strokeStyle = rgba('#d6b4e6', 0.5);
+    // Shoulders and upper back, top-lit by the lamps.
+    ctx.fillStyle = lin(ctx, 0, 74, 0, 120, [[0, S.hi], [0.45, S.mid], [1, S.sh]]);
+    ctx.beginPath();
+    ctx.moveTo(112, 120);
+    ctx.bezierCurveTo(112, 96, 140, 84, 178, 80);
+    ctx.quadraticCurveTo(206, 76, 236, 80);
+    ctx.bezierCurveTo(276, 84, 302, 96, 304, 120);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = rgba(S.rim, 0.5);
+    ctx.lineWidth = 1.1;
+    ctx.beginPath(); ctx.moveTo(116, 104); ctx.bezierCurveTo(132, 88, 156, 82, 186, 79); ctx.stroke();
+    // Spine and blades, barely.
+    ctx.fillStyle = lin(ctx, 196, 0, 220, 0, [[0, rgba(S.sh, 0)], [0.5, rgba(S.sh, 0.45)], [1, rgba(S.sh, 0)]]);
+    ctx.fillRect(196, 84, 24, 36);
+    // The scar: small, pale, four-rayed. Never mentioned.
+    line(ctx, 152, 98, 162, 108, rgba('#eadcea', 0.4), 0.9);
+    line(ctx, 162, 98, 152, 108, rgba('#eadcea', 0.28), 0.8);
+    line(ctx, 157, 95, 157, 111, rgba('#eadcea', 0.18), 0.6);
+    // Neck.
+    ctx.fillStyle = lin(ctx, 0, 62, 0, 86, [[0, S.sh], [1, S.mid]]);
+    ctx.fillRect(196, 62, 26, 22);
+    // Head, turned away into the pillow: the back of a dark head of hair.
+    ctx.fillStyle = lin(ctx, 0, 24, 0, 80, [[0, '#2a2036'], [1, '#0c0810']]);
+    ctx.beginPath();
+    ctx.moveTo(176, 66);
+    ctx.bezierCurveTo(168, 40, 186, 24, 212, 24);
+    ctx.bezierCurveTo(240, 24, 254, 42, 248, 64);
+    ctx.lineTo(240, 74); ctx.lineTo(234, 66); ctx.lineTo(226, 78); ctx.lineTo(218, 68);
+    ctx.lineTo(208, 80); ctx.lineTo(200, 68); ctx.lineTo(190, 76); ctx.lineTo(186, 66);
+    ctx.closePath();
+    ctx.fill();
+    // Strands follow the skull from the crown.
+    ctx.strokeStyle = rgba('#a77bff', 0.3);
     ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(42, 22); ctx.lineTo(38, 92); ctx.lineTo(34, 158); ctx.stroke();
-    // A thin dark ring.
+    for (let i = 0; i < 6; i++) {
+      const x = 186 + i * 11;
+      ctx.beginPath();
+      ctx.moveTo(214, 30);
+      ctx.quadraticCurveTo(x - 4 + (i - 2.5) * 4, 42, x, 66);
+      ctx.stroke();
+    }
+    ctx.strokeStyle = rgba('#d8c0ff', 0.35);
+    ctx.beginPath(); ctx.arc(212, 48, 26, Math.PI * 1.15, Math.PI * 1.55); ctx.stroke();
+  }, { scale: 2 });
+
+  // The forearm and hand hanging off the side of the mattress. Pivot at the top.
+  paintTexture(scene, 'px_arm_hang', 60, 200, (ctx) => {
+    ctx.fillStyle = lin(ctx, 12, 0, 46, 0, [[0, '#2a1626'], [0.6, '#5e3e58'], [1, '#8a6888']]);
+    ctx.beginPath();
+    ctx.moveTo(16, 0);
+    ctx.lineTo(42, 0);
+    ctx.quadraticCurveTo(44, 60, 38, 110);
+    ctx.lineTo(34, 158);
+    ctx.lineTo(24, 158);
+    ctx.lineTo(20, 110);
+    ctx.quadraticCurveTo(14, 60, 16, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = lin(ctx, 0, 154, 0, 196, [[0, '#5e3e58'], [1, '#2a1626']]);
+    ctx.beginPath();
+    ctx.moveTo(23, 154);
+    ctx.lineTo(35, 154);
+    ctx.quadraticCurveTo(42, 172, 37, 192);
+    ctx.quadraticCurveTo(30, 199, 26, 192);
+    ctx.quadraticCurveTo(19, 175, 23, 154);
+    ctx.fill();
+    ctx.strokeStyle = rgba('#d6b4e6', 0.45);
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(42, 4); ctx.quadraticCurveTo(43, 60, 37, 110); ctx.lineTo(34, 156); ctx.stroke();
     line(ctx, 26, 182, 36, 182, '#0b0710', 1.6);
   }, { scale: 2 });
 
-  // The other woman: asleep on her side, facing away, wine-dark hair across the pillow.
-  paintTexture(scene, 'sleeper', 380, 220, (ctx, w, h) => {
-    ctx.fillStyle = lin(ctx, 0, 80, 0, h, [[0, '#4a2258'], [0.35, DUVET], [1, '#12061a']]);
+  // The other woman: on her side, turned away; long hair across the pillow,
+  // one bare shoulder, an arm thrown over the pillow. Local (0,0) = bed (450, 230).
+  paintTexture(scene, 'sleeper', 380, 220, (ctx) => {
+    const S = { hi: '#c49aae', mid: '#7a5466', sh: '#3a2232', rim: '#f2d4e2' };
+    // Her curled body under the duvet, hip toward the foot of the bed.
+    ctx.fillStyle = lin(ctx, 150, 0, 330, 0, [[0, rgba('#000', 0)], [0.4, rgba('#9a6ab8', 0.16)], [0.65, rgba('#000', 0.3)], [1, rgba('#000', 0)]]);
     ctx.beginPath();
-    ctx.moveTo(10, h);
-    ctx.bezierCurveTo(20, 130, 120, 100, 210, 104);
-    ctx.bezierCurveTo(300, 108, 360, 140, 372, h);
+    ctx.moveTo(150, 116); ctx.lineTo(300, 116); ctx.lineTo(350, 220); ctx.lineTo(170, 220);
     ctx.closePath();
     ctx.fill();
-    ctx.strokeStyle = rgba('#9a6ab8', 0.35);
-    ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(60, 150); ctx.bezierCurveTo(150, 104, 250, 106, 350, 150); ctx.stroke();
-    duvetFolds(ctx, 40, 330, 130, 200, 21);
-    // Hair spread over the pillow.
-    hairMass(ctx, 160, 40, 84, 30, '#1e0810', '#4a1a2a', rgba('#c46a7a', 0.3), 12, Math.PI * 0.85, 6);
-    // Shoulder, bare, catching the lamp.
-    ctx.fillStyle = lin(ctx, 0, 60, 0, 120, [[0, '#9a7488'], [1, '#3a2232']]);
+    // Arm over the pillow, a gold bracelet.
+    ctx.fillStyle = lin(ctx, 0, 34, 0, 70, [[0, S.hi], [1, S.sh]]);
     ctx.beginPath();
-    ctx.moveTo(176, 112);
-    ctx.bezierCurveTo(180, 80, 220, 66, 262, 74);
-    ctx.bezierCurveTo(296, 80, 306, 102, 300, 116);
-    ctx.bezierCurveTo(260, 106, 210, 106, 176, 112);
-    ctx.fill();
-    ctx.strokeStyle = rgba('#f0d0dc', 0.45);
-    ctx.lineWidth = 1.2;
-    ctx.beginPath(); ctx.moveTo(196, 86); ctx.bezierCurveTo(220, 72, 250, 70, 276, 76); ctx.stroke();
-    // An arm thrown over the pillow; a gold bracelet.
-    ctx.fillStyle = lin(ctx, 0, 30, 0, 64, [[0, '#a07a8c'], [1, '#4a3040']]);
-    blob(ctx, [[262, 40], [330, 30], [352, 42], [326, 56], [270, 62]]);
+    ctx.moveTo(214, 86);
+    ctx.bezierCurveTo(240, 54, 290, 40, 330, 38);
+    ctx.quadraticCurveTo(344, 42, 336, 52);
+    ctx.bezierCurveTo(296, 56, 256, 72, 236, 96);
+    ctx.closePath();
     ctx.fill();
     ctx.strokeStyle = rgba(C.gold, 0.9);
     ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.ellipse(320, 44, 2.5, 8, 0.2, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(316, 44, 2.5, 7, 0.4, 0, Math.PI * 2); ctx.stroke();
+    // Shoulder and the top of her back, rounded, catching the lamp.
+    ctx.fillStyle = lin(ctx, 0, 70, 0, 118, [[0, S.hi], [0.5, S.mid], [1, S.sh]]);
+    ctx.beginPath();
+    ctx.moveTo(140, 120);
+    ctx.bezierCurveTo(142, 96, 164, 80, 196, 78);
+    ctx.bezierCurveTo(228, 76, 252, 92, 256, 120);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = rgba(S.rim, 0.5);
+    ctx.lineWidth = 1.1;
+    ctx.beginPath(); ctx.moveTo(150, 98); ctx.bezierCurveTo(166, 84, 188, 79, 214, 80); ctx.stroke();
+    // Head, mostly hair; long tresses spilling across the pillow toward him.
+    ctx.fillStyle = lin(ctx, 0, 20, 0, 84, [[0, '#5a2232'], [1, '#22080f']]);
+    ctx.beginPath();
+    ctx.moveTo(196, 82);
+    ctx.bezierCurveTo(206, 54, 194, 28, 166, 26);
+    ctx.bezierCurveTo(140, 24, 122, 40, 118, 58);
+    // The spill: waves running left and down over the pillow.
+    ctx.bezierCurveTo(96, 50, 70, 64, 40, 58);
+    ctx.bezierCurveTo(62, 70, 84, 68, 104, 74);
+    ctx.bezierCurveTo(84, 82, 62, 92, 48, 108);
+    ctx.bezierCurveTo(78, 98, 110, 88, 132, 90);
+    ctx.bezierCurveTo(150, 92, 176, 96, 196, 82);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = rgba('#d47a8a', 0.32);
+    ctx.lineWidth = 1;
+    [[180, 36, 120, 60, 50, 60], [176, 50, 110, 72, 60, 100], [188, 70, 140, 84, 100, 84], [160, 32, 130, 44, 90, 58]].forEach(([x0, y0, x1, y1, x2, y2]) => {
+      ctx.beginPath(); ctx.moveTo(x0, y0); ctx.quadraticCurveTo(x1, y1, x2, y2); ctx.stroke();
+    });
+  }, { scale: 2 });
+
+  // A fold of duvet drawn up over her shoulder.
+  paintTexture(scene, 'sheet_pull', 160, 70, (ctx, w, h) => {
+    ctx.fillStyle = lin(ctx, 0, 6, 0, h, [[0, '#5a2c6a'], [0.4, DUVET], [1, rgba(DUVET, 0)]]);
+    ctx.beginPath();
+    ctx.moveTo(8, h);
+    ctx.bezierCurveTo(14, 26, 50, 8, 84, 8);
+    ctx.bezierCurveTo(120, 8, 150, 28, 154, h);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = rgba('#b88ad0', 0.45);
+    ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(18, 40); ctx.bezierCurveTo(36, 16, 70, 9, 100, 11); ctx.stroke();
   }, { scale: 2 });
 
   // Awake, sitting up, sheet held close, watching the window.
