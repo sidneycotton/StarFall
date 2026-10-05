@@ -624,3 +624,17 @@ input[type=range]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 
   .record .choice .opts { width: 92%; gap: 10px; }
 }
 .reduce .record.glitch .scan, .reduce .record .interf.on { animation: none; }
+
+/* A letter, held up close. */
+.paper {
+  position: absolute; left: 50%; top: 46%; width: min(86%, calc(var(--u) * 46));
+  transform: translate(-50%, -50%) rotate(-1.4deg);
+  padding: calc(var(--u) * 3.2) calc(var(--u) * 3.6);
+  background: linear-gradient(170deg, #ece4d2, #ddd2ba); color: #2c2436;
+  font-style: italic; font-size: max(15px, calc(var(--u) * 2.2)); line-height: 1.45;
+  box-shadow: 0 14px 50px rgba(0,0,0,0.8);
+  opacity: 0; transition: opacity 0.9s var(--ease); pointer-events: none; z-index: 12;
+}
+.paper.on { opacity: 1; }
+.paper p { margin: 0 0 0.6em; }
+.paper p.sig { text-align: right; margin: 1em 0 0; }

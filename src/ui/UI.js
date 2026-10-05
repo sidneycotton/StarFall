@@ -35,6 +35,7 @@ class UIRoot {
     this.title = el(this.root, 'title', '<div class="word">STARFALL</div><div class="chapter">Chapter One</div><div class="sub">What Survives</div><div class="actions"><button class="next">Chapter Two</button><button class="again">Begin again</button></div>');
     this.hintEl = el(this.root, 'hint');
     this.chapterEl = el(this.root, 'chaptercard', '<div class="c"></div><div class="rule"></div><div class="s"></div>');
+    this.paperEl = el(this.root, 'paper');
 
     this.dialogue = new Dialogue(this.root, this.stage);
     this.touch = new TouchControls(this.root);
@@ -126,6 +127,17 @@ class UIRoot {
     this.hintEl.textContent = text;
     this.hintEl.classList.add('on');
     if (ms) this.hintTimer = setTimeout(() => this.hintEl.classList.remove('on'), ms);
+  }
+
+  // A handwritten page held up to the eye. The last line is the signature.
+  paper(lines) {
+    const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    this.paperEl.innerHTML = lines.map((t, i) => `<p class="${i === lines.length - 1 ? 'sig' : ''}">${esc(t)}</p>`).join('');
+    this.paperEl.classList.add('on');
+  }
+
+  paperOff() {
+    this.paperEl.classList.remove('on');
   }
 
   // "Chapter Two · The Starfall Record", centred over the picture.
