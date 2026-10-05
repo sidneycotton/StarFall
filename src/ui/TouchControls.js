@@ -59,10 +59,14 @@ export class TouchControls {
 
     window.addEventListener('touchstart', () => {
       this.touchSeen = true;
+      input.lastDevice = 'touch';
       document.getElementById('ui').classList.add('touch');
       this.refresh();
     }, { passive: true });
-    if (IS_TOUCH) document.getElementById('ui').classList.add('touch');
+    if (IS_TOUCH) {
+      document.getElementById('ui').classList.add('touch');
+      input.lastDevice = 'touch';
+    }
   }
 
   // Scenes call this when player control starts/stops.

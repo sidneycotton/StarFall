@@ -450,4 +450,7 @@ input[type=range]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 
   .dlg { width: 84%; bottom: 9%; }
 }
 
-.reduce * { transition-duration: 0.2s !important; animation: none !important; }
+.reduce .dlg, .reduce .dlg.on, .reduce .prompt, .reduce .prompt.on { transform: translate(-50%, 0); }
+.reduce .prompt, .reduce .prompt.on { transform: translate(-50%, -100%); }
+.reduce .title .word { filter: none; letter-spacing: 0.62em; }
+.reduce .start .line, .reduce .dlg-next, .reduce .hud .tick { animation: none !important; }

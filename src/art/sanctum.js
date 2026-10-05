@@ -65,7 +65,6 @@ export function registerSanctum(scene) {
     ctx.lineWidth = 1;
     ctx.beginPath(); archPath(ctx, nx, ny, 210, 450); ctx.stroke();
     glow(ctx, nx + 105, ny + 30, 120, '#7b4bc4', 0.08);
-    void w;
     // Floor shadow line.
     ctx.fillStyle = '#030204';
     ctx.fillRect(0, 640, w, 60);

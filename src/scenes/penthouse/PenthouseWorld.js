@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { addPainted, paintScaleOf } from '../../art/paint.js';
+import { addPainted } from '../../art/paint.js';
 import { VIEW_W, VIEW_H } from '../../config.js';
 import { WORLD_W, SF, L, px } from './layout.js';
 import { WALL_H } from '../../art/kit.js';
@@ -146,6 +146,10 @@ export class PenthouseWorld {
       const sh = addPainted(s, px(x, sf), 60, 'shutter_slit', 0.5, 0).setScrollFactor(sf, 1).setDepth(D.shutter);
       sh.homeScale = sh.scaleY;
       sh.worldX = x;
+      // Shafts of city light that pour in once the shutter lifts.
+      sh.shaft = s.add.image(px(x, 0.97), 60, 'light_cone').setOrigin(0.5, 0).setScrollFactor(0.97, 1)
+        .setScale(0.9, 1.5).setRotation(0.38).setBlendMode(ADD).setTint(0xc8c4ff).setAlpha(0).setDepth(D.light - 1);
+      sh.pool = s.add.image(x + 120, 800, 'light_soft').setScale(1.8, 0.28).setBlendMode(ADD).setTint(0xb8b4f0).setAlpha(0).setDepth(D.floorFx);
       this.slitShutters.push(sh);
     });
 
@@ -280,7 +284,7 @@ export class PenthouseWorld {
     this.trophy = this.img(L.trophy, 742, 'trophy', 0.5, 1, D.back + 1).setRotation(-0.14);
     this.img(L.crate, 794, 'crate', 0.5, 1, D.back + 2);
     this.figurine = this.img(L.figurine, 812, 'figurine', 0.5, 1, D.front);
-    this.img(L.portrait, 794, 'portrait_back', 0.5, 1, D.back).setRotation(0.06);
+    this.img(L.portrait, 794, 'portrait_back', 0.5, 1, D.back).setRotation(0.06).setScale(0.72).setTint(0x8a7a90);
     // A single cold spot from the gallery slit.
     this.light(px(L.gallerySlit, SF.wall), 360, 0xa0a8d0, [0.8, 2.2], 0.07, { sf: SF.wall, depth: D.wallFx, group: 'window' }).home = 0.07;
     this.light(L.crate, 780, 0x6a5aa0, [2.4, 0.4], 0.12, { depth: D.floorFx, group: 'violet' });
@@ -335,7 +339,6 @@ export class PenthouseWorld {
     fg(8420, 0, 'fg_drape', 0, 0, 1, true);
     fg(1350, 0, 'fg_column', 0.5, 0);
     this.fgLamp = fg(5700, 40, 'fg_lamp', 0.5, 0.5, 0.55).setBlendMode(ADD);
-    void paintScaleOf;
   }
 
   buildAtmosphere() {

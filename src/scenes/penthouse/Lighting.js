@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { sound } from '../../audio/soundscape.js';
 import { audio } from '../../audio/AudioEngine.js';
-import { L, SF } from './layout.js';
+import { L } from './layout.js';
 
 // Two lighting systems fighting over one room.
 //   PARTY  — violet, soft, slow, residual: lamp pools that breathe.
@@ -62,7 +62,6 @@ export class Lighting {
       p.redY = 0.45;
       p.redFocus = this.cityAlert > 0 ? 0.2 : 0.55;
     }
-    void SF;
   }
 
   setSeerPoints(levels) {

@@ -53,8 +53,8 @@ export class ChamberScene extends Phaser.Scene {
     // Hard overhead lights: thin bars, cones, and their reflections in the floor.
     [380, 900, 1700].forEach((x) => {
       this.add.image(x, 20, 'ch_lightbar').setDepth(3);
-      this.add.image(x, 22, 'light_cone').setOrigin(0.5, 0).setScale(2.6, 1.6).setBlendMode(ADD).setTint(0xcfc8ea).setAlpha(0.06).setDepth(4);
-      this.add.image(x, 790, 'light_soft').setScale(2.6, 0.3).setBlendMode(ADD).setTint(0xcfc8ea).setAlpha(0.12).setDepth(3);
+      this.add.image(x, 22, 'light_cone').setOrigin(0.5, 0).setScale(2.6, 1.6).setBlendMode(ADD).setTint(0xcfc8ea).setAlpha(0.1).setDepth(4);
+      this.add.image(x, 790, 'light_soft').setScale(2.6, 0.3).setBlendMode(ADD).setTint(0xcfc8ea).setAlpha(0.2).setDepth(3);
       this.add.image(x, 860, 'light_drip').setScale(4, 0.5).setBlendMode(ADD).setTint(0xcfc8ea).setAlpha(0.05).setDepth(3);
     });
     // The door Parallax came in through.
@@ -161,7 +161,7 @@ export class ChamberScene extends Phaser.Scene {
     const cw = 250;
     const gap = 22;
     const total = HEROES.length * cw + (HEROES.length - 1) * gap;
-    const x0 = (VIEW_W - total) / 2 + cw / 2 + 110;
+    const x0 = (VIEW_W - total) / 2 + cw / 2 + 60;
     HEROES.forEach((h, i) => {
       this.time.delayedCall(300 + i * 280, () => this.cards.push(this.makeCard(h, x0 + i * (cw + gap), 400, i)));
     });

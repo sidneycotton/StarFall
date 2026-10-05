@@ -472,7 +472,7 @@ export class PenthouseScene extends Phaser.Scene {
       ev(2950, () => { sound.run.escalate(3); this.wakeSpine(); }),
       ev(1550, () => this.starProtocol()),
       ev(560, () => this.openDoor(this.world.chamberDoor)),
-      ev(250, () => this.enterChamber()),
+      ev(330, () => this.enterChamber()),
     ];
     this.spineOpened = new Set();
     this.streakTimer = 0;
@@ -487,6 +487,8 @@ export class PenthouseScene extends Phaser.Scene {
         if (!this.spineOpened.has(i) && x < sh.worldX + 520 && x < 3000) {
           this.spineOpened.add(i);
           this.tweens.add({ targets: sh, scaleY: sh.homeScale * 0.04, duration: 900, ease: 'Cubic.easeInOut' });
+          this.tweens.add({ targets: sh.shaft, alpha: 0.13, duration: 1100, delay: 300 });
+          this.tweens.add({ targets: sh.pool, alpha: 0.16, duration: 1100, delay: 400 });
           sfx.shutterRise({ pan: -0.3, gain: 0.05 });
         }
       });
@@ -547,7 +549,7 @@ export class PenthouseScene extends Phaser.Scene {
     const glow = this.add.image(frame.x, sy + 206, 'light_soft').setScale(1.4, 1.8).setBlendMode(ADD).setTint(0xcfd8ff).setAlpha(0).setDepth(D.back + 1);
     this.tweens.add({ targets: glow, alpha: 0.12, duration: 400 });
     const kicker = this.add.text(sx + 22, sy + 40, '', { fontFamily: 'Jost', fontSize: '13px', color: '#a9cbd2', letterSpacing: 4 }).setDepth(D.back + 2).setAlpha(0);
-    const head = this.add.text(sx + 22, sy + 74, '', { fontFamily: 'Cormorant Garamond', fontSize: '34px', color: '#ece6f2', wordWrap: { width: 250 }, lineSpacing: 2 }).setDepth(D.back + 2).setAlpha(0);
+    const head = this.add.text(sx + 22, sy + 74, '', { fontFamily: 'Cormorant Garamond', fontSize: '30px', color: '#ece6f2', wordWrap: { width: 240 }, lineSpacing: 2 }).setDepth(D.back + 2).setAlpha(0);
     const rule = this.add.image(sx + 22, sy + 66, 'pixel').setOrigin(0, 0.5).setDisplaySize(36, 1).setTint(0xa9cbd2).setAlpha(0).setDepth(D.back + 2);
     let i = 0;
     const show = () => {

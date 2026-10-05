@@ -30,20 +30,21 @@ function duvetFolds(ctx, x0, x1, y0, y1, seed) {
 }
 
 // Hair spread across a pillow: a soft mass with tapered locks spilling out of it.
-function hairMass(ctx, cx, cy, rx, ry, dark, mid, hi, seed) {
+function hairMass(ctx, cx, cy, rx, ry, dark, mid, hi, seed, dir = 0, count = 5) {
   const r = rng(seed);
   ctx.fillStyle = lin(ctx, 0, cy - ry, 0, cy + ry, [[0, mid], [1, dark]]);
   ctx.beginPath();
   ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
   ctx.fill();
-  for (let i = 0; i < 9; i++) {
-    const a = Math.PI * (0.05 + r() * 0.9) * (r() < 0.5 ? 1 : -1) + (r() < 0.5 ? 0 : Math.PI);
+  // Locks fall one way only, like hair dragged across a pillow by sleep.
+  for (let i = 0; i < count; i++) {
+    const a = dir + (r() - 0.5) * 0.9;
     const x0 = cx + Math.cos(a) * rx * 0.6;
     const y0 = cy + Math.sin(a) * ry * 0.6;
-    const len = rx * (0.5 + r() * 0.6);
+    const len = rx * (0.35 + r() * 0.4);
     const x1 = x0 + Math.cos(a) * len;
     const y1 = y0 + Math.sin(a) * len * 0.45 + 6;
-    const wdt = 5 + r() * 7;
+    const wdt = 8 + r() * 8;
     ctx.fillStyle = r() < 0.5 ? dark : mid;
     ctx.beginPath();
     ctx.moveTo(x0 - wdt, y0);
@@ -162,7 +163,7 @@ export function registerBedroom(scene) {
     line(ctx, 240, 80, 228, 92, rgba('#e9dbe6', 0.3), 0.8);
     line(ctx, 234, 76, 234, 96, rgba('#e9dbe6', 0.2), 0.7);
     // Head turned into the pillow: only dark hair shows.
-    hairMass(ctx, 194, 40, 50, 26, '#0a070d', '#1e1628', rgba('#a77bff', 0.28), 4);
+    hairMass(ctx, 194, 40, 50, 26, '#0a070d', '#1e1628', rgba('#a77bff', 0.28), 4, Math.PI * 0.75, 4);
     // A fold of pillow pushed up against the face.
     ctx.fillStyle = lin(ctx, 0, 40, 0, 80, [[0, '#b8aac8'], [1, '#4a3a58']]);
     blob(ctx, [[236, 40], [290, 34], [320, 52], [300, 72], [246, 70]]);
@@ -216,7 +217,7 @@ export function registerBedroom(scene) {
     ctx.beginPath(); ctx.moveTo(60, 150); ctx.bezierCurveTo(150, 104, 250, 106, 350, 150); ctx.stroke();
     duvetFolds(ctx, 40, 330, 130, 200, 21);
     // Hair spread over the pillow.
-    hairMass(ctx, 160, 40, 84, 30, '#1e0810', '#4a1a2a', rgba('#c46a7a', 0.3), 12);
+    hairMass(ctx, 160, 40, 84, 30, '#1e0810', '#4a1a2a', rgba('#c46a7a', 0.3), 12, Math.PI * 0.85, 6);
     // Shoulder, bare, catching the lamp.
     ctx.fillStyle = lin(ctx, 0, 60, 0, 120, [[0, '#9a7488'], [1, '#3a2232']]);
     ctx.beginPath();

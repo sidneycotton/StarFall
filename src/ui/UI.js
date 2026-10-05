@@ -27,7 +27,7 @@ class UIRoot {
     this.hud = el(this.root, 'hud', '<div class="rim"></div><div class="arc"></div><div class="tick"></div>');
     this.captionEl = el(this.root, 'caption');
     this.barkEl = el(this.root, 'bark');
-    this.nameCard = el(this.root, 'namecard', '<div class="n">Parallax</div><div class="rule"></div><div class="s">Seer of Ruin</div>');
+    this.nameCard = el(this.root, 'namecard', '<div class="n">Parallax</div><div class="rule"></div>');
     this.promptEl = el(this.root, 'prompt', '<div class="key interactive"></div><div class="label"></div>');
     this.promptKey = this.promptEl.querySelector('.key');
     this.promptLabel = this.promptEl.querySelector('.label');
