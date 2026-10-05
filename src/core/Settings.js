@@ -10,6 +10,9 @@ const DEFAULTS = {
   master: 0.9,
   music: 0.8,
   muted: false,
+  // Timed prompts and combat: standard | relaxed (wider windows, hold instead
+  // of mash) | auto (prompts complete themselves; dodges happen for you).
+  assist: 'standard',
 };
 
 export const TEXT_SPEED_CPS = { slow: 28, normal: 48, fast: 90, instant: Infinity };

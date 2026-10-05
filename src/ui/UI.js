@@ -4,6 +4,7 @@ import { VIEW_W, VIEW_H } from '../config.js';
 import { Dialogue } from './Dialogue.js';
 import { TouchControls } from './TouchControls.js';
 import { Panels } from './Panels.js';
+import { RecordOverlay } from './RecordOverlay.js';
 
 // The DOM overlay. It tracks the canvas rectangle exactly, so anything placed
 // in percentages lines up with the picture at any window size.
@@ -31,18 +32,22 @@ class UIRoot {
     this.promptEl = el(this.root, 'prompt', '<div class="key interactive"></div><div class="label"></div>');
     this.promptKey = this.promptEl.querySelector('.key');
     this.promptLabel = this.promptEl.querySelector('.label');
-    this.title = el(this.root, 'title', '<div class="word">STARFALL</div><div class="chapter">Chapter One</div><div class="sub">What Survives</div><button class="again">Begin again</button>');
+    this.title = el(this.root, 'title', '<div class="word">STARFALL</div><div class="chapter">Chapter One</div><div class="sub">What Survives</div><div class="actions"><button class="next">Chapter Two</button><button class="again">Begin again</button></div>');
+    this.hintEl = el(this.root, 'hint');
+    this.chapterEl = el(this.root, 'chaptercard', '<div class="c"></div><div class="rule"></div><div class="s"></div>');
 
     this.dialogue = new Dialogue(this.root, this.stage);
     this.touch = new TouchControls(this.root);
     this.panels = new Panels(this.root, this.dialogue);
+    this.record = new RecordOverlay(this.root, this.dialogue);
     el(document.body, 'rotate', 'Best experienced in landscape');
 
     this.promptKey.addEventListener('pointerdown', (e) => {
       e.stopPropagation();
       this.onPromptTap?.();
     });
-    this.title.querySelector('.again').addEventListener('click', () => bus.emit('game:restart'));
+    this.title.querySelector('.again').addEventListener('click', () => bus.emit('game:restart', { chapter: this.titleChapter || 1 }));
+    this.title.querySelector('.next').addEventListener('click', () => bus.emit('game:restart', { chapter: (this.titleChapter || 1) + 1 }));
 
     const sync = () => this.layout();
     window.addEventListener('resize', sync);
@@ -72,14 +77,18 @@ class UIRoot {
   }
 
   // --- start screen --------------------------------------------------------
-  showStart({ canContinue, checkpointLabel, onBegin, onContinue }) {
+  showStart({ canContinue, checkpointLabel, onBegin, onContinue, chapters = [] }) {
     this.start = el(this.root, 'start interactive', `
       <div class="line"></div>
       <button class="begin">Begin</button>
       ${canContinue ? `<button class="continue">Continue · ${checkpointLabel}</button>` : ''}
+      ${chapters.length ? `<div class="chapters">${chapters.map((c, i) => `<button data-i="${i}">${c.label}</button>`).join('<span>·</span>')}</div>` : ''}
       <div class="note">Headphones recommended.</div>`);
     this.start.querySelector('.begin').addEventListener('click', (e) => { e.stopPropagation(); onBegin(); });
     this.start.querySelector('.continue')?.addEventListener('click', (e) => { e.stopPropagation(); onContinue(); });
+    this.start.querySelectorAll('.chapters button').forEach((b) => {
+      b.addEventListener('click', (e) => { e.stopPropagation(); chapters[Number(b.dataset.i)].go(); });
+    });
   }
 
   hideStart() {
@@ -108,6 +117,25 @@ class UIRoot {
     this.barkEl.innerHTML = `${who ? `<span class="who">${who}</span>` : ''}${text}`;
     this.barkEl.classList.add('on');
     this.barkTimer = setTimeout(() => this.barkEl.classList.remove('on'), ms);
+  }
+
+  // A quiet instruction near the bottom of the frame. Empty text hides it.
+  hint(text, ms = 0) {
+    clearTimeout(this.hintTimer);
+    if (!text) { this.hintEl.classList.remove('on'); return; }
+    this.hintEl.textContent = text;
+    this.hintEl.classList.add('on');
+    if (ms) this.hintTimer = setTimeout(() => this.hintEl.classList.remove('on'), ms);
+  }
+
+  // "Chapter Two · The Starfall Record", centred over the picture.
+  async chapterCard(chapter, sub, ms = 5200) {
+    this.chapterEl.querySelector('.c').textContent = chapter;
+    this.chapterEl.querySelector('.s').textContent = sub;
+    this.chapterEl.classList.add('on');
+    await new Promise((r) => setTimeout(r, ms));
+    this.chapterEl.classList.remove('on');
+    await new Promise((r) => setTimeout(r, 1600));
   }
 
   showHud(on, fear = false) {
@@ -139,11 +167,18 @@ class UIRoot {
   }
 
   // --- title -----------------------------------------------------------------
+  setTitle(chapter, sub, n = 1, { next = true } = {}) {
+    this.titleChapter = n;
+    this.title.querySelector('.chapter').textContent = chapter;
+    this.title.querySelector('.sub').textContent = sub;
+    this.title.querySelector('.next').style.display = next ? '' : 'none';
+  }
+
   titleStep(step) {
     if (step === 'word') this.title.classList.add('on');
     if (step === 'chapter') this.title.querySelector('.chapter').classList.add('on');
     if (step === 'sub') this.title.querySelector('.sub').classList.add('on');
-    if (step === 'again') this.title.querySelector('.again').classList.add('on');
+    if (step === 'again') this.title.querySelector('.actions').classList.add('on');
   }
 
   resetTitle() {

@@ -24,6 +24,13 @@ export class TouchControls {
     this.act.textContent = 'Use';
     root.appendChild(this.act);
 
+    // Combat only: a second, smaller button above the first.
+    this.dodge = document.createElement('button');
+    this.dodge.className = 'act dodge';
+    this.dodge.setAttribute('aria-label', 'Dodge');
+    this.dodge.textContent = 'Dodge';
+    root.appendChild(this.dodge);
+
     const held = new Map();
     const update = () => {
       let a = 0;
@@ -51,17 +58,28 @@ export class TouchControls {
       b.addEventListener('lostpointercapture', release);
     });
 
-    this.act.addEventListener('pointerdown', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      input.fireAction();
-    });
+    const hold = (btn, press, release) => {
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        btn.setPointerCapture?.(e.pointerId);
+        input.lastDevice = 'touch';
+        press(`t:${e.pointerId}`);
+      });
+      const up = (e) => release(`t:${e.pointerId}`);
+      btn.addEventListener('pointerup', up);
+      btn.addEventListener('pointercancel', up);
+      btn.addEventListener('lostpointercapture', up);
+    };
+    hold(this.act, (id) => input.pressAction(id), (id) => input.releaseAction(id));
+    hold(this.dodge, (id) => input.pressDodge(id), (id) => input.releaseDodge(id));
 
     window.addEventListener('touchstart', () => {
       this.touchSeen = true;
       input.lastDevice = 'touch';
       document.getElementById('ui').classList.add('touch');
       this.refresh();
+      if (this.combat) this.setCombat(true);
     }, { passive: true });
     if (IS_TOUCH) {
       document.getElementById('ui').classList.add('touch');
@@ -75,8 +93,16 @@ export class TouchControls {
     this.refresh();
   }
 
-  setAction(on) {
+  setAction(on, label = 'Use') {
+    this.act.textContent = label;
     this.act.classList.toggle('on', on && this.touchSeen);
+  }
+
+  // Strike + Dodge, for the duels.
+  setCombat(on) {
+    this.combat = on;
+    this.setAction(on, on ? 'Strike' : 'Use');
+    this.dodge.classList.toggle('on', on && this.touchSeen);
   }
 
   refresh() {

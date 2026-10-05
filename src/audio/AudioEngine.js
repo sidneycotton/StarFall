@@ -219,9 +219,31 @@ class AudioEngineImpl {
   setHelmet(sealed, time = 0.35) {
     if (!this.ctx) return;
     const t = this.now;
+    this.helmet = sealed;
     this.worldFilter.frequency.cancelScheduledValues(t);
-    this.worldFilter.frequency.setTargetAtTime(sealed ? 1500 : 18000, t, time);
+    this.worldFilter.frequency.setTargetAtTime(sealed ? 1500 : this.openFreq(), t, time);
     this.worldFilter.Q.setTargetAtTime(sealed ? 1.6 : 0.4, t, time);
+  }
+
+  openFreq() {
+    return this.archive ? 5200 : 18000;
+  }
+
+  // Archive footage: the world is heard through a narrower, older channel.
+  setArchive(on, time = 0.4) {
+    this.archive = on;
+    if (!this.ctx || this.helmet) return;
+    this.worldFilter.frequency.setTargetAtTime(this.openFreq(), this.now, time);
+  }
+
+  // Momentary dip (slow motion), returning to the current base.
+  dip(freq = 700, hold = 0.8) {
+    if (!this.ctx) return;
+    const t = this.now;
+    const f = this.worldFilter.frequency;
+    f.cancelScheduledValues(t);
+    f.setTargetAtTime(freq, t, 0.04);
+    f.setTargetAtTime(this.helmet ? 1500 : this.openFreq(), t + hold, 0.25);
   }
 
   // Hard cut of everything in the world (used for the gunshot silence).

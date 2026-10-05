@@ -42,6 +42,18 @@ export class CameraDirector {
     this.scene.tweens.add({ targets: this, zoom, cy: this.baseY, duration: blend, ease: 'Sine.easeInOut' });
   }
 
+  // Keep two figures in frame (duels): centre between them, pull back as they part.
+  pair(a, b, { zoom = 1.15, minZoom = 0.82, y = this.baseY, lag = 0.08, blend = 900 } = {}) {
+    this.pairA = a;
+    this.pairB = b;
+    this.pairZoom = zoom;
+    this.pairMin = minZoom;
+    this.lag = lag;
+    this.mode = 'pair';
+    this.scene.tweens.killTweensOf(this);
+    this.scene.tweens.add({ targets: this, cy: y, duration: blend, ease: 'Sine.easeInOut' });
+  }
+
   // Frame a point. Returns a promise for the end of the move.
   shot(x, y, zoom = 1, duration = 1600, ease = 'Sine.easeInOut') {
     this.mode = 'shot';
@@ -74,6 +86,14 @@ export class CameraDirector {
       if (this.focus) tx = Phaser.Math.Linear(tx, this.focus.x, this.focus.weight);
       const k = 1 - Math.pow(1 - this.lag, dt * 60);
       this.cx += (tx - this.cx) * k;
+    }
+    if (this.mode === 'pair' && this.pairA && this.pairB) {
+      const k = 1 - Math.pow(1 - this.lag, dt * 60);
+      const mid = (this.pairA.x + this.pairB.x) / 2;
+      const gap = Math.abs(this.pairA.x - this.pairB.x);
+      const want = Phaser.Math.Clamp((this.cam.width * 0.62) / Math.max(gap + 360, 1), this.pairMin, this.pairZoom);
+      this.cx += (mid - this.cx) * k;
+      this.zoom += (want - this.zoom) * k * 0.6;
     }
     this.drift += dt;
     this.apply();

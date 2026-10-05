@@ -368,3 +368,159 @@ export class CallTone extends Layer {
     return this;
   }
 }
+
+// ---------------------------------------------------------------------------
+// Chapter Two.
+
+// Tape/stream hiss under everything in the Record, with dropouts.
+export class ArchiveHiss extends Layer {
+  start({ gain = 1, fadeIn = 1 } = {}) {
+    if (!A.ready || this.running) return this;
+    const out = this.begin(A.amb, gain, fadeIn);
+    const n = this.track(A.noiseSource(A.pink));
+    const f = this.track(A.filter('bandpass', 4200, 0.4));
+    const g = this.track(A.gain(0.018));
+    A.chain(n, f, g, out);
+    const hum = this.track(A.osc('sine', 60));
+    const hg = this.track(A.gain(0.006));
+    A.chain(hum, hg, out);
+    n.start(); hum.start();
+    this.g = g;
+    this.every(1700, () => {
+      if (Math.random() < 0.35) {
+        const t = A.now;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.setValueAtTime(0.018, t + rnd(0.03, 0.12));
+      }
+    });
+    return this;
+  }
+}
+
+// The bridge: high wind through cables, the river far below, fires, a crowd.
+export class BridgeAmbience extends Layer {
+  start({ gain = 1, fadeIn = 3 } = {}) {
+    if (!A.ready || this.running) return this;
+    const out = this.begin(A.amb, gain, fadeIn);
+    const wind = this.track(A.noiseSource(A.pink));
+    this.windF = this.track(A.filter('bandpass', 500, 0.6));
+    this.windG = this.track(A.gain(0.07));
+    A.chain(wind, this.windF, this.windG, out);
+    const lfo = this.track(A.osc('sine', 0.09));
+    const lfoG = this.track(A.gain(260));
+    lfo.connect(lfoG); lfoG.connect(this.windF.frequency);
+    // Cables singing: two thin tones that swell with the wind.
+    [311, 466].forEach((f, i) => {
+      const o = this.track(A.osc('sine', f));
+      const og = this.track(A.gain(0.004));
+      const l = this.track(A.osc('sine', 0.13 + i * 0.07));
+      const lg = this.track(A.gain(0.004));
+      l.connect(lg); lg.connect(og.gain);
+      A.chain(o, og, out);
+      o.start(); l.start();
+    });
+    const river = this.track(A.noiseSource(A.brown));
+    const rf = this.track(A.filter('lowpass', 260, 0.7));
+    const rg = this.track(A.gain(0.12));
+    A.chain(river, rf, rg, out);
+    // Crowd: a band of murmur, rising and falling.
+    const crowd = this.track(A.noiseSource(A.pink));
+    const cf = this.track(A.filter('bandpass', 700, 1.6));
+    this.crowdG = this.track(A.gain(0.035));
+    A.chain(crowd, cf, this.crowdG, out);
+    wind.start(); lfo.start(); river.start(); crowd.start();
+    // Fire crackle and distant collapses.
+    this.every(140, () => {
+      if (Math.random() < 0.5) return;
+      const t = A.now;
+      const c = A.noiseSource(A.noise, false);
+      const cg = A.gain();
+      A.chain(c, A.filter('highpass', 2000), cg, out);
+      A.env(cg.gain, t, rnd(0.004, 0.02), 0.001, rnd(0.01, 0.04));
+      c.start(t); c.stop(t + 0.06);
+    });
+    this.every(6500, () => {
+      if (Math.random() < 0.6) {
+        const t = A.now;
+        const b = A.noiseSource(A.brown, false);
+        const bg = A.gain();
+        A.chain(b, A.filter('lowpass', 140), bg, out);
+        A.env(bg.gain, t, rnd(0.06, 0.15), 0.05, 2.2);
+        b.start(t); b.stop(t + 2.4);
+      }
+    });
+    return this;
+  }
+
+  setCrowd(level, time = 1.5) {
+    if (!this.running) return;
+    this.crowdG.gain.setTargetAtTime(0.01 + level * 0.07, A.now, time / 3);
+  }
+
+  setWind(level, time = 2) {
+    if (!this.running) return;
+    this.windG.gain.setTargetAtTime(0.04 + level * 0.12, A.now, time / 3);
+  }
+}
+
+// High over the clouds: one huge, smooth wind and nothing else.
+export class SkyWind extends Layer {
+  start({ gain = 1, fadeIn = 2 } = {}) {
+    if (!A.ready || this.running) return this;
+    const out = this.begin(A.amb, gain, fadeIn);
+    [A.pink, A.brown].forEach((buf, i) => {
+      const n = this.track(A.noiseSource(buf));
+      const f = this.track(A.filter(i ? 'lowpass' : 'bandpass', i ? 220 : 800, 0.5));
+      const g = this.track(A.gain(i ? 0.18 : 0.05));
+      const l = this.track(A.osc('sine', 0.05 + i * 0.04));
+      const lg = this.track(A.gain(i ? 60 : 400));
+      l.connect(lg); lg.connect(f.frequency);
+      A.chain(n, f, g, out);
+      n.start(); l.start();
+    });
+    return this;
+  }
+}
+
+// A vigil: hundreds of quiet people outdoors, a far city, a breeze.
+export class VigilCrowd extends Layer {
+  start({ gain = 1, fadeIn = 4 } = {}) {
+    if (!A.ready || this.running) return this;
+    const out = this.begin(A.amb, gain, fadeIn);
+    const city = this.track(A.noiseSource(A.brown));
+    const cf = this.track(A.filter('lowpass', 200, 0.6));
+    const cg = this.track(A.gain(0.06));
+    A.chain(city, cf, cg, out);
+    // Murmur: two bands of pink noise with syllabic wobble.
+    [480, 1100].forEach((f, i) => {
+      const n = this.track(A.noiseSource(A.pink));
+      const bf = this.track(A.filter('bandpass', f, 2.2));
+      const g = this.track(A.gain(0.02 - i * 0.008));
+      const l = this.track(A.osc('sine', 3.2 + i * 1.7));
+      const lg = this.track(A.gain(0.008 - i * 0.003));
+      l.connect(lg); lg.connect(g.gain);
+      A.chain(n, bf, g, out);
+      const s = this.track(A.gain(0.3));
+      g.connect(s); s.connect(A.reverbSend);
+      n.start(); l.start();
+    });
+    this.murmur = out;
+    city.start();
+    // Now and then: a cough, a shuffle.
+    this.every(2600, () => {
+      if (Math.random() < 0.5) return;
+      const t = A.now;
+      const c = A.noiseSource(A.noise, false);
+      const g = A.gain();
+      const p = A.panner(rnd(-0.8, 0.8));
+      A.chain(c, A.filter('bandpass', rnd(400, 1200), 1.5), g, p, out);
+      A.env(g.gain, t, rnd(0.004, 0.012), 0.01, rnd(0.08, 0.2));
+      c.start(t); c.stop(t + 0.3);
+    });
+    return this;
+  }
+
+  hush(level = 0.3, time = 2) {
+    this.fadeTo(level, time);
+  }
+}

@@ -1,8 +1,13 @@
 import { bus } from '../core/EventBus.js';
 
 // Unified input: keyboard, gamepad and the touch overlay all feed one model.
-// Movement is an axis; "action" (interact / advance) is routed to whichever
-// handler is on top of a stack, so dialogue can temporarily own the button.
+// Movement is an axis; "action" (interact / advance / strike) is routed to
+// whichever handler is on top of a stack, so dialogue can temporarily own the
+// button. "Dodge" is a second verb used only in combat; it is broadcast on the
+// bus. Both buttons also expose a held state for hold-style prompts.
+
+const ACTION_KEYS = { e: 1, enter: 1, ' ': 1, arrowup: 1, w: 1 };
+const DODGE_KEYS = { shift: 1, k: 1, q: 1, arrowdown: 1, s: 1 };
 
 class InputSystem {
   constructor() {
@@ -13,30 +18,63 @@ class InputSystem {
     this.handlers = [];
     this.lastDevice = 'keyboard';
     this.padActionDown = false;
+    this.padDodgeDown = false;
+    // Held state per source, so releasing one device can't cancel another.
+    this.held = { action: new Set(), dodge: new Set() };
 
     window.addEventListener('keydown', (e) => this.onKey(e, true));
     window.addEventListener('keyup', (e) => this.onKey(e, false));
-    window.addEventListener('blur', () => { this.keys.clear(); this.touchAxis = 0; });
+    window.addEventListener('blur', () => {
+      this.keys.clear();
+      this.touchAxis = 0;
+      this.held.action.clear();
+      this.held.dodge.clear();
+    });
   }
+
+  get actionHeld() { return this.held.action.size > 0; }
+  get dodgeHeld() { return this.held.dodge.size > 0; }
 
   onKey(e, down) {
     const k = e.key.toLowerCase();
     const code = e.code;
     const mapped = {
       arrowleft: 'left', a: 'left', arrowright: 'right', d: 'right',
-      e: 'action', enter: 'action', ' ': 'action', arrowup: 'action', w: 'action',
-    }[k];
+    }[k] || (ACTION_KEYS[k] ? 'action' : null) || (DODGE_KEYS[k] ? 'dodge' : null);
     if (mapped || code === 'Space') e.preventDefault();
     this.lastDevice = 'keyboard';
     if (down && !e.repeat) {
-      if (mapped === 'action') this.fireAction();
+      if (mapped === 'action') this.pressAction(`k:${k}`);
+      if (mapped === 'dodge') this.pressDodge(`k:${k}`);
       if (k === 'escape') bus.emit('ui:toggleSettings');
       if (k === 'h' || k === 'l') bus.emit('ui:toggleLog');
+      if (k === '1' || k === '2') bus.emit('input:choice', Number(k) - 1);
     }
-    if (!down && mapped === 'action') bus.emit('input:actionUp');
+    if (!down && mapped === 'action') this.releaseAction(`k:${k}`);
+    if (!down && mapped === 'dodge') this.releaseDodge(`k:${k}`);
     if (mapped === 'left' || mapped === 'right') {
       if (down) this.keys.add(mapped); else this.keys.delete(mapped);
     }
+  }
+
+  // --- verbs (also called by the touch overlay) ------------------------------
+  pressAction(src = 'touch') {
+    this.held.action.add(src);
+    this.fireAction();
+  }
+
+  releaseAction(src = 'touch') {
+    this.held.action.delete(src);
+    bus.emit('input:actionUp');
+  }
+
+  pressDodge(src = 'touch') {
+    this.held.dodge.add(src);
+    bus.emit('input:dodge');
+  }
+
+  releaseDodge(src = 'touch') {
+    this.held.dodge.delete(src);
   }
 
   fireAction() {
@@ -64,9 +102,13 @@ class InputSystem {
     this.padAxis = ax;
     if (ax) this.lastDevice = 'gamepad';
     const act = pad.buttons[0]?.pressed;
-    if (act && !this.padActionDown) { this.lastDevice = 'gamepad'; this.fireAction(); }
-    if (!act && this.padActionDown) bus.emit('input:actionUp');
+    if (act && !this.padActionDown) { this.lastDevice = 'gamepad'; this.pressAction('pad'); }
+    if (!act && this.padActionDown) this.releaseAction('pad');
     this.padActionDown = act;
+    const dodge = pad.buttons[1]?.pressed || pad.buttons[5]?.pressed;
+    if (dodge && !this.padDodgeDown) { this.lastDevice = 'gamepad'; this.pressDodge('pad'); }
+    if (!dodge && this.padDodgeDown) this.releaseDodge('pad');
+    this.padDodgeDown = dodge;
     const start = pad.buttons[9]?.pressed;
     if (start && !this.padStartDown) bus.emit('ui:toggleSettings');
     this.padStartDown = start;
@@ -81,6 +123,13 @@ class InputSystem {
     if (this.keys.has('right')) a += 1;
     if (!a) a = this.padAxis || this.touchAxis;
     return Math.max(-1, Math.min(1, a));
+  }
+
+  // Human-readable name of a verb on the current device.
+  keyName(verb) {
+    const d = this.lastDevice;
+    if (verb === 'dodge') return d === 'gamepad' ? 'B' : d === 'touch' ? 'Dodge' : 'Shift';
+    return d === 'gamepad' ? 'A' : d === 'touch' ? 'Tap' : 'E';
   }
 }
 

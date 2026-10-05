@@ -68,11 +68,12 @@ export class Panels {
       <h2>Settings</h2>
       <div class="row"><span class="k">Captions</span>${opts('subtitles', [[true, 'On'], [false, 'Off']])}</div>
       <div class="row"><span class="k">Text speed</span>${opts('textSpeed', [['slow', 'Slow'], ['normal', 'Normal'], ['fast', 'Fast'], ['instant', 'Instant']])}</div>
+      <div class="row"><span class="k">Timed prompts</span>${opts('assist', [['standard', 'Standard'], ['relaxed', 'Relaxed'], ['auto', 'Automatic']])}</div>
       <div class="row"><span class="k">Reduce motion</span>${opts('reduceMotion', [[true, 'On'], [false, 'Off']])}</div>
       <div class="row"><span class="k">Sound</span>${opts('muted', [[false, 'On'], [true, 'Muted']])}</div>
       <div class="row"><span class="k">Volume</span><input type="range" min="0" max="100" value="${pct(settings.get('master'))}" data-range="master" aria-label="Master volume"></div>
       <div class="row"><span class="k">Music</span><input type="range" min="0" max="100" value="${pct(settings.get('music'))}" data-range="music" aria-label="Music volume"></div>
-      <div class="keys-help">Move · A D / ← →&nbsp;&nbsp;&nbsp;Interact · E / Space&nbsp;&nbsp;&nbsp;History · H&nbsp;&nbsp;&nbsp;Settings · Esc</div>
+      <div class="keys-help">Move · A D / ← →&nbsp;&nbsp;&nbsp;Interact · Strike · E / Space&nbsp;&nbsp;&nbsp;Dodge · Shift / K&nbsp;&nbsp;&nbsp;History · H&nbsp;&nbsp;&nbsp;Settings · Esc</div>
       <div class="foot"><button class="restart">Begin again</button><button class="resume">Resume</button></div>`;
     const sync = () => {
       panel.querySelectorAll('.opts').forEach((o) => {
@@ -96,7 +97,7 @@ export class Panels {
       r.addEventListener('input', () => settings.set(r.dataset.range, Number(r.value) / 100));
     });
     panel.querySelector('.resume').addEventListener('click', () => this.close());
-    panel.querySelector('.restart').addEventListener('click', () => bus.emit('game:restart'));
+    panel.querySelector('.restart').addEventListener('click', () => bus.emit('game:restart', { current: true }));
     sync();
   }
 

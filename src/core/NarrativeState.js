@@ -1,6 +1,6 @@
 import { bus } from './EventBus.js';
 import { loadJSON, saveJSON } from './storage.js';
-import { STAGES } from '../config.js';
+import { STAGES, CHECKPOINTS } from '../config.js';
 
 // Single source of truth for story progress. Scenes read and write it; nothing
 // else keeps narrative flags. Serialisable so the full game can grow a save system.
@@ -19,13 +19,15 @@ const FRESH = {
     sawStarProtocol: false,
     completed: false,
   },
+  // Which accounts the player chose to believe when the Record's sources disagree.
+  record: {},
   playthroughs: 0,
 };
 
 class NarrativeStateStore {
   constructor() {
     const saved = loadJSON(KEY, FRESH);
-    this.data = { ...FRESH, ...saved, flags: { ...FRESH.flags, ...saved.flags } };
+    this.data = { ...FRESH, ...saved, flags: { ...FRESH.flags, ...saved.flags }, record: { ...saved.record } };
   }
 
   get stage() {
@@ -35,7 +37,7 @@ class NarrativeStateStore {
   setStage(stage) {
     if (!STAGES.includes(stage)) throw new Error(`Unknown stage "${stage}"`);
     this.data.stage = stage;
-    if (['wake', 'call', 'run', 'chamber'].includes(stage)) this.data.checkpoint = stage;
+    if (CHECKPOINTS[stage]) this.data.checkpoint = stage;
     this.persist();
     bus.emit('narrative:stage', stage);
   }
@@ -71,17 +73,48 @@ class NarrativeStateStore {
     const keep = {
       playthroughs: this.data.playthroughs,
       everExaminedFigurine: this.data.flags.starFigurineExamined || this.data.flags.everExaminedFigurine,
+      ch2Seen: this.data.flags.ch2Seen || 0,
     };
     this.data = structuredClone(FRESH);
     this.data.playthroughs = keep.playthroughs;
     this.data.flags.everExaminedFigurine = Boolean(keep.everExaminedFigurine);
+    this.data.flags.ch2Seen = keep.ch2Seen;
     this.persist();
   }
 
   completeRun() {
     this.data.flags.completed = true;
     this.data.playthroughs += 1;
+    this.data.checkpoint = null;
     this.persist();
+  }
+
+  // Chapter Two can be entered on its own; it keeps what Chapter One left behind.
+  beginChapterTwo() {
+    this.data.record = {};
+    this.data.flags.ch2Completed = false;
+    this.persist();
+  }
+
+  completeChapterTwo() {
+    this.data.flags.ch2Completed = true;
+    this.data.flags.ch2Seen = (this.data.flags.ch2Seen || 0) + 1;
+    this.data.checkpoint = null;
+    this.persist();
+  }
+
+  // The Record remembers which witness the player chose to believe.
+  setRecord(key, value) {
+    this.data.record[key] = value;
+    this.persist();
+  }
+
+  record(key) {
+    return this.data.record[key];
+  }
+
+  get chapter() {
+    return CHECKPOINTS[this.data.checkpoint] || (STAGES.indexOf(this.data.stage) >= STAGES.indexOf('vigil') ? 2 : 1);
   }
 
   persist() {

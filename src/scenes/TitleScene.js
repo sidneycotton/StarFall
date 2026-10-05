@@ -17,11 +17,18 @@ export class TitleScene extends Phaser.Scene {
     super('Title');
   }
 
-  create() {
+  create(data = {}) {
     this.cameras.main.setBackgroundColor('#000000');
     this.fx = new ScreenFX(this);
     this.fx.set({ grain: 0.05, aberration: 0.4, vignette: 0.6 });
-    narrative.completeRun();
+    ui.resetTitle();
+    if (data.chapter === 2) {
+      ui.setTitle('Chapter Two', 'The Starfall Record', 2, { next: false });
+      narrative.completeChapterTwo();
+    } else {
+      ui.setTitle('Chapter One', 'What Survives', 1);
+      narrative.completeRun();
+    }
     this.run();
   }
 

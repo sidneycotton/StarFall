@@ -12,11 +12,15 @@ import { registerSanctum } from '../art/sanctum.js';
 import { registerSeers } from '../art/seers.js';
 import { registerVision } from '../art/vision.js';
 import { registerChamber } from '../art/chamber.js';
+import { registerStar } from '../art/star.js';
+import { registerBridge } from '../art/bridge.js';
+import { registerSky } from '../art/sky.js';
+import { registerVigil } from '../art/vigil.js';
 
 // Paints every texture (there are no image files), waits for fonts, then
 // shows a quiet start prompt — audio needs a user gesture before sound can come first.
 
-const PAINTERS = [registerLights, registerCity, registerKit, registerBedroom, registerLounge, registerParallax, registerSanctum, registerSeers, registerVision, registerChamber];
+const PAINTERS = [registerLights, registerCity, registerKit, registerBedroom, registerLounge, registerParallax, registerSanctum, registerSeers, registerVision, registerChamber, registerStar, registerBridge, registerSky, registerVigil];
 
 const START_SCENE = {
   wake: ['Penthouse', { start: 'wake' }],
@@ -26,9 +30,20 @@ const START_SCENE = {
   run: ['Penthouse', { start: 'aftermath' }],
   chamber: ['Chamber', {}],
   title: ['Title', {}],
+  vigil: ['Vigil', {}],
+  record: ['Record', {}],
+  duel: ['Record', { start: 'duel' }],
+  sky: ['Sky', {}],
+  vigilEnd: ['Vigil', { end: true }],
+  title2: ['Title', { chapter: 2 }],
 };
 
-const CHECKPOINT_LABEL = { call: 'The Call', run: 'After', chamber: 'The Chamber' };
+const CHAPTER_TWO = ['vigil', 'record', 'duel', 'sky', 'vigilEnd', 'title2'];
+
+const CHECKPOINT_LABEL = {
+  call: 'The Call', run: 'After', chamber: 'The Chamber',
+  vigil: 'The Vigil', record: 'The Lantern Bridge', duel: 'Parallax', sky: 'Above the Cloud',
+};
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -62,6 +77,7 @@ export class BootScene extends Phaser.Scene {
       const go = () => {
         audio.unlock();
         narrative.beginNewRun();
+        if (CHAPTER_TWO.includes(debugStage)) narrative.beginChapterTwo();
         const [key, data] = START_SCENE[debugStage];
         this.scene.start(key, data);
       };
@@ -71,9 +87,22 @@ export class BootScene extends Phaser.Scene {
     }
 
     const cp = narrative.data.checkpoint;
-    const canContinue = Boolean(cp && cp !== 'wake' && CHECKPOINT_LABEL[cp] && !narrative.data.flags.completed);
+    const flags = narrative.data.flags;
+    const done = CHAPTER_TWO.includes(cp) ? flags.ch2Completed : flags.completed;
+    const canContinue = Boolean(cp && cp !== 'wake' && CHECKPOINT_LABEL[cp] && !done);
+    const chapters = [
+      { label: 'Chapter One', go: () => begin(() => this.scene.start('Penthouse', { start: 'wake' }), true) },
+      { label: 'Chapter Two', go: () => begin(() => { narrative.beginChapterTwo(); this.scene.start('Vigil', {}); }, true) },
+    ];
+    const begin = async (fn, fresh) => {
+      await audio.unlock();
+      if (fresh) narrative.beginNewRun();
+      ui.hideStart();
+      this.time.delayedCall(1200, fn);
+    };
     ui.showStart({
       canContinue,
+      chapters,
       checkpointLabel: CHECKPOINT_LABEL[cp],
       onBegin: async () => {
         await audio.unlock();

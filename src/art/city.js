@@ -4,7 +4,7 @@ import { paintTexture, rng, lin, rad, rgba, glow, poly, starShape, ellipse } fro
 // Aureate towers wear gold halos, Meridian slabs are ruled grids, and the
 // skyline is dominated by a colossal statue of Star.
 
-function building(ctx, r, x, w, top, base, style, fill, haze, lights) {
+export function building(ctx, r, x, w, top, base, style, fill, haze, lights) {
   ctx.fillStyle = fill;
   ctx.beginPath();
   if (style === 'spire') {
@@ -61,7 +61,7 @@ function building(ctx, r, x, w, top, base, style, fill, haze, lights) {
   ctx.fillRect(x - 1, top - w * 2.5, w + 2, base - top + w * 2.5);
 }
 
-function halo(ctx, cx, cy, r, color, alpha) {
+export function halo(ctx, cx, cy, r, color, alpha) {
   ctx.save();
   ctx.strokeStyle = rgba(color, alpha);
   ctx.lineWidth = Math.max(1, r * 0.08);

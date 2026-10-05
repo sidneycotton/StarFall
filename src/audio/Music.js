@@ -168,3 +168,112 @@ export class ChamberPad {
     this.out = null;
   }
 }
+
+// Star's theme, for the duel: bright, lydian, brass-like swells over a
+// driving low pulse. `intensity` 0..3 adds layers; it never resolves home.
+export class DuelCue {
+  constructor() {
+    this.running = false;
+    this.timers = [];
+  }
+
+  start({ bpm = 118, intensity = 1 } = {}) {
+    if (!A.ready || this.running) return;
+    this.running = true;
+    this.out = A.gain(0.0001);
+    this.out.connect(A.music);
+    this.out.gain.linearRampToValueAtTime(0.85, A.now + 1.5);
+    this.brass = A.filter('lowpass', 1400, 1.2);
+    this.brass.connect(this.out);
+    const send = A.gain(0.4);
+    this.out.connect(send); send.connect(A.hallSend);
+    this.bpm = bpm;
+    this.intensity = intensity;
+    this.step = 0;
+    this.next = A.now + 0.05;
+    this.timers.push(setInterval(() => this.schedule(), 60));
+  }
+
+  setIntensity(n) {
+    this.intensity = n;
+    if (this.brass) this.brass.frequency.setTargetAtTime(1000 + n * 600, A.now, 0.8);
+    if (this.out && this.running) this.out.gain.setTargetAtTime(0.85, A.now, 0.3);
+  }
+
+  schedule() {
+    if (!this.running) return;
+    const sixteenth = 60 / this.bpm / 4;
+    // D lydian: D — E/D — C#m7 — Bm(add9) with the raised fourth on top.
+    const bars = [[50, [62, 66, 69, 68]], [50, [64, 68, 71, 73]], [49, [61, 64, 68, 71]], [47, [59, 62, 66, 73]]];
+    while (this.next < A.now + 0.25) {
+      const t = this.next;
+      const bar = Math.floor(this.step / 16);
+      const s = this.step % 16;
+      const [root, chord] = bars[bar % bars.length];
+      if (s % 2 === 0) RunCue.prototype.sub.call(this, t, midi(root - 12), s % 8 === 0 ? 0.2 : 0.1);
+      if (s === 0 || s === 8 || (this.intensity >= 2 && (s === 6 || s === 14))) RunCue.prototype.drum.call(this, t, s === 0 ? 0.42 : 0.26);
+      if (this.intensity >= 2 && s % 4 === 2) this.snare(t);
+      if (s === 0) this.swell(t, chord, sixteenth * 16);
+      if (this.intensity >= 1 && s % 2 === 0) {
+        const pat = [0, 2, 1, 3, 2, 1, 3, 0];
+        RunCue.prototype.pluck.call(this, t, midi(chord[pat[(s / 2) % 8]] + 12), 0.025 + this.intensity * 0.006);
+      }
+      if (this.intensity >= 3 && s === 0 && bar % 2 === 0) {
+        bell({ freq: midi(chord[3] + 12), gain: 0.03, ratio: 2, index: 0.8, decay: 3, bus: this.out, hall: 0.5 });
+      }
+      this.step++;
+      this.next += sixteenth;
+    }
+  }
+
+  swell(t, chord, dur) {
+    chord.forEach((n, i) => {
+      [-6, 6].forEach((det) => {
+        const o = A.osc('sawtooth', midi(n));
+        o.detune.value = det;
+        const g = A.gain();
+        A.chain(o, g, this.brass);
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.linearRampToValueAtTime(0.016 / (i * 0.3 + 1), t + dur * 0.18);
+        g.gain.linearRampToValueAtTime(0.009 / (i * 0.3 + 1), t + dur * 0.7);
+        g.gain.linearRampToValueAtTime(0.0001, t + dur * 1.02);
+        o.start(t); o.stop(t + dur * 1.05);
+      });
+    });
+  }
+
+  snare(t) {
+    const n = A.noiseSource(A.noise, false);
+    const g = A.gain();
+    A.chain(n, A.filter('bandpass', 1800, 0.8), g, this.out);
+    A.env(g.gain, t, 0.05, 0.002, 0.12);
+    n.start(t); n.stop(t + 0.16);
+  }
+
+  // Drop to a held drone (used when the span goes).
+  hush(time = 0.5) {
+    if (!this.out) return;
+    this.intensity = 0;
+    this.out.gain.setTargetAtTime(0.0001, A.now, time / 3);
+  }
+
+  stop(fade = 2) {
+    if (!this.running) return;
+    this.running = false;
+    this.timers.forEach(clearInterval);
+    const t = A.now;
+    this.out.gain.cancelScheduledValues(t);
+    this.out.gain.setValueAtTime(Math.max(this.out.gain.value, 0.0001), t);
+    this.out.gain.linearRampToValueAtTime(0.0001, t + fade);
+  }
+}
+
+// A slow elegy for the names: piano-like bells, one note at a time.
+export function elegy({ when = 0 } = {}) {
+  if (!A.ready) return;
+  const notes = [[69, 0], [76, 1.6], [74, 3.2], [72, 4.4], [71, 5.6], [64, 7.6], [69, 9.6]];
+  notes.forEach(([n, w]) => {
+    bell({ freq: midi(n), when: when + w, gain: 0.04, ratio: 4, index: 0.5, decay: 5, bus: A.music, hall: 0.9 });
+    bell({ freq: midi(n - 12), when: when + w, gain: 0.015, ratio: 2, index: 0.3, decay: 5, bus: A.music, hall: 0.6 });
+  });
+}

@@ -36,9 +36,38 @@ const PRESETS = {
   still: { hipY: -157, hipX: 0, lean: 0.0, head: -0.1, thighF: -0.08, shinF: 0.03, thighB: 0.1, shinB: 0.0, upperF: 0.04, foreF: -0.25, upperB: -0.06, foreB: -0.2 },
   // Bending to touch the sheet.
   lean: { hipY: -150, hipX: -4, lean: 0.55, head: 0.35, thighF: -0.2, shinF: 0.25, thighB: 0.15, shinB: 0.2, upperF: -1.2, foreF: 0.2, upperB: -0.2, foreB: -0.5 },
+
+  // ----- Combat (Chapter Two). Shared by Star and Parallax: one body.
+  stance: { hipY: -148, hipX: 0, lean: 0.06, head: 0.0, thighF: -0.38, shinF: 0.4, thighB: 0.35, shinB: 0.25, upperF: -0.7, foreF: -1.3, upperB: -0.4, foreB: -1.5 },
+  guard: { hipY: -144, hipX: -2, lean: 0.1, head: 0.12, thighF: -0.45, shinF: 0.5, thighB: 0.4, shinB: 0.3, upperF: -0.95, foreF: -1.75, upperB: -0.6, foreB: -1.9 },
+  windup: { hipY: -147, hipX: -6, lean: -0.12, head: 0.0, thighF: -0.3, shinF: 0.3, thighB: 0.32, shinB: 0.2, upperF: 0.35, foreF: -1.9, upperB: -0.7, foreB: -1.2 },
+  strike: { hipY: -141, hipX: 12, lean: 0.2, head: -0.12, thighF: -0.78, shinF: 0.55, thighB: 0.55, shinB: 0.25, upperF: -1.56, foreF: -0.04, upperB: 0.5, foreB: -1.4 },
+  lunge: { hipY: -128, hipX: 20, lean: 0.36, head: -0.28, thighF: -1.02, shinF: 0.82, thighB: 0.82, shinB: 0.12, upperF: -1.62, foreF: 0.04, upperB: 0.72, foreB: -0.4 },
+  dodge: { hipY: -142, hipX: -14, lean: -0.32, head: -0.1, thighF: -0.6, shinF: 0.4, thighB: 0.35, shinB: 0.6, upperF: -0.5, foreF: -0.6, upperB: 0.4, foreB: -0.6 },
+  hit: { hipY: -146, hipX: -10, lean: -0.38, head: -0.45, thighF: -0.3, shinF: 0.2, thighB: 0.3, shinB: 0.3, upperF: 0.4, foreF: -0.3, upperB: 0.6, foreB: -0.2 },
+  cast: { hipY: -152, hipX: 0, lean: -0.05, head: -0.05, thighF: -0.35, shinF: 0.2, thighB: 0.3, shinB: 0.1, upperF: -1.45, foreF: -0.1, upperB: -0.2, foreB: -0.6 },
+  // Arms overhead, taking a weight.
+  hold: { hipY: -146, hipX: 0, lean: -0.05, head: -0.35, thighF: -0.4, shinF: 0.45, thighB: 0.4, shinB: 0.4, upperF: -2.85, foreF: -0.2, upperB: -2.7, foreB: -0.25 },
+  // Leaning back against a pull, arms out in front.
+  strain: { hipY: -136, hipX: -8, lean: -0.36, head: -0.05, thighF: -0.82, shinF: 0.72, thighB: 0.6, shinB: 0.2, upperF: -1.32, foreF: -0.2, upperB: -1.2, foreB: -0.3 },
+  catch: { hipY: -130, hipX: 6, lean: 0.28, head: 0.1, thighF: -0.9, shinF: 1.0, thighB: 0.6, shinB: 0.6, upperF: -1.1, foreF: -0.5, upperB: -1.0, foreB: -0.6 },
+  kneel: { hipY: -100, hipX: 0, lean: 0.25, head: 0.35, thighF: -1.5, shinF: 1.5, thighB: -0.2, shinB: 1.6, upperF: -0.3, foreF: -0.6, upperB: 0.2, foreB: -0.3 },
+  // Body laid out along the line of flight (root is rotated by the scene).
+  fly: { hipY: -150, hipX: 0, lean: 0.0, head: -0.25, thighF: 0.04, shinF: 0.1, thighB: 0.16, shinB: 0.16, upperF: -2.9, foreF: -0.05, upperB: 0.18, foreB: -0.1 },
+  // Upright hover, cape streaming: arms loose, toes pointed.
+  hover: { hipY: -150, hipX: 0, lean: 0.04, head: 0.05, thighF: -0.12, shinF: 0.3, thighB: 0.1, shinB: 0.4, upperF: -0.25, foreF: -0.3, upperB: 0.15, foreB: -0.25 },
+  // Landing: one knee nearly down, a fist to the deck.
+  land: { hipY: -104, hipX: 4, lean: 0.5, head: -0.1, thighF: -1.35, shinF: 1.3, thighB: 0.3, shinB: 1.25, upperF: -0.15, foreF: -0.05, upperB: 0.5, foreB: -0.6 },
 };
 
 const KEYS = Object.keys(PRESETS.still);
+
+const CAPE = {
+  parallax: { body: 0x07040b, lining: 0x2a1640, edge: 0xa9a4b6, edgeAlpha: 0.18 },
+  star: { body: 0xe6dcc6, lining: 0xc79a48, edge: 0xfff4d8, edgeAlpha: 0.5 },
+};
+
+export const POSES = PRESETS;
 
 function end(x, y, angle, len) {
   return { x: x - Math.sin(angle) * len, y: y + Math.cos(angle) * len };
@@ -52,6 +81,9 @@ function rot(dx, dy, a) {
 export class Parallax {
   constructor(scene, x, y, { outfit = 'robe', helmet = false, scale = 1.24 } = {}) {
     this.scene = scene;
+    this.airborne = false;  // hides the ground shadow
+    this.projection = false; // no shadow, no footfalls
+    this.capeLen = null;    // fixed cape length (flight); null = to the ground
     this.size = scale;
     this.root = scene.add.container(x, y).setScale(scale);
     this.facing = 1;
@@ -70,6 +102,7 @@ export class Parallax {
     this.stepCallback = null;
     this.lastStepSign = 0;
     this.lookOffset = 0;
+    this.radiance = 0;  // Star's light surging (0..1)
 
     this.shadow = scene.add.image(x, y + 2, 'light_soft').setTint(0x000000).setAlpha(0.6).setScale(0.75 * scale, 0.12 * scale);
 
@@ -116,6 +149,11 @@ export class Parallax {
 
   setOutfit(outfit) {
     this.outfit = outfit;
+    if (outfit === 'star') { this.setStar(); return; }
+    this.capeColors = CAPE.parallax;
+    [this.upperB, this.foreB, this.thighB, this.shinB].forEach((p) => p.setTint(0x6c6478));
+    this.halo.setTexture('px_halo').setBlendMode(Phaser.BlendModes.NORMAL).clearTint();
+    this.head.setOrigin(22 / 60, 62 / 74);
     const robe = outfit === 'robe';
     this.torso.setTexture(robe ? 'robe_torso' : 'px_torso');
     [this.upperF, this.upperB].forEach((p) => p.setTexture(robe ? 'robe_upper' : 'px_upper'));
@@ -127,7 +165,24 @@ export class Parallax {
     this.foreB.setOrigin(0.5, 0.04);
   }
 
+  // Star: ivory and gold over the very same frame. Bare head, a gold mask,
+  // hair tied back; her halo burns where Parallax's ring is dark.
+  setStar() {
+    this.capeColors = CAPE.star;
+    this.torso.setTexture('st_torso');
+    [this.upperF, this.upperB].forEach((p) => p.setTexture('st_upper'));
+    [this.foreF, this.foreB].forEach((p) => p.setTexture('st_fore').setOrigin(0.5, 0.04));
+    [this.thighF, this.thighB].forEach((p) => p.setTexture('st_thigh'));
+    [this.shinF, this.shinB].forEach((p) => p.setTexture('st_shin'));
+    [this.upperB, this.foreB, this.thighB, this.shinB].forEach((p) => p.setTint(0xa49682));
+    this.head.setTexture('st_head').setOrigin(52 / 90, 68 / 80);
+    this.halo.setTexture('st_halo').setBlendMode(Phaser.BlendModes.ADD).setTint(0xffe2a0).setAlpha(0.9);
+    this.helmet = false;
+    this.visorLevel = 0;
+  }
+
   setHelmet(on, instant = false) {
+    if (this.outfit === 'star') return;
     this.helmet = on;
     this.head.setTexture(on ? 'px_helmet' : (this.hideHead ? 'px_helmet' : 'px_head_hair'));
     if (instant) {
@@ -211,7 +266,7 @@ export class Parallax {
     const sign = Math.sign(s);
     if (moving > 0.3 && sign !== this.lastStepSign) {
       this.lastStepSign = sign;
-      this.stepCallback?.(run > 0.5 ? 'run' : (this.outfit === 'robe' ? 'soft' : 'boot'));
+      if (!this.projection) this.stepCallback?.(run > 0.5 ? 'run' : (this.outfit === 'robe' ? 'soft' : 'boot'));
     }
     return pose;
   }
@@ -245,7 +300,12 @@ export class Parallax {
     this.visorGlow.setAlpha(lvl * 0.35);
 
     this.shadow.x = this.root.x + (pose.hipX || 0) * this.facing * this.size;
-    this.shadow.y = this.root.y + 2;
+    this.shadow.y = this.groundY ?? this.root.y + 2;
+    this.shadow.setVisible(this.root.visible && !this.airborne && !this.projection);
+    if (this.outfit === 'star') {
+      // Her light breathes.
+      this.halo.setAlpha(0.75 + Math.sin(this.time * 2.1) * 0.12 + this.radiance * 0.4);
+    }
   }
 
   applyPose(P) {
@@ -294,14 +354,15 @@ export class Parallax {
   drawCape(dt, P) {
     const g = this.capeG;
     g.clear();
-    if (this.outfit !== 'suit') return;
+    if (this.outfit !== 'suit' && this.outfit !== 'star') return;
+    const C = this.capeColors || CAPE.parallax;
     const lean = P.lean;
     const anchor = rot(-14, -100, lean);
     const ax = P.hipX + anchor.x;
     const ay = P.hipY + anchor.y;
     const speed = Math.abs(this.vx);
     const groundY = -6;
-    const len = Math.max(60, groundY - ay);
+    const len = this.capeLen ?? Math.max(60, groundY - ay);
     const trail = speed * 0.16 + this.capeWind;
     const N = 14;
     const outer = [];
@@ -316,20 +377,20 @@ export class Parallax {
       inner.push([ax - back + 14 + t * 30 + (P.thighB > 0.2 ? P.thighB * 10 : 0), y]);
     }
     // Heavy cloth: near-black body, a violet lining glimpsed at the edge.
-    g.fillStyle(0x07040b, 1);
+    g.fillStyle(C.body, 1);
     g.beginPath();
     g.moveTo(ax + 6, ay - 4);
     outer.forEach(([x, y]) => g.lineTo(x, y));
     for (let i = inner.length - 1; i >= 0; i--) g.lineTo(inner[i][0], inner[i][1]);
     g.closePath();
     g.fillPath();
-    g.fillStyle(0x2a1640, 0.9);
+    g.fillStyle(C.lining, 0.9);
     g.beginPath();
     outer.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y)));
     for (let i = outer.length - 1; i >= 0; i--) g.lineTo(outer[i][0] + 3.5, outer[i][1]);
     g.closePath();
     g.fillPath();
-    g.lineStyle(1, 0xa9a4b6, 0.18);
+    g.lineStyle(1, C.edge, C.edgeAlpha);
     g.beginPath();
     g.moveTo(outer[N][0], outer[N][1]);
     g.lineTo(inner[N][0], inner[N][1]);

@@ -1,5 +1,5 @@
-import { RoomTone, Sirens, ConvergenceAlarm, PartyLoop, VisionDrone, HelmetBreath, CallTone } from './Ambience.js';
-import { RunCue, ChamberPad } from './Music.js';
+import { RoomTone, Sirens, ConvergenceAlarm, PartyLoop, VisionDrone, HelmetBreath, CallTone, ArchiveHiss, BridgeAmbience, SkyWind, VigilCrowd } from './Ambience.js';
+import { RunCue, ChamberPad, DuelCue } from './Music.js';
 import { audio } from './AudioEngine.js';
 
 // Long-lived sound layers shared across scenes. The alarm, for instance, keeps
@@ -15,10 +15,16 @@ export const sound = {
   callTone: new CallTone(),
   run: new RunCue(),
   chamber: new ChamberPad(),
+  hiss: new ArchiveHiss(),
+  bridge: new BridgeAmbience(),
+  skyWind: new SkyWind(),
+  vigil: new VigilCrowd(),
+  duel: new DuelCue(),
 
   stopAll(fade = 0.5) {
-    ['room', 'sirens', 'alarm', 'party', 'vision', 'breath', 'callTone'].forEach((k) => this[k].stop(fade));
+    ['room', 'sirens', 'alarm', 'party', 'vision', 'breath', 'callTone', 'hiss', 'bridge', 'skyWind', 'vigil'].forEach((k) => this[k].stop(fade));
     this.run.stop(fade);
+    this.duel.stop(fade);
     this.chamber.stop(fade);
     // Fresh instances so a restart begins from silence with clean state.
     this.room = new RoomTone();
@@ -30,6 +36,12 @@ export const sound = {
     this.callTone = new CallTone();
     this.run = new RunCue();
     this.chamber = new ChamberPad();
+    this.hiss = new ArchiveHiss();
+    this.bridge = new BridgeAmbience();
+    this.skyWind = new SkyWind();
+    this.vigil = new VigilCrowd();
+    this.duel = new DuelCue();
+    audio.setArchive(false, 0.05);
     audio.setHelmet(false, 0.05);
     audio.restoreWorld(0.3);
   },

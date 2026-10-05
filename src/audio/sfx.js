@@ -397,3 +397,247 @@ export function metalSet({ pan = 0 } = {}) {
     o.start(t); o.stop(t + 0.6);
   });
 }
+
+// ---------------------------------------------------------------------------
+// Chapter Two: the Record, the bridge, the duel.
+
+// Prompt feedback: small, tonal, not "gamey".
+export function qteTick({ p = 0, soft = false } = {}) {
+  if (!ok()) return;
+  const t = A.now;
+  const o = A.osc('sine', 520 + p * 640);
+  const g = A.gain();
+  A.chain(o, g, out(A.sfx, 0, 0.05));
+  A.env(g.gain, t, soft ? 0.008 : 0.02, 0.003, soft ? 0.05 : 0.09);
+  o.start(t); o.stop(t + 0.15);
+}
+
+export function qteOk() {
+  if (!ok()) return;
+  bell({ freq: 880, gain: 0.03, ratio: 2, index: 0.6, decay: 1.4, hall: 0.3 });
+  bell({ freq: 1318.5, when: 0.05, gain: 0.02, ratio: 2, index: 0.4, decay: 1.2, hall: 0.3 });
+}
+
+export function qteFail() {
+  if (!ok()) return;
+  const t = A.now;
+  const o = A.osc('triangle', 196);
+  const g = A.gain();
+  A.chain(o, A.filter('lowpass', 900), g, out(A.sfx, 0, 0.1));
+  o.frequency.exponentialRampToValueAtTime(150, t + 0.4);
+  A.env(g.gain, t, 0.03, 0.01, 0.45);
+  o.start(t); o.stop(t + 0.5);
+}
+
+// Her blows: a bright crack of light with a ringing tail.
+export function lightStrike({ pan = 0, gain = 1, hit = true } = {}) {
+  if (!ok()) return;
+  const t = A.now;
+  const n = A.noiseSource(A.noise, false);
+  const f = A.filter('bandpass', 3200, 0.9);
+  const g = A.gain();
+  A.chain(n, f, g, out(A.sfx, pan, 0.35));
+  f.frequency.setValueAtTime(5200, t);
+  f.frequency.exponentialRampToValueAtTime(900, t + 0.18);
+  A.env(g.gain, t, 0.16 * gain, 0.002, 0.2);
+  n.start(t); n.stop(t + 0.3);
+  if (hit) {
+    lowImpact({ gain: 0.22 * gain, freq: 62 });
+    bell({ freq: 1567.98, gain: 0.025 * gain, ratio: 2.76, index: 1.4, decay: 1.6, pan, hall: 0.4 });
+  }
+}
+
+// His: a hollow, inward thud, as if the air folded.
+export function umbralStrike({ pan = 0, gain = 1 } = {}) {
+  if (!ok()) return;
+  const t = A.now;
+  const o = A.osc('sine', 180);
+  const g = A.gain();
+  A.chain(o, A.shaper(6), g, out(A.sfx, pan, 0.4));
+  o.frequency.setValueAtTime(240, t);
+  o.frequency.exponentialRampToValueAtTime(38, t + 0.35);
+  A.env(g.gain, t, 0.3 * gain, 0.004, 0.6);
+  o.start(t); o.stop(t + 0.8);
+  const n = A.noiseSource(A.brown, false);
+  const ng = A.gain();
+  A.chain(n, A.filter('lowpass', 600), ng, out(A.sfx, pan, 0.3));
+  ng.gain.setValueAtTime(0.0001, t);
+  ng.gain.exponentialRampToValueAtTime(0.25 * gain, t + 0.12);
+  ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+  n.start(t); n.stop(t + 0.4);
+}
+
+// Blade meets guard: metal and light, no blood.
+export function parry({ pan = 0 } = {}) {
+  if (!ok()) return;
+  const t = A.now;
+  [1, 2.71, 4.13].forEach((r, i) => {
+    const o = A.osc('square', 610 * r * rnd(0.99, 1.01));
+    const g = A.gain();
+    A.chain(o, A.filter('bandpass', 610 * r, 6), g, out(A.sfx, pan, 0.5));
+    A.env(g.gain, t, 0.04 / (i + 1), 0.001, 0.5 - i * 0.1);
+    o.start(t); o.stop(t + 0.6);
+  });
+  const n = A.noiseSource();
+  const ng = A.gain();
+  A.chain(n, A.filter('highpass', 2500), ng, out(A.sfx, pan, 0.2));
+  A.env(ng.gain, t, 0.08, 0.001, 0.06);
+  n.start(t); n.stop(t + 0.1);
+}
+
+export function dodge({ pan = 0 } = {}) {
+  if (!ok()) return;
+  const t = A.now;
+  const n = A.noiseSource(A.pink);
+  const f = A.filter('bandpass', 900, 1.4);
+  const g = A.gain();
+  A.chain(n, f, g, out(A.sfx, pan, 0.1));
+  f.frequency.setValueAtTime(1800, t);
+  f.frequency.exponentialRampToValueAtTime(500, t + 0.22);
+  A.env(g.gain, t, 0.09, 0.02, 0.22);
+  n.start(t); n.stop(t + 0.3);
+}
+
+// The tell before he moves: a dry intake and a rising sliver of tone.
+export function tell({ pan = 0, ms = 700 } = {}) {
+  if (!ok()) return;
+  const t = A.now;
+  const d = ms / 1000;
+  const o = A.osc('sine', 330);
+  const g = A.gain();
+  A.chain(o, g, out(A.sfx, pan, 0.4));
+  o.frequency.setValueAtTime(330, t);
+  o.frequency.exponentialRampToValueAtTime(990, t + d);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.03, t + d * 0.9);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.05);
+  o.start(t); o.stop(t + d + 0.1);
+  const n = A.noiseSource();
+  const ng = A.gain();
+  const nf = A.filter('bandpass', 1400, 2);
+  A.chain(n, nf, ng, out(A.sfx, pan, 0.2));
+  nf.frequency.exponentialRampToValueAtTime(5000, t + d);
+  ng.gain.setValueAtTime(0.0001, t);
+  ng.gain.exponentialRampToValueAtTime(0.04, t + d);
+  ng.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.03);
+  n.start(t); n.stop(t + d + 0.1);
+}
+
+// Slow motion: the world drops a register for a moment.
+export function timeSlip() {
+  if (!ok()) return;
+  const t = A.now;
+  const o = A.osc('sine', 110);
+  const g = A.gain();
+  A.chain(o, g, out(A.sfx, 0, 0.8));
+  o.frequency.exponentialRampToValueAtTime(55, t + 0.8);
+  A.env(g.gain, t, 0.12, 0.01, 1.4);
+  o.start(t); o.stop(t + 1.5);
+  bell({ freq: 246.94, gain: 0.04, ratio: 0.5, index: 1.5, decay: 2.5, hall: 0.8 });
+}
+
+// A hanger cable parting: a whip-crack and a long singing wire.
+export function cableSnap({ pan = 0, gain = 1 } = {}) {
+  if (!ok()) return;
+  const t = A.now;
+  const n = A.noiseSource(A.noise, false);
+  const g = A.gain();
+  A.chain(n, A.filter('highpass', 1500), g, out(A.sfx, pan, 0.5));
+  A.env(g.gain, t, 0.3 * gain, 0.001, 0.12);
+  n.start(t); n.stop(t + 0.2);
+  [1, 1.5, 2.25].forEach((r, i) => {
+    const o = A.osc('sawtooth', 140 * r);
+    const og = A.gain();
+    A.chain(o, A.filter('bandpass', 700 * r, 8), og, out(A.sfx, pan, 0.6));
+    o.frequency.setValueAtTime(220 * r, t);
+    o.frequency.exponentialRampToValueAtTime(70 * r, t + 1.8);
+    A.env(og.gain, t, 0.05 * gain / (i + 1), 0.002, 1.9);
+    o.start(t); o.stop(t + 2);
+  });
+}
+
+// Steel under load: a slow, deep complaint.
+export function bridgeGroan({ pan = 0, gain = 1, duration = 3 } = {}) {
+  if (!ok()) return;
+  const t = A.now;
+  const o = A.osc('sawtooth', 42);
+  const g = A.gain();
+  const f = A.filter('bandpass', 180, 6);
+  A.chain(o, f, g, out(A.sfx, pan, 0.7));
+  o.frequency.setValueAtTime(46, t);
+  o.frequency.linearRampToValueAtTime(34, t + duration);
+  f.frequency.setValueAtTime(140, t);
+  f.frequency.linearRampToValueAtTime(260, t + duration * 0.5);
+  f.frequency.linearRampToValueAtTime(120, t + duration);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(0.22 * gain, t + duration * 0.3);
+  g.gain.linearRampToValueAtTime(0.0001, t + duration);
+  o.start(t); o.stop(t + duration + 0.1);
+}
+
+// The span going: tearing steel, then the long fall, then the water.
+export function collapse() {
+  if (!ok()) return;
+  bridgeGroan({ gain: 1.6, duration: 2.2 });
+  [0, 0.3, 0.55, 0.9].forEach((w, i) => setTimeout(() => cableSnap({ pan: (i - 1.5) * 0.4, gain: 0.8 }), w * 1000));
+  const t = A.now;
+  const n = A.noiseSource(A.brown, false);
+  const f = A.filter('lowpass', 300, 0.8);
+  const g = A.gain();
+  A.chain(n, f, g, out(A.sfx, 0, 0.8));
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(0.7, t + 1.2);
+  g.gain.linearRampToValueAtTime(0.4, t + 3.5);
+  g.gain.linearRampToValueAtTime(0.0001, t + 6);
+  f.frequency.linearRampToValueAtTime(900, t + 1.5);
+  f.frequency.linearRampToValueAtTime(140, t + 6);
+  n.start(t); n.stop(t + 6.2);
+  setTimeout(() => lowImpact({ gain: 0.6, freq: 30 }), 3200);
+}
+
+// Archive damage: a digital tear in the footage.
+export function glitch({ gain = 1 } = {}) {
+  if (!ok()) return;
+  const t = A.now;
+  const o = A.osc('square', rnd(80, 300));
+  const g = A.gain();
+  A.chain(o, A.filter('bandpass', rnd(900, 3000), 3), g, out(A.sfx, rnd(-0.5, 0.5), 0));
+  for (let i = 0; i < 6; i++) o.frequency.setValueAtTime(rnd(60, 1200), t + i * 0.025);
+  A.env(g.gain, t, 0.05 * gain, 0.001, 0.16);
+  o.start(t); o.stop(t + 0.2);
+  const n = A.noiseSource();
+  const ng = A.gain();
+  A.chain(n, A.filter('highpass', 4000), ng, out(A.sfx, 0, 0));
+  A.env(ng.gain, t, 0.04 * gain, 0.001, 0.1);
+  n.start(t); n.stop(t + 0.15);
+}
+
+// Her arrival: light hitting stone from a great height.
+export function landing({ gain = 1 } = {}) {
+  if (!ok()) return;
+  lowImpact({ gain: 0.5 * gain, freq: 40 });
+  const t = A.now;
+  const n = A.noiseSource(A.noise, false);
+  const g = A.gain();
+  A.chain(n, A.filter('lowpass', 2400), g, out(A.sfx, 0, 0.6));
+  A.env(g.gain, t, 0.22 * gain, 0.002, 0.5);
+  n.start(t); n.stop(t + 0.6);
+  bell({ freq: 587.33, gain: 0.03 * gain, ratio: 1.5, index: 1, decay: 3, hall: 0.8 });
+}
+
+// Lanterns dying one by one: a low electric pop with a violet whine.
+export function lanternOut({ pan = 0 } = {}) {
+  if (!ok()) return;
+  const t = A.now;
+  const o = A.osc('sawtooth', 120);
+  const g = A.gain();
+  A.chain(o, A.filter('lowpass', 800), g, out(A.sfx, pan, 0.3));
+  o.frequency.exponentialRampToValueAtTime(40, t + 0.2);
+  A.env(g.gain, t, 0.05, 0.002, 0.25);
+  o.start(t); o.stop(t + 0.3);
+}
+
+// A cloth-and-air rush for flight.
+export function flyBy({ pan = 0, gain = 0.08 } = {}) {
+  whoosh({ pan, gain, duration: 0.9 });
+}

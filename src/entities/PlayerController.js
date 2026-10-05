@@ -82,7 +82,7 @@ export class PlayerController {
       if (nx <= this.minX || nx >= this.maxX) rig.vx = 0;
     }
     rig.x = nx;
-    if (want !== 0) rig.face(want > 0 ? 1 : -1);
+    if (want !== 0 && !this.lockFacing) rig.face(want > 0 ? 1 : -1);
   }
 }
 

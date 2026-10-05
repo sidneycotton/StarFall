@@ -1,6 +1,8 @@
-# STARFALL — Chapter One: *What Survives*
+# STARFALL
 
-A playable cinematic opening (≈6–9 minutes) for an original narrative game.
+Chapter One: *What Survives* · Chapter Two: *The Starfall Record*
+
+A playable cinematic narrative game (two chapters so far, ≈25 minutes in all).
 Celestial neo-noir, illustrated science fantasy. Built with Phaser 3, Web Audio
 and a DOM/CSS UI layer. There are **no image or audio files**: every texture
 is painted procedurally to canvas at boot, and every sound is synthesised.
@@ -26,18 +28,21 @@ Headphones recommended. Sound starts after the first click/tap (browser audio po
 | | Desktop | Gamepad | Touch |
 |---|---|---|---|
 | Move | A / D, ← / → | Left stick / D-pad | Chevrons (appear after first touch) |
-| Interact / advance | E, Space, Enter | A | Tap the prompt, or *Use* |
+| Interact / advance / strike | E, Space, Enter | A | Tap the prompt, or *Use* |
+| Dodge | Shift, Q | B | *Dodge* (appears in combat) |
 | Dialogue history | H | | ☰ top-right |
 | Settings / pause | Esc | Start | ⚙ top-right |
 
 Clicking/tapping anywhere also advances dialogue; holding speeds up the typewriter.
 
 Settings: captions (sound subtitles, on by default), text speed, reduce motion,
-sound on/mute, master and music volume, restart.
+sound on/mute, master and music volume, assist (relaxed timing or automatic
+quick-time events and combat), restart.
 
 ### Jumping to a section (for review)
 
-`?stage=wake|explore|call|aftermath|chamber|title` starts at that section
+`?stage=wake|explore|call|aftermath|chamber|title` (Chapter One) or
+`?stage=vigil|record|duel|sky|vigilEnd|title2` (Chapter Two) starts at that section
 (add `&auto` to skip the start prompt, `&autoplay` to auto-advance dialogue).
 
 ## The sequence
@@ -53,6 +58,19 @@ sound on/mute, master and music volume, restart.
 7. **The chamber** — five D-class heroes. *“…you?”* *“Of course.”*
 8. **STARFALL.**
 
+### Chapter Two — The Starfall Record
+
+Seven years later. The city gathers in Vesper Plaza for the anniversary, and the
+Civic Network plays the Record: a reconstruction of the night on the Lantern Bridge,
+assembled from 1,412 public sources. You play it — as Star.
+
+1. **The vigil** — walk through the crowd beneath her statue.
+2. **The Lantern Bridge** — three rescues as the bridge fails (hold, timed and mash prompts).
+3. **Parallax** — a duel: read the visor's flare, dodge, strike when he's open.
+   Where witnesses disagree, the Record asks which account it should follow.
+4. **Above the cloud** — what the helicopter could not follow.
+5. **The names.**
+
 ## Architecture
 
 ```
@@ -62,21 +80,24 @@ src/
   config.js               design space (1600×900), palettes, stage list
   core/                   EventBus, Settings, NarrativeState (save-ready story state), storage
   audio/                  AudioEngine (buses, reverb, helmet filter), sfx recipes,
-                          Ambience layers (alarm shares its clock with the lighting),
+                          Ambience layers (alarm shares its clock with the lighting, bridge, sky, vigil),
                           Music cues, VoiceModulator (Parallax's helmet voice), soundscape registry
   art/                    procedural painters per domain (kit, bedroom, lounge, sanctum,
-                          parallax, seers, vision, chamber, city, lights) + paint toolkit
+                          parallax, seers, vision, chamber, city, lights, star, bridge,
+                          sky, vigil) + paint toolkit
   fx/                     CinematicPipeline (film pass: red duotone, grain, chromatic
                           separation, vignette, flash/fade) and ScreenFX controller
   entities/               Parallax (procedural cut-out rig with pose blending and cloth),
                           PlayerController (tired / precise / run temperaments)
   systems/                Input (keyboard/gamepad/touch + action routing), Interactions,
-                          CameraDirector (lead, focus, shots), Cutscene helpers
+                          CameraDirector (lead, focus, shots, pairs), Cutscene helpers,
+                          QTE (press / hold / mash), Duel (readable melee: tells, dodges, openings)
   ui/                     DOM overlay: Dialogue (typewriter subtitles), TouchControls,
-                          Panels (settings, history), prompts, captions, HUD, title
+                          Panels (settings, history), prompts, captions, HUD, title,
+                          RecordOverlay (timecode, sources, witness notes, choices)
   scenes/                 Boot, Penthouse (+ layout / world / lighting), SeerCall (+ Feed),
-                          Chamber, Title
-  data/                   script, speakers, heroes
+                          Chamber, Title, Vigil, Record (the bridge), Sky
+  data/                   script, speakers, heroes, record
 ```
 
 Design notes:

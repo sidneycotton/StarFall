@@ -14,4 +14,8 @@ export const SPEAKERS = {
   candlemas: { name: 'Candlemas', style: 'aureate', sigil: SIGILS.aureate, voice: null },
   almanac: { name: 'Almanac', style: 'meridian', sigil: SIGILS.meridian, voice: null },
   her: { name: 'Her', style: 'other', sigil: null, voice: null },
+  // Chapter Two. Star is only ever heard as recovered audio.
+  star: { name: 'Star', style: 'aureate star', sigil: '<svg viewBox="0 0 20 20"><path d="M10 1 L11.6 8.4 L19 10 L11.6 11.6 L10 19 L8.4 11.6 L1 10 L8.4 8.4 Z" fill="currentColor"/></svg>', voice: null },
+  record: { name: 'The Record', style: 'meridian record', sigil: SIGILS.meridian, voice: null },
+  crowd: { name: '', style: 'whisper crowd', sigil: null, voice: null },
 };
