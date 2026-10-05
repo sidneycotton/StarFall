@@ -7,22 +7,24 @@ import { ui } from '../../ui/UI.js';
 export const REQUEST_PARTS = ['crowd', 'bedsit', 'relay', 'ambush', 'mine'];
 
 const OWN_SCENE = {
+  relay: 'Relay',
   ambush: 'Ambush',
 };
 
-export function partStart(part) {
-  return OWN_SCENE[part] ? [OWN_SCENE[part], {}] : ['Request', { part }];
+export function partStart(part, data = {}) {
+  return OWN_SCENE[part] ? [OWN_SCENE[part], data] : ['Request', { ...data, part }];
 }
 
-export function startPart(scene, part) {
-  const [key, data] = partStart(part);
-  scene.scene.start(key, data);
+export function startPart(scene, part, data) {
+  const [key, d] = partStart(part, data);
+  scene.scene.start(key, d);
 }
 
-export function nextPart(scene, part) {
+// `data` is handed on to the next part (where Wallflower was standing, say).
+export function nextPart(scene, part, data) {
   const i = REQUEST_PARTS.indexOf(part);
   if (i >= 0 && i < REQUEST_PARTS.length - 1) {
-    startPart(scene, REQUEST_PARTS[i + 1]);
+    startPart(scene, REQUEST_PARTS[i + 1], data);
   } else {
     ui.letterbox(false);
     narrative.setStage('ch3end');

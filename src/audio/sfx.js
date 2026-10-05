@@ -703,3 +703,26 @@ export function hush({ duration = 6, gain = 0.02 } = {}) {
   g.gain.linearRampToValueAtTime(0.0001, t + duration);
   o.start(t); o.stop(t + duration + 0.1);
 }
+
+// A phone ringing out, heard through somebody else's handset: the double burr,
+// small and far away.
+export function ringback({ rings = 2, gain = 0.035, pan = 0.25 } = {}) {
+  if (!ok()) return;
+  const t0 = A.now;
+  for (let r = 0; r < rings; r++) {
+    for (let k = 0; k < 2; k++) {
+      const t = t0 + r * 3 + k * 0.6;
+      const g = A.gain();
+      A.chain(g, out(A.sfx, pan, 0.05));
+      [400, 450].forEach((f) => {
+        const o = A.osc('sine', f);
+        o.connect(g);
+        o.start(t); o.stop(t + 0.42);
+      });
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(gain, t + 0.02);
+      g.gain.setValueAtTime(gain, t + 0.38);
+      g.gain.linearRampToValueAtTime(0.0001, t + 0.41);
+    }
+  }
+}

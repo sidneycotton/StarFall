@@ -33,11 +33,13 @@ export class AmbushScene extends Room {
     super('Ambush');
   }
 
-  create() {
+  create(data = {}) {
     narrative.setStage('ambush');
     ui.letterbox(false);
+    // Wherever the meeting left Wallflower standing.
+    const from = Number.isFinite(data.x) ? data : { x: RELAY.byDoor.x, z: RELAY.byDoor.z, yaw: 0.35 };
     this.setupRoom({
-      start: { x: RELAY.byDoor.x, z: RELAY.byDoor.z, yaw: 0.35, pitch: -0.04 },
+      start: { x: from.x, z: from.z, yaw: from.yaw, pitch: -0.04 },
       fog: 0x070508, fogDist: 16, ambient: 0.13,
       fx: { grain: 0.09, vignette: 0.85, aberration: 0.45, desat: 0.1 },
     });

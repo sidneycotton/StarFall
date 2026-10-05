@@ -129,6 +129,7 @@ export const REQUEST = {
       ],
       [
         { id: 'rq_r7', speaker: 'humdrum', text: 'Evening. Is this the— is this it?', auto: 2400 },
+        { id: 'rq_r7b', speaker: 'humdrum', text: 'Mind the third step. It\'s gone.', auto: 2200 },
         { id: 'rq_r8', speaker: 'lukewarm', text: 'If it isn\'t, I\'m going home, I\'ve a shift at six.', auto: 2800 },
       ],
     ],
@@ -141,6 +142,10 @@ export const REQUEST = {
     ],
     // Wallflower is standing by the door. They have to move to be counted.
     countHint: 'Step forward',
+    countHintTouch: 'Step forward',
+    passing: [
+      { id: 'rq_r9', speaker: 'wallflowerThought', text: 'He came in past me close enough to touch. He didn\'t.', auto: 3200 },
+    ],
     counted: [
       { id: 'rq_n6', speaker: 'wallflower', text: 'Five.' },
       { id: 'rq_n7', speaker: 'paperweight', text: 'Oh my— how long have you been there?', pause: 200 },

@@ -25,6 +25,7 @@ import { TramScene } from './scenes/TramScene.js';
 import { SpanScene } from './scenes/SpanScene.js';
 import { RequestScene } from './scenes/RequestScene.js';
 import { AmbushScene } from './scenes/request/AmbushScene.js';
+import { RelayScene } from './scenes/request/RelayScene.js';
 import { partStart } from './scenes/request/parts.js';
 
 // STARFALL. Entry point: game config, the DOM UI layer and the
@@ -49,7 +50,7 @@ const game = new Phaser.Game({
   audio: { noAudio: true },
   input: { gamepad: false },
   pipeline: { CinematicPipeline },
-  scene: [BootScene, PenthouseScene, SeerCallScene, ChamberScene, TitleScene, VigilScene, TramScene, SpanScene, SkyScene, RequestScene, AmbushScene],
+  scene: [BootScene, PenthouseScene, SeerCallScene, ChamberScene, TitleScene, VigilScene, TramScene, SpanScene, SkyScene, RequestScene, RelayScene, AmbushScene],
 });
 
 ui.init(game);
