@@ -17,9 +17,9 @@ const PRESETS = {
   // Sitting on the edge of the bed, elbows on knees, head hanging.
   sitBed: { hipY: -86, hipX: -6, lean: 0.55, head: 0.5, thighF: -1.45, shinF: 1.25, thighB: -1.35, shinB: 1.4, upperF: -0.55, foreF: -2.1, upperB: -0.45, foreB: -2.0 },
   // Upright in the eclipse chair, one hand on the altar.
-  sitChair: { hipY: -98, hipX: 0, lean: -0.04, head: 0.04, thighF: -1.5, shinF: 1.45, thighB: -1.45, shinB: 1.5, upperF: -0.9, foreF: -0.6, upperB: -0.35, foreB: -0.9 },
+  sitChair: { hipY: -94, hipX: 0, lean: -0.04, head: 0.04, thighF: -1.5, shinF: 1.45, thighB: -1.45, shinB: 1.5, upperF: -0.5, foreF: -0.95, upperB: -0.35, foreB: -0.9 },
   // The hand withdrawn from the altar, resting on a thigh.
-  sitChairHandAway: { hipY: -98, hipX: 0, lean: 0.02, head: 0.1, thighF: -1.5, shinF: 1.45, thighB: -1.45, shinB: 1.5, upperF: -0.3, foreF: -0.9, upperB: -0.35, foreB: -0.9 },
+  sitChairHandAway: { hipY: -94, hipX: 0, lean: 0.02, head: 0.1, thighF: -1.5, shinF: 1.45, thighB: -1.45, shinB: 1.5, upperF: -0.3, foreF: -0.9, upperB: -0.35, foreB: -0.9 },
   // Both hands to the back of the head, gathering hair.
   gatherHair: { hipY: -154, hipX: 0, lean: 0.02, head: 0.25, thighF: -0.04, shinF: 0.06, thighB: 0.06, shinB: 0.04, upperF: -2.75, foreF: -1.96, upperB: -2.6, foreB: -1.9 },
   // Raising the helmet above the head.

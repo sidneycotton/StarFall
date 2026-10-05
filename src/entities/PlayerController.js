@@ -76,8 +76,11 @@ export class PlayerController {
     const rate = Math.abs(target) > Math.abs(rig.vx) ? prof.accel : prof.decel;
     rig.vx = approach(rig.vx, target, rate * dt);
     let nx = rig.x + rig.vx * dt;
-    if (!this.autoTarget) nx = Phaser.Math.Clamp(nx, this.minX, this.maxX);
-    if ((nx <= this.minX || nx >= this.maxX) && !this.autoTarget) rig.vx = 0;
+    // Bounds only constrain the player; scripted walks and placements may go anywhere.
+    if (this.enabled && !this.autoTarget) {
+      nx = Phaser.Math.Clamp(nx, this.minX, this.maxX);
+      if (nx <= this.minX || nx >= this.maxX) rig.vx = 0;
+    }
     rig.x = nx;
     if (want !== 0) rig.face(want > 0 ? 1 : -1);
   }
