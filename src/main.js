@@ -24,6 +24,8 @@ import { SkyScene } from './scenes/SkyScene.js';
 import { TramScene } from './scenes/TramScene.js';
 import { SpanScene } from './scenes/SpanScene.js';
 import { RequestScene } from './scenes/RequestScene.js';
+import { AmbushScene } from './scenes/request/AmbushScene.js';
+import { partStart } from './scenes/request/parts.js';
 
 // STARFALL. Entry point: game config, the DOM UI layer and the
 // few global behaviours (pause, restart) that sit above individual scenes.
@@ -47,7 +49,7 @@ const game = new Phaser.Game({
   audio: { noAudio: true },
   input: { gamepad: false },
   pipeline: { CinematicPipeline },
-  scene: [BootScene, PenthouseScene, SeerCallScene, ChamberScene, TitleScene, VigilScene, TramScene, SpanScene, SkyScene, RequestScene],
+  scene: [BootScene, PenthouseScene, SeerCallScene, ChamberScene, TitleScene, VigilScene, TramScene, SpanScene, SkyScene, RequestScene, AmbushScene],
 });
 
 ui.init(game);
@@ -81,7 +83,7 @@ bus.on('game:restart', (opts = {}) => {
   });
   if (audio.ctx) audio.ctx.resume();
   setTimeout(() => {
-    if (chapter >= 3) game.scene.start('Request', { part: 'crowd' });
+    if (chapter >= 3) game.scene.start(...partStart('crowd'));
     else if (chapter === 2) game.scene.start('Vigil', {});
     else game.scene.start('Penthouse', { start: 'wake' });
   }, 400);

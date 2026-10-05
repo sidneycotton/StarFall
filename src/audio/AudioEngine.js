@@ -43,7 +43,14 @@ class AudioEngineImpl {
     this.worldFilter.frequency.value = 18000;
     this.worldFilter.Q.value = 0.4;
     this.world = ctx.createGain();
-    this.world.connect(this.worldFilter);
+    // Stillness (Chapter Three): the world drawn in close and soft.
+    this.stillFilter = ctx.createBiquadFilter();
+    this.stillFilter.type = 'lowpass';
+    this.stillFilter.frequency.value = 20000;
+    this.stillGain = ctx.createGain();
+    this.world.connect(this.stillFilter);
+    this.stillFilter.connect(this.stillGain);
+    this.stillGain.connect(this.worldFilter);
     this.worldFilter.connect(this.master);
 
     this.sfx = this.makeBus(this.world, 1);
@@ -244,6 +251,14 @@ class AudioEngineImpl {
     f.cancelScheduledValues(t);
     f.setTargetAtTime(freq, t, 0.04);
     f.setTargetAtTime(this.helmet ? 1500 : this.openFreq(), t + hold, 0.25);
+  }
+
+  // 0..1: how far Wallflower has faded from notice.
+  setStill(s) {
+    if (!this.ctx) return;
+    const t = this.now;
+    this.stillFilter.frequency.setTargetAtTime(20000 * Math.pow(1400 / 20000, s), t, 0.08);
+    this.stillGain.gain.setTargetAtTime(1 - s * 0.35, t, 0.08);
   }
 
   // Hard cut of everything in the world (used for the gunshot silence).

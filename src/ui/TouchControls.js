@@ -6,6 +6,8 @@ import { IS_TOUCH } from '../config.js';
 
 const CHEVRON_L = '<svg viewBox="0 0 20 20"><polyline points="13,3 6,10 13,17"/></svg>';
 const CHEVRON_R = '<svg viewBox="0 0 20 20"><polyline points="7,3 14,10 7,17"/></svg>';
+const CHEVRON_U = '<svg viewBox="0 0 20 20"><polyline points="3,13 10,6 17,13"/></svg>';
+const CHEVRON_D = '<svg viewBox="0 0 20 20"><polyline points="3,7 10,14 17,7"/></svg>';
 
 export class TouchControls {
   constructor(root) {
@@ -17,6 +19,13 @@ export class TouchControls {
     this.pad.className = 'pad';
     this.pad.innerHTML = `<button aria-label="Move left" data-dir="-1">${CHEVRON_L}</button><button aria-label="Move right" data-dir="1">${CHEVRON_R}</button>`;
     root.appendChild(this.pad);
+
+    // First person: walk forward and back; the head turns by dragging.
+    this.walk = document.createElement('div');
+    this.walk.className = 'pad walk';
+    this.walk.innerHTML = `<button aria-label="Walk forward" data-dir="1">${CHEVRON_U}</button><button aria-label="Step back" data-dir="-1">${CHEVRON_D}</button>`;
+    root.appendChild(this.walk);
+    this.walkWanted = false;
 
     this.act = document.createElement('button');
     this.act.className = 'act';
@@ -58,6 +67,28 @@ export class TouchControls {
       b.addEventListener('lostpointercapture', release);
     });
 
+    const walkHeld = new Map();
+    this.walk.querySelectorAll('button').forEach((b) => {
+      const dir = Number(b.dataset.dir);
+      b.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        b.setPointerCapture?.(e.pointerId);
+        walkHeld.set(e.pointerId, dir);
+        b.classList.add('held');
+        input.lastDevice = 'touch';
+        input.touchFwd = Math.max(-1, Math.min(1, [...walkHeld.values()].reduce((a, d) => a + d, 0)));
+      });
+      const release = (e) => {
+        walkHeld.delete(e.pointerId);
+        b.classList.remove('held');
+        input.touchFwd = Math.max(-1, Math.min(1, [...walkHeld.values()].reduce((a, d) => a + d, 0)));
+      };
+      b.addEventListener('pointerup', release);
+      b.addEventListener('pointercancel', release);
+      b.addEventListener('lostpointercapture', release);
+    });
+
     const hold = (btn, press, release) => {
       btn.addEventListener('pointerdown', (e) => {
         e.preventDefault();
@@ -93,6 +124,12 @@ export class TouchControls {
     this.refresh();
   }
 
+  // First-person walking (Chapter Three).
+  setWalk(on) {
+    this.walkWanted = on;
+    this.refresh();
+  }
+
   setAction(on, label = 'Use') {
     this.act.textContent = label;
     this.act.classList.toggle('on', on && this.touchSeen);
@@ -115,5 +152,7 @@ export class TouchControls {
   refresh() {
     this.pad.classList.toggle('on', this.wanted && this.touchSeen);
     if (!this.wanted) input.touchAxis = 0;
+    this.walk.classList.toggle('on', this.walkWanted && this.touchSeen);
+    if (!this.walkWanted) input.touchFwd = 0;
   }
 }

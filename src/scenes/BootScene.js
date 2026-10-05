@@ -17,6 +17,7 @@ import { registerBridge } from '../art/bridge.js';
 import { registerVigil } from '../art/vigil.js';
 import { registerTram } from '../art/tram.js';
 import { registerSpan } from '../art/span.js';
+import { partStart, startPart } from './request/parts.js';
 
 // Paints every texture (there are no image files), waits for fonts, then
 // shows a quiet start prompt — audio needs a user gesture before sound can come first.
@@ -40,11 +41,11 @@ const START_SCENE = {
   // Saves from before the Record and the duel were retired.
   record: ['Tram', {}],
   duel: ['Tram', {}],
-  crowd: ['Request', { part: 'crowd' }],
-  bedsit: ['Request', { part: 'bedsit' }],
-  relay: ['Request', { part: 'relay' }],
-  ambush: ['Request', { part: 'ambush' }],
-  mine: ['Request', { part: 'mine' }],
+  crowd: partStart('crowd'),
+  bedsit: partStart('bedsit'),
+  relay: partStart('relay'),
+  ambush: partStart('ambush'),
+  mine: partStart('mine'),
   title3: ['Title', { chapter: 3 }],
 };
 
@@ -111,7 +112,7 @@ export class BootScene extends Phaser.Scene {
     ];
     // Chapter Three opens once Chapter Two has been seen through.
     if (flags.ch2Seen || flags.ch3Seen) {
-      chapters.push({ label: 'Chapter Three', go: () => begin(() => { narrative.beginChapterThree(); this.scene.start('Request', { part: 'crowd' }); }, true) });
+      chapters.push({ label: 'Chapter Three', go: () => begin(() => { narrative.beginChapterThree(); startPart(this, 'crowd'); }, true) });
     }
     const begin = async (fn, fresh) => {
       await audio.unlock();

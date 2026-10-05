@@ -186,13 +186,28 @@ export const REQUEST = {
       { id: 'rq_d1', speaker: 'dowser', text: 'Back door— everyone, the back—', auto: 1600 },
       { id: 'rq_d2', speaker: 'parallax', text: 'You always run downhill. Water does.', voiceGain: 0.07 },
     ],
+    goOn: [
+      { id: 'rq_d3', speaker: 'parallax', text: 'Go on.', voiceGain: 0.07, auto: 1400 },
+    ],
+    outside: [
+      { id: 'rq_d4', speaker: 'wallflowerThought', text: 'She was already out there.', auto: 2600 },
+    ],
     paperweight: [
       { id: 'rq_w1', speaker: 'paperweight', text: 'Stay— stay THERE—', auto: 1600 },
       { id: 'rq_w2', speaker: 'parallax', text: 'A minute. You can hold anything for a minute. Then what?', voiceGain: 0.07 },
     ],
+    pulled: [
+      { id: 'rq_w3', speaker: 'paperweight', text: 'Who— who\'s got me?', auto: 2000 },
+    ],
+    dropped: [
+      { id: 'rq_w4', speaker: 'paperweight', text: '—', auto: 900 },
+    ],
     lukewarm: [
       { id: 'rq_u1', speaker: 'parallax', text: 'Room temperature. Show me how much room.', voiceGain: 0.07 },
       { id: 'rq_u2', speaker: 'lukewarm', text: 'Let go— let GO of me—', auto: 1600 },
+    ],
+    powerCut: [
+      { id: 'rq_u3', speaker: 'wallflowerThought', text: 'The boiler died. She didn\'t let go.', auto: 2800 },
     ],
     // Wallflower moves only when the helmet is turned away.
     stillHint: 'Stand still',
@@ -201,14 +216,17 @@ export const REQUEST = {
       { id: 'rq_e1', speaker: 'parallax', text: '…', voiceGain: 0.05, auto: 1400 },
       { id: 'rq_e2', speaker: 'wallflowerThought', text: 'She turned to the air where I\'d been. Then back, to whoever was nearest.', auto: 3800 },
     ],
+    seenAgain: [
+      { id: 'rq_e3', speaker: 'wallflowerThought', text: 'Again. The air, and then whoever was nearest.', auto: 2800 },
+    ],
     tasks: {
       power: { label: 'Cut the power' },
       bar: { label: 'Kick the bar loose' },
       drag: { label: 'Pull her out of the doorway' },
     },
     // The one choice.
-    choose: (stay, step) => `${stay} — stay still · ${step} — step forward`,
-    chooseTouch: 'Stay still · or step forward',
+    choose: (stay, step) => `Stay still · or walk to her (${step} to step forward)`,
+    chooseTouch: 'Stay still · or walk to her',
     stay: [
       { id: 'rq_y1', speaker: 'wallflowerThought', text: 'I didn\'t move. I didn\'t breathe.', auto: 2600 },
       { id: 'rq_y2', speaker: 'lukewarm', text: '—', auto: 1600 },

@@ -14,6 +14,12 @@ class InputSystem {
     this.keys = new Set();
     this.touchAxis = 0;
     this.padAxis = 0;
+    // First-person walking (Chapter Three): W/S and the arrows walk instead of
+    // acting, the left stick's y walks, the right stick looks.
+    this.fpMode = false;
+    this.touchFwd = 0;
+    this.padFwd = 0;
+    this.padLook = { x: 0, y: 0 };
     this.enabled = true;
     this.handlers = [];
     this.lastDevice = 'keyboard';
@@ -27,6 +33,7 @@ class InputSystem {
     window.addEventListener('blur', () => {
       this.keys.clear();
       this.touchAxis = 0;
+      this.touchFwd = 0;
       this.held.action.clear();
       this.held.dodge.clear();
     });
@@ -38,7 +45,8 @@ class InputSystem {
   onKey(e, down) {
     const k = e.key.toLowerCase();
     const code = e.code;
-    const mapped = {
+    const walk = this.fpMode ? { w: 'fwd', arrowup: 'fwd', s: 'back', arrowdown: 'back' }[k] : null;
+    const mapped = walk || {
       arrowleft: 'left', a: 'left', arrowright: 'right', d: 'right',
     }[k] || (ACTION_KEYS[k] ? 'action' : null) || (DODGE_KEYS[k] ? 'dodge' : null);
     if (mapped || code === 'Space') e.preventDefault();
@@ -52,7 +60,7 @@ class InputSystem {
     }
     if (!down && mapped === 'action') this.releaseAction(`k:${k}`);
     if (!down && mapped === 'dodge') this.releaseDodge(`k:${k}`);
-    if (mapped === 'left' || mapped === 'right') {
+    if (mapped === 'left' || mapped === 'right' || mapped === 'fwd' || mapped === 'back') {
       if (down) this.keys.add(mapped); else this.keys.delete(mapped);
     }
   }
@@ -94,9 +102,16 @@ class InputSystem {
   pollGamepad() {
     const pads = navigator.getGamepads ? navigator.getGamepads() : [];
     const pad = pads && [...pads].find((p) => p && p.connected);
-    if (!pad) { this.padAxis = 0; return; }
+    if (!pad) { this.padAxis = 0; this.padFwd = 0; this.padLook = { x: 0, y: 0 }; return; }
     let ax = pad.axes[0] || 0;
     if (Math.abs(ax) < 0.2) ax = 0;
+    const dz = (v) => (Math.abs(v || 0) < 0.2 ? 0 : v);
+    let fy = -dz(pad.axes[1]);
+    if (this.fpMode && pad.buttons[12]?.pressed) fy = 1;
+    if (this.fpMode && pad.buttons[13]?.pressed) fy = -1;
+    this.padFwd = fy;
+    this.padLook = { x: dz(pad.axes[2]), y: dz(pad.axes[3]) };
+    if (fy || this.padLook.x || this.padLook.y) this.lastDevice = 'gamepad';
     if (pad.buttons[14]?.pressed) ax = -1;
     if (pad.buttons[15]?.pressed) ax = 1;
     this.padAxis = ax;
@@ -123,6 +138,16 @@ class InputSystem {
     if (this.keys.has('right')) a += 1;
     if (!a) a = this.padAxis || this.touchAxis;
     return Math.max(-1, Math.min(1, a));
+  }
+
+  // Walking, -1..1 (first person only).
+  forward() {
+    if (!this.enabled || !this.fpMode) return 0;
+    let f = 0;
+    if (this.keys.has('fwd')) f += 1;
+    if (this.keys.has('back')) f -= 1;
+    if (!f) f = this.padFwd || this.touchFwd;
+    return Math.max(-1, Math.min(1, f));
   }
 
   // Human-readable name of a verb on the current device.

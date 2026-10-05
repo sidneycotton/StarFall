@@ -5,6 +5,7 @@ import { wait } from '../systems/Cutscene.js';
 import { input } from '../systems/Input.js';
 import { ScreenFX } from '../fx/ScreenFX.js';
 import { REQUEST } from '../data/request.js';
+import { REQUEST_PARTS, nextPart } from './request/parts.js';
 
 // Chapter Three — The Request, as a running order. Each part plays its script
 // over black so the whole chapter can be walked end to end; the parts are
@@ -12,8 +13,6 @@ import { REQUEST } from '../data/request.js';
 
 const PARAMS = new URLSearchParams(window.location.search);
 const AUTOPLAY = PARAMS.has('autoplay');
-
-export const REQUEST_PARTS = ['crowd', 'bedsit', 'relay', 'ambush', 'mine'];
 
 export class RequestScene extends Phaser.Scene {
   constructor() {
@@ -31,13 +30,7 @@ export class RequestScene extends Phaser.Scene {
   }
 
   next() {
-    const i = REQUEST_PARTS.indexOf(this.part);
-    if (i < REQUEST_PARTS.length - 1) this.scene.start('Request', { part: REQUEST_PARTS[i + 1] });
-    else {
-      ui.letterbox(false);
-      narrative.setStage('ch3end');
-      this.scene.start('Title', { chapter: 3 });
-    }
+    nextPart(this, this.part);
   }
 
   async place(text) {

@@ -26,6 +26,7 @@ uniform float uWarp;
 uniform vec3  uTint;
 uniform vec3  uLift;
 uniform float uExposure;
+uniform float uStill;
 
 varying vec2 outTexCoord;
 
@@ -62,8 +63,16 @@ void main() {
   col = mix(col, vec3(dot(col, vec3(0.299, 0.587, 0.114))), uDesat);
   col = col * uTint + uLift * (1.0 - col);
 
-  // Vignette (wider than tall, like a lens).
   vec2 vc = c * vec2(1.0, 1.25);
+
+  // Stillness (Chapter Three): the edges of the world settle, cool and go
+  // quiet; only the middle stays sharp.
+  float edge = smoothstep(0.12, 0.62, length(vc));
+  float gl = dot(col, vec3(0.299, 0.587, 0.114));
+  col = mix(col, vec3(gl * 0.86, gl * 0.9, gl * 1.02), uStill * (0.3 + edge * 0.6));
+  col *= 1.0 - uStill * edge * 0.42;
+
+  // Vignette (wider than tall, like a lens).
   float v = smoothstep(0.92, 0.18, length(vc) * 1.18);
   col *= mix(1.0, v, uVignette);
 
@@ -93,6 +102,7 @@ export const FX_DEFAULTS = {
   tintR: 1, tintG: 1, tintB: 1,
   liftR: 0, liftG: 0, liftB: 0,
   exposure: 1,
+  still: 0,
 };
 
 export class CinematicPipeline extends Phaser.Renderer.WebGL.Pipelines.PostFXPipeline {
@@ -119,5 +129,6 @@ export class CinematicPipeline extends Phaser.Renderer.WebGL.Pipelines.PostFXPip
     this.set3f('uTint', p.tintR, p.tintG, p.tintB);
     this.set3f('uLift', p.liftR, p.liftG, p.liftB);
     this.set1f('uExposure', p.exposure);
+    this.set1f('uStill', p.still);
   }
 }
