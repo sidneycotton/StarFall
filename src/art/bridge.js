@@ -31,6 +31,10 @@ function civilian(ctx, r, w, h, { coat, skin = '#6a5048', bag = false, arm = 0 }
   ctx.fillRect(cx + 9, h * 0.22, 3, h * 0.42);
 }
 
+// Props on the walkway are painted at double resolution: they are drawn large
+// beside the hero rigs, and Record scales them down from this.
+const HI = { scale: 2 };
+
 export function registerBridge(scene) {
   // Sky: night, with the eastern horizon burning orange through smoke.
   paintTexture(scene, 'br_sky', 1600, 900, (ctx, w, h) => {
@@ -155,7 +159,7 @@ export function registerBridge(scene) {
     }
     ctx.fillStyle = rgba(LANTERN, 0.18);
     ctx.fillRect(0, 64, w, 2);
-  });
+  }, HI);
 
   // Lantern post: tall, slender, a paper-gold lamp.
   paintTexture(scene, 'br_lantern', 40, 190, (ctx, w, h) => {
@@ -168,7 +172,7 @@ export function registerBridge(scene) {
     roundRect(ctx, cx - 9, 14, 18, 28, 4, ctx.fillStyle);
     ctx.fillStyle = rgba('#7a4a20', 0.5);
     ctx.fillRect(cx - 9, 26, 18, 1.5);
-  });
+  }, HI);
   paintTexture(scene, 'br_lantern_off', 40, 190, (ctx, w, h) => {
     const cx = w / 2;
     ctx.fillStyle = IRON_HI;
@@ -176,7 +180,7 @@ export function registerBridge(scene) {
     ctx.fillRect(cx - 8, h - 8, 16, 8);
     poly(ctx, [[cx - 12, 14], [cx + 12, 14], [cx + 8, 4], [cx - 8, 4]], IRON);
     roundRect(ctx, cx - 9, 14, 18, 28, 4, '#2a2028');
-  });
+  }, HI);
 
   // Tram 6: an old cream-and-maroon tram, windows lit.
   const tram = (key, crushed) => paintTexture(scene, key, 380, 170, (ctx, w, h) => {
@@ -208,7 +212,7 @@ export function registerBridge(scene) {
     }
     ctx.fillStyle = '#e8d8b0';
     ctx.font = '600 14px sans-serif';
-    ctx.fillText('6', w - 34, top + 82);
+    ctx.fillText(crushed ? '6' : '4', w - 34, top + 82);
     // Bogies.
     [60, w - 60].forEach((x) => {
       ctx.fillStyle = '#100c12';
@@ -221,7 +225,7 @@ export function registerBridge(scene) {
     ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(w / 2 - 30, top); ctx.lineTo(w / 2, top - 14); ctx.lineTo(w / 2 + 30, top); ctx.stroke();
     ctx.restore();
-  });
+  }, HI);
   tram('br_tram', false);
   tram('br_tram_crushed', true);
 
@@ -237,15 +241,15 @@ export function registerBridge(scene) {
     ctx.fillStyle = '#c84a3a';
     ellipse(ctx, 40, h / 2, 6, 6, '#c84a3a');
     ellipse(ctx, 80, h / 2, 6, 6, '#3a1a18');
-  });
+  }, HI);
 
   // Civilians: a handful of variants, tinted cool by the footage.
   const coats = [['#2a2a3a', '#3e3e52'], ['#3a2228', '#56343a'], ['#24302e', '#364a46'], ['#3a3226', '#54483a'], ['#2e2438', '#463a52'], ['#1e1e24', '#34343c']];
   coats.forEach((coat, i) => {
-    paintTexture(scene, `br_civ${i}`, 44, 120, (ctx, w, h) => civilian(ctx, rng(i + 3), w, h, { coat, bag: i % 2 === 0, arm: (i % 3) - 1 }));
+    paintTexture(scene, `br_civ${i}`, 44, 120, (ctx, w, h) => civilian(ctx, rng(i + 3), w, h, { coat, bag: i % 2 === 0, arm: (i % 3) - 1 }), HI);
   });
   // The boy who goes over the rail: small, a yellow raincoat.
-  paintTexture(scene, 'br_boy', 36, 80, (ctx, w, h) => civilian(ctx, rng(19), w, h, { coat: ['#a88a2a', '#d8b848'], skin: '#8a6a58' }));
+  paintTexture(scene, 'br_boy', 36, 80, (ctx, w, h) => civilian(ctx, rng(19), w, h, { coat: ['#a88a2a', '#d8b848'], skin: '#8a6a58' }), HI);
 
   // Ember/ash flake.
   paintTexture(scene, 'ember', 8, 8, (ctx) => {

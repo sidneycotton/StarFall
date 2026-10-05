@@ -25,6 +25,7 @@ import { RECORD } from '../data/record.js';
 const ADD = Phaser.BlendModes.ADD;
 const W = 4100;
 const DECK = 760;               // feet line on the walkway
+const RAIL = 98;                // railing height above the walkway (deck tile is painted at 2×)
 const TOWERS = [600, 3500];
 const SPAN = { x0: 1500, x1: 2600 };
 const ARENA = { min: 2660, max: 3440 };
@@ -40,7 +41,7 @@ function cableY(x) {
     return 140 + 490 * (1 - k * k);
   }
   const d = x < a ? a - x : x - b;
-  return Math.min(DECK - 60, 140 + d * d * 0.0009 + d * 0.12);
+  return Math.min(DECK - RAIL - 12, 140 + d * d * 0.0009 + d * 0.12);
 }
 
 export class RecordScene extends Phaser.Scene {
@@ -102,8 +103,8 @@ export class RecordScene extends Phaser.Scene {
     this.hangers = [];
     for (let x = -360; x < W + 360; x += 56) {
       const y = cableY(x);
-      if (y > DECK - 90 || (x > SPAN.x0 && x < SPAN.x1)) continue;
-      hang.lineStyle(2, 0x2a2232, 1).lineBetween(x, y, x, DECK - 48);
+      if (y > DECK - RAIL - 40 || (x > SPAN.x0 && x < SPAN.x1)) continue;
+      hang.lineStyle(2, 0x2a2232, 1).lineBetween(x, y, x, DECK - RAIL);
     }
 
     // The centre span is its own body: it sags, and then it goes.
@@ -116,42 +117,43 @@ export class RecordScene extends Phaser.Scene {
     }
     this.drawSpanHangers();
     this.span.add(this.spanHang);
-    this.add.tileSprite(-400, DECK - 50, SPAN.x0 + 400, 150, 'br_deck').setOrigin(0, 0).setDepth(22);
-    this.add.tileSprite(SPAN.x1, DECK - 50, W - SPAN.x1 + 400, 150, 'br_deck').setOrigin(0, 0).setDepth(22);
-    this.span.add(this.add.tileSprite(0, -50, SPAN.x1 - SPAN.x0, 150, 'br_deck').setOrigin(0, 0));
+    this.add.tileSprite(-400, DECK - 100, SPAN.x0 + 400, 300, 'br_deck').setOrigin(0, 0).setDepth(22);
+    this.add.tileSprite(SPAN.x1, DECK - 100, W - SPAN.x1 + 400, 300, 'br_deck').setOrigin(0, 0).setDepth(22);
+    this.span.add(this.add.tileSprite(0, -100, SPAN.x1 - SPAN.x0, 300, 'br_deck').setOrigin(0, 0));
 
-    // Lanterns, every 160 px. They go out from the east, one at a time.
+    // Lanterns, every 200 px, taller than anyone on the bridge. They go out from the east, one at a time.
     this.lanterns = [];
-    for (let x = 80; x < W; x += 160) {
+    for (let x = 80; x < W; x += 200) {
       const inSpan = x > SPAN.x0 && x < SPAN.x1;
       const lx = inSpan ? x - SPAN.x0 : x;
-      const post = this.add.image(lx, inSpan ? -46 : DECK - 46, 'br_lantern').setOrigin(0.5, 1).setScale(1.15);
-      const glowY = (inSpan ? -46 : DECK - 46) - 190 * 1.15 + 32;
-      const glow = this.add.image(lx, glowY, 'light_soft').setScale(0.55).setBlendMode(ADD).setTint(0xffc070).setAlpha(0.55);
-      const pool = this.add.image(lx, inSpan ? 6 : DECK + 6, 'light_soft').setScale(1.4, 0.18).setBlendMode(ADD).setTint(0xffb060).setAlpha(0.25);
+      const base = inSpan ? -6 : DECK - 6;
+      const post = this.add.image(lx, base, 'br_lantern').setOrigin(0.5, 1).setScale(1.15);
+      const glowY = base - 380 * 1.15 + 64;
+      const glow = this.add.image(lx, glowY, 'light_soft').setScale(0.9).setBlendMode(ADD).setTint(0xffc070).setAlpha(0.55);
+      const pool = this.add.image(lx, inSpan ? 6 : DECK + 6, 'light_soft').setScale(2, 0.24).setBlendMode(ADD).setTint(0xffb060).setAlpha(0.25);
       if (inSpan) this.span.add([post, glow, pool]);
       else { post.setDepth(21); glow.setDepth(21); pool.setDepth(23); }
       this.lanterns.push({ x, post, glow, pool, on: true });
     }
 
     // Trams: one abandoned at the west end; Tram 6 pinned under the gantry.
-    this.add.image(380, DECK + 6, 'br_tram').setOrigin(0.5, 1).setScale(1.3).setDepth(25).setTint(0xb8b0b8);
-    this.tram6 = this.add.image(SPOT.tram + 160, DECK + 6, 'br_tram_crushed').setOrigin(0.5, 1).setScale(1.3).setDepth(25);
-    this.gantry = this.add.image(SPOT.tram + 420, DECK - 190, 'br_gantry').setOrigin(1, 0.5).setScale(1.3).setDepth(26).setRotation(0.4);
-    this.tramGlow = this.add.image(SPOT.tram + 120, DECK - 80, 'light_soft').setScale(2.4, 0.8).setBlendMode(ADD).setTint(0xffd090).setAlpha(0.2).setDepth(24);
+    this.add.image(260, DECK + 6, 'br_tram').setOrigin(0.5, 1).setScale(1.05).setDepth(25).setTint(0xb8b0b8);
+    this.tram6 = this.add.image(SPOT.tram - 60, DECK + 6, 'br_tram_crushed').setOrigin(0.5, 1).setScale(1.05).setDepth(25);
+    this.gantry = this.add.image(SPOT.tram + 400, DECK - 300, 'br_gantry').setOrigin(1, 0.5).setScale(0.85).setDepth(26).setRotation(0.4);
+    this.tramGlow = this.add.image(SPOT.tram - 60, DECK - 140, 'light_soft').setScale(3.8, 1.3).setBlendMode(ADD).setTint(0xffd090).setAlpha(0.2).setDepth(24);
 
     // Civilians crossing west, and the ones still stuck on the span.
     this.walkers = [];
     const r = rng(61);
-    for (let i = 0; i < 26; i++) {
+    for (let i = 0; i < 16; i++) {
       const x = 950 + r() * 1500;
       if (Math.abs(x - SPOT.tram) < 140) continue;
       this.addWalker(x, r);
     }
     this.spanCrowd = [];
-    for (let i = 0; i < 22; i++) {
+    for (let i = 0; i < 13; i++) {
       const x = 120 + r() * (SPAN.x1 - SPAN.x0 - 240);
-      const p = this.add.image(x, 4 + r() * 6, `br_civ${Math.floor(r() * 6)}`).setOrigin(0.5, 1).setScale(1.35 + r() * 0.12).setTint(0x9a94a0).setFlipX(r() < 0.6).setAlpha(0);
+      const p = this.add.image(x, 4 + r() * 6, `br_civ${Math.floor(r() * 6)}`).setOrigin(0.5, 1).setScale(1.16 + r() * 0.1).setTint(0x9a94a0).setFlipX(r() < 0.6).setAlpha(0);
       p.seed = r() * 6;
       this.span.add(p);
       this.spanCrowd.push(p);
@@ -162,12 +164,12 @@ export class RecordScene extends Phaser.Scene {
       x: { min: 0, max: W }, y: { min: -100, max: 700 }, speedX: { min: -90, max: -30 }, speedY: { min: 10, max: 40 },
       lifespan: 9000, scale: { start: 0.8, end: 0.2 }, alpha: { start: 0.7, end: 0 }, frequency: 90, blendMode: 'ADD',
     }).setDepth(60);
-    this.boy = this.add.image(SPOT.boy + 120, DECK + 2, 'br_boy').setOrigin(0.5, 1).setScale(1.5).setDepth(31).setFlipX(true);
+    this.boy = this.add.image(SPOT.boy + 120, DECK + 2, 'br_boy').setOrigin(0.5, 1).setScale(1.1).setDepth(31).setFlipX(true);
     this.boy.setVisible(false);
   }
 
   addWalker(x, r = Math.random) {
-    const p = this.add.image(x, DECK + 2 + r() * 8, `br_civ${Math.floor(r() * 6)}`).setOrigin(0.5, 1).setScale(1.35 + r() * 0.15).setDepth(30 + Math.floor(r() * 3)).setTint(0xb0aab4).setFlipX(true);
+    const p = this.add.image(x, DECK + 2 + r() * 8, `br_civ${Math.floor(r() * 6)}`).setOrigin(0.5, 1).setScale(1.16 + r() * 0.12).setDepth(30 + Math.floor(r() * 3)).setTint(0x8c8692).setFlipX(true);
     p.speed = 50 + r() * 50;
     p.seed = r() * 6;
     this.walkers.push(p);
@@ -182,9 +184,9 @@ export class RecordScene extends Phaser.Scene {
       if (l.snapped) {
         // A snapped hanger: a stub above, a whip-curled end below.
         g.lineBetween(l.x, l.top, l.x, l.top + 60);
-        g.lineBetween(l.x, -48, l.x + 8, -110);
+        g.lineBetween(l.x, -RAIL, l.x + 8, -RAIL - 62);
       } else {
-        g.lineBetween(l.x, l.top, l.x, -48);
+        g.lineBetween(l.x, l.top, l.x, -RAIL);
       }
     });
   }
@@ -375,7 +377,7 @@ export class RecordScene extends Phaser.Scene {
     this.tweens.add({ targets: this.span, rotation: 0.012, y: DECK + 8, duration: 300, yoyo: true, ease: 'Sine.easeOut' });
     await wait(this, 350);
     const fallX = SPOT.boy + 150;
-    this.tweens.add({ targets: this.boy, x: fallX, y: DECK - 30, angle: 50, duration: 260, ease: 'Sine.easeOut' });
+    this.tweens.add({ targets: this.boy, x: fallX, y: DECK - RAIL + 10, angle: 50, duration: 260, ease: 'Sine.easeOut' });
     await wait(this, 260);
     this.boy.setDepth(19);
     this.setSlow(0.25);
@@ -573,7 +575,7 @@ export class RecordScene extends Phaser.Scene {
     const dark = this.add.image(mid + 30, DECK - 230, 'light_soft').setBlendMode(ADD).setTint(0x7b4bc4).setScale(0.6).setDepth(55);
     sound.duel.setIntensity(0);
     const res = await qte(this, {
-      type: 'mash', label: RECORD.duel.clash, presses: 16, limit: 6000, x: VIEW_W * 0.5, y: VIEW_H * 0.28,
+      type: 'mash', label: RECORD.duel.clash, presses: 14, limit: 7500, x: VIEW_W * 0.5, y: VIEW_H * 0.28,
       onProgress: (p) => {
         const k = p - 0.5;
         core.setScale(0.6 + p * 0.8).setX(mid - 10 + k * 60);

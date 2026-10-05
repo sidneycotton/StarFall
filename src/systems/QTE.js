@@ -122,7 +122,7 @@ export function qte(scene, opts) {
         } else if (progress >= 1) finish('success');
         if (h && Math.floor((t - dt) / 160) !== Math.floor(t / 160)) sfx.qteTick({ p: progress, soft: true });
       } else if (type === 'mash' || (type === 'rigged' && shown === 'mash')) {
-        if (auto) for (let k = Math.floor(t / 120) - Math.floor((t - dt) / 120); k > 0; k--) press();
+        if (auto) for (let k = Math.floor(t / 95) - Math.floor((t - dt) / 95); k > 0; k--) press();
         // Drain is in presses per second (0.9 → about 3/s to break even), so it
         // stays fair whatever the press count.
         progress = Math.max(0, progress - (dt / 1000) * o.drain * (3.4 / o.presses) * (type === 'rigged' ? 0.5 : 1) * (progress > 0.6 ? 1.12 : 1));

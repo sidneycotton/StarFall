@@ -171,7 +171,7 @@ export class SkyScene extends Phaser.Scene {
     this.px.root.setRotation(-1.2);
 
     // They meet head on.
-    const meet = await qte(this, { type: 'mash', label: SKY.prompts.meet, presses: 12, limit: 5200, x: CX, y: VIEW_H * 0.24 });
+    const meet = await qte(this, { type: 'mash', label: SKY.prompts.meet, presses: 12, limit: 6500, x: CX, y: VIEW_H * 0.24 });
     narrative.setRecord('skyMeet', meet);
     this.move('s', 760, 430, 200, 'Cubic.easeIn');
     this.move('p', 860, 430, 200, 'Cubic.easeIn');
