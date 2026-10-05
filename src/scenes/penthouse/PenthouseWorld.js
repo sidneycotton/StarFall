@@ -220,21 +220,20 @@ export class PenthouseWorld {
     this.img(L.bed, 830, 'rug', 0.5, 0.5, D.floorFx);
     this.garland = this.img(L.bed - 40, 30, 'garland', 0.5, 0, D.wallLight, SF.wall);
     this.bed = this.img(L.bed, 790, 'bed', 0.5, 1, D.back);
-    const bedLeft = L.bed - 450;
-    this.pxLying = this.img(bedLeft + 20, 500, 'px_lying', 0, 0, D.back + 2);
-    this.sleeper = this.img(bedLeft + 450, 500, 'sleeper', 0, 0, D.back + 2);
-    this.sleeperSit = this.img(bedLeft + 520, 420, 'sleeper_sit', 0, 0, D.back + 2).setAlpha(0);
-    // A fold of sheet that can be drawn up over her shoulder.
-    this.bedFold = this.img(L.bed, 790, 'bed_fold', 0.5, 1, D.back + 4);
-    this.sheetCover = this.img(bedLeft + 648, 616, 'sheet_pull', 0.5, 1, D.back + 3).setAlpha(0);
+    this.pxLying = this.img(3545, 592, 'px_lying', 0, 0, D.back + 3);
+    this.sleeper = this.img(3560, 538, 'sleeper', 0, 0, D.back + 2);
+    this.sleeperSit = this.img(3500, 382, 'sleeper_sit', 0, 0, D.back + 2).setAlpha(0);
+    // The sheet she can be covered with ("Go back to sleep").
+    this.sheetCover = this.img(3742, 640, 'sheet_pull', 0.5, 1, D.back + 2).setAlpha(0);
 
     this.nightstand = this.img(L.nightstand, 785, 'nightstand', 0.5, 1, D.prop);
     this.relay = this.img(L.nightstand - 36, 716, 'relay', 0.5, 1, D.prop + 1);
     this.relayLed = s.add.image(L.nightstand - 36, 701, 'light_core').setScale(0.32).setBlendMode(ADD).setTint(0xff2a3a).setAlpha(0).setDepth(D.prop + 2);
     this.relayHalo = s.add.image(L.nightstand - 36, 701, 'light_soft').setScale(1.4).setBlendMode(ADD).setTint(0xff2030).setAlpha(0).setDepth(D.light);
-    this.glass = this.img(L.nightstand + 26, 716, 'glass', 0.5, 1, D.prop + 3);
-    // Hangs from the mattress edge, behind the bed's front corner.
-    this.arm = this.img(bedLeft + 88, 600, 'px_arm_hang', 0.5, 0.02, D.back - 1).setRotation(0.1);
+    // Last night's glass, on the floor beside the bed.
+    this.glass = this.img(3566, 812, 'glass', 0.5, 1, D.prop + 3);
+    // The near arm hangs off the front of the mattress to the floor.
+    this.arm = this.img(3664, 684, 'px_arm_hang', 0.5, 0.02, D.back + 4).setRotation(0.32);
 
     this.lampL = this.img(L.lampL, 790, 'floor_lamp', 0.5, 1, D.back + 1);
     this.lampR = this.img(L.lampR, 790, 'floor_lamp', 0.5, 1, D.back + 1);

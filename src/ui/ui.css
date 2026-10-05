@@ -45,7 +45,8 @@ html, body {
   overflow: hidden;
 }
 #ui > * { pointer-events: none; }
-#ui .interactive, #ui button { pointer-events: auto; }
+/* Nothing in the overlay takes clicks unless it is visible and explicitly enabled below. */
+#ui .start.interactive { pointer-events: auto; }
 
 button {
   font: inherit;
@@ -229,7 +230,7 @@ button:focus-visible { outline: 1px solid var(--umbral); outline-offset: 4px; }
   margin-right: -0.36em;
   text-shadow: 0 0 10px #000;
 }
-.touch .prompt .key { pointer-events: auto; }
+.touch .prompt.on .key { pointer-events: auto; }
 .touch .prompt .key::before { width: 40px; height: 40px; }
 .touch .prompt .key::after { width: 40px; height: 40px; }
 

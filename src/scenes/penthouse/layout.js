@@ -44,10 +44,10 @@ export const L = {
   spineScreens: [660, 1080, 1500, 1920, 2340],
 
   bed: 3850,
-  nightstand: 3330,
+  nightstand: 3410,
   lampL: 3190,
   lampR: 4600,
-  sleeperX: 3880,
+  sleeperX: 3760,
   dress: 4330,
   heels: 4420,
   mask: 4450,

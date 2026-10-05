@@ -34,7 +34,7 @@ export class PenthouseScene extends Phaser.Scene {
     this.fx = new ScreenFX(this);
     this.cameraDir = new CameraDirector(this, { minX: 0, maxX: WORLD_W, y: 450 });
     this.lighting = new Lighting(this, this.world, this.fx);
-    this.rig = new Parallax(this, 3560, L.lane, { outfit: 'robe' }).setDepth(D.player);
+    this.rig = new Parallax(this, 3640, L.lane, { outfit: 'robe' }).setDepth(D.player);
     this.player = new PlayerController(this, this.rig, { minX: L.exploreMin, maxX: L.equipTrigger + 40 });
     this.interactions = new Interactions(this, this.rig, this.cameraDir);
     this.interactions.setEnabled(false);
@@ -122,20 +122,20 @@ export class PenthouseScene extends Phaser.Scene {
     w.relayHalo.setDepth(D.light);
 
     // Establishing: the bed beneath the oculus and its eclipse.
-    await this.cameraDir.shot(L.bed - 60, 470, 1.16, 7500);
+    await this.cameraDir.shot(L.bed - 40, 520, 1.16, 7500);
     await wait(this, 1800);
 
     // The hand.
-    await this.cameraDir.shot(L.nightstand + 110, 640, 1.75, 2800);
+    await this.cameraDir.shot(3640, 700, 1.75, 2800);
     await wait(this, 600);
     sfx.cloth({ duration: 1.4, gain: 0.03, bright: 0.7 });
-    await tween(this, { targets: w.arm, rotation: 0.6, duration: 2600, ease: 'Sine.easeInOut' });
+    await tween(this, { targets: w.arm, rotation: 0.55, duration: 2600, ease: 'Sine.easeInOut' });
     await wait(this, 700);
-    tween(this, { targets: w.arm, rotation: 0.97, duration: 520, ease: 'Sine.easeIn' });
+    tween(this, { targets: w.arm, rotation: 0.86, duration: 520, ease: 'Sine.easeIn' });
     await wait(this, 330);
     this.knockGlass();
     await wait(this, 2900);
-    tween(this, { targets: w.arm, rotation: 0.78, duration: 1400, ease: 'Sine.easeOut' });
+    tween(this, { targets: w.arm, rotation: 0.68, duration: 1400, ease: 'Sine.easeOut' });
     await wait(this, 1700);
 
     // Cut. Sitting on the edge of the bed.
@@ -145,12 +145,12 @@ export class PenthouseScene extends Phaser.Scene {
     w.pxLying.setVisible(false);
     w.arm.setVisible(false);
     this.rig.setVisible(true);
-    this.rig.x = 3560;
+    this.rig.x = 3640;
     this.rig.face(-1, false);
     this.rig.presetTo = 'sitBed';
     this.rig.presetT = 1;
     this.rig.breath = 0.18;
-    this.cameraDir.shot(3500, 600, 1.42, 0);
+    this.cameraDir.shot(3600, 610, 1.42, 0);
     await this.fx.fadeTo(0, 700);
     await wait(this, 1200);
     sfx.exhale({ gain: 0.04, duration: 1.8 });
@@ -162,17 +162,14 @@ export class PenthouseScene extends Phaser.Scene {
     this.explore();
   }
 
+  // The fingers find the glass on the floor; it tips over and rolls away.
   knockGlass() {
     const g = this.world.glass;
     sfx.glassKnockOver({ pan: -0.3 });
     ui.caption(CAPTIONS.glass, 2400);
-    this.tweens.add({ targets: g, angle: -78, x: g.x - 22, duration: 380, ease: 'Quad.easeIn' });
     this.tweens.add({
-      targets: g, y: 806, duration: 420, delay: 80, ease: 'Quad.easeIn',
-      onComplete: () => {
-        this.tweens.add({ targets: g, y: 798, duration: 120, yoyo: true, ease: 'Quad.easeOut' });
-        this.tweens.add({ targets: g, x: g.x - 70, angle: -90 - 160, duration: 2200, ease: 'Cubic.easeOut' });
-      },
+      targets: g, angle: -90, x: g.x - 6, y: g.y - 8, duration: 420, ease: 'Quad.easeIn',
+      onComplete: () => this.tweens.add({ targets: g, x: g.x - 80, angle: -90 - 300, duration: 2400, ease: 'Cubic.easeOut' }),
     });
   }
 
@@ -181,7 +178,7 @@ export class PenthouseScene extends Phaser.Scene {
     w.darkness.setAlpha(0);
     w.pxLying.setVisible(false);
     w.arm.setVisible(false);
-    w.glass.setPosition(w.glass.x - 92, 806).setAngle(-250);
+    w.glass.setPosition(w.glass.x - 86, 804).setAngle(-390);
     this.lighting.violet = 1;
     this.lighting.alarm = 0.32;
     this.fx.set({ warp: 0.6, aberration: 1.1 });
@@ -241,7 +238,7 @@ export class PenthouseScene extends Phaser.Scene {
       this.rig.face(-1);
       await this.say(def.lines);
     } });
-    this.inspect('sleeper', 4010, 570, { once: true, range: 110, run: async (def) => {
+    this.inspect('sleeper', L.sleeperX, 590, { once: true, range: 110, run: async (def) => {
       await this.rig.pose('lean', 800);
       sfx.sheetPull();
       w.sheetCover.y += 14;
@@ -386,7 +383,7 @@ export class PenthouseScene extends Phaser.Scene {
     w.darkness.setAlpha(0);
     w.pxLying.setVisible(false);
     w.arm.setVisible(false);
-    w.glass.setPosition(w.glass.x - 92, 806).setAngle(-250);
+    w.glass.setPosition(w.glass.x - 86, 804).setAngle(-390);
     w.suitForm.setTexture('form_empty');
     w.robeHeap.setAlpha(1);
     w.helmet.setVisible(false);
