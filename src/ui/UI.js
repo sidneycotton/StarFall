@@ -62,8 +62,13 @@ class UIRoot {
 
     this.promptKey.addEventListener('pointerdown', (e) => {
       e.stopPropagation();
+      this.promptKey.setPointerCapture?.(e.pointerId);
+      this.onPromptHold?.(true);
       this.onPromptTap?.();
     });
+    for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+      this.promptKey.addEventListener(ev, () => this.onPromptHold?.(false));
+    }
     this.title.querySelector('.again').addEventListener('click', () => bus.emit('game:restart', { chapter: this.titleChapter || 1 }));
     this.title.querySelector('.next').addEventListener('click', () => bus.emit('game:restart', { chapter: (this.titleChapter || 1) + 1 }));
 

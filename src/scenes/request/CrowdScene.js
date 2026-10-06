@@ -366,7 +366,7 @@ export class CrowdScene extends Room {
     const { x, z } = this.child;
     if (AUTOPLAY) this.lookAt({ x, y: 0.5, z }, 900);
     await new Promise((resolve) => {
-      const s = this.spot({ id: 'child', x, y: 0.5, z, label: C.child.prompt, reach: 1.5, hold: 700, use: () => { this.removeSpot(s); resolve(); } });
+      const s = this.spot({ id: 'child', x, y: 0.5, z, label: C.child.prompt, reach: 1.5, hold: 0.8, use: () => { this.removeSpot(s); resolve(); } });
       if (AUTOPLAY) this.walkPath(x - 0.2, z - 1.0, { speed: 1.6 }).then(() => this.lookAt({ x, y: 0.5, z }, 600)).then(() => { this.removeSpot(s); resolve(); });
     });
     this.setFree(false, false);

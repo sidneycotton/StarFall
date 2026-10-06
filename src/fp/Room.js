@@ -118,10 +118,12 @@ export class Room extends Phaser.Scene {
     });
     this.releaseAction = input.pushActionHandler(() => this.onAction());
     ui.onPromptTap = () => this.onAction();
+    ui.onPromptHold = (on) => { this.promptHeld = on; };
   }
 
   teardownRoom() {
     this.releaseAction?.();
+    ui.onPromptHold = null;
     input.fpMode = false;
     input.keys.delete('fwd');
     input.keys.delete('back');
@@ -311,10 +313,11 @@ export class Room extends Phaser.Scene {
       return;
     }
     const label = best.s.hold && best.s.progress > 0 ? `${best.s.label} ${this.dots(best.s.progress)}` : best.s.label;
-    if (this.target !== best.s || this.targetLabel !== label) {
+    if (this.target !== best.s || this.targetLabel !== label || this.targetDevice !== input.lastDevice) {
       this.target = best.s;
       this.targetLabel = label;
-      ui.showPrompt(label, best.p.x, best.p.y - 60, best.s.hold ? `Hold ${input.keyName('action')}` : input.keyName('action'));
+      this.targetDevice = input.lastDevice;
+      ui.showPrompt(label, best.p.x, best.p.y - 60, best.s.hold ? (input.lastDevice === 'touch' ? 'Hold' : `Hold ${input.keyName('action')}`) : input.keyName('action'));
     } else {
       ui.movePrompt(best.p.x, best.p.y - 60);
     }
@@ -326,8 +329,9 @@ export class Room extends Phaser.Scene {
     return '●'.repeat(k) + '○'.repeat(n - k);
   }
 
+  // A finger resting on the picture (not dragging the view) holds, like a key.
   get actionHeld() {
-    return input.actionHeld || this.mouseHeld;
+    return input.actionHeld || this.mouseHeld || this.promptHeld || Boolean(this.drag && !this.drag.moved);
   }
 
   onAction() {

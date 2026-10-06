@@ -14,6 +14,8 @@ import { input } from '../systems/Input.js';
 
 // ?autoplay advances lines by itself (used for unattended playtests).
 const AUTOPLAY = new URLSearchParams(window.location.search).has('autoplay');
+// ?autoplay=read holds each line about as long as a reader would (for timing a chapter).
+const READ = new URLSearchParams(window.location.search).get('autoplay') === 'read';
 
 const PUNCT_PAUSE = { '.': 320, ',': 140, '—': 260, '…': 380, '?': 320, '!': 300, ':': 200, ';': 200 };
 
@@ -124,7 +126,7 @@ export class Dialogue {
     this.el.classList.add('done');
     if (line?.auto || AUTOPLAY) {
       clearTimeout(this.autoTimer);
-      this.autoTimer = setTimeout(() => this.complete(), line?.auto || 1400);
+      this.autoTimer = setTimeout(() => this.complete(), line?.auto || (READ ? 1200 + (line?.text?.length || 0) * 55 : 1400));
     }
     this.currentLine = line;
   }
