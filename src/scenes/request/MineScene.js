@@ -290,6 +290,7 @@ export class MineScene extends Room {
       if (id === 'machine') sfx.metalSet({ pan: 0.5 });
       await ui.dialogue.play(linesFor(id));
       seen.add(id);
+      this.lastLook = this.time.now;
       this.busy = false;
     };
     const at = {
@@ -308,29 +309,36 @@ export class MineScene extends Room {
     } });
 
     const start = this.time.now;
+    this.lastLook = start;
+    this.chatted = 0;
     const idle = () => !this.busy && !ui.dialogue.active;
+    // They talk in the gaps: never straight over something you've just looked at.
+    const lull = () => idle() && this.time.now - this.lastLook > 3500;
     const chat = (async () => {
       for (const [i, group] of M.chat.entries()) {
-        await this.until(() => this.lookDone || (this.time.now - start > 7000 + i * 13000 && idle()));
+        await this.until(() => this.lookDone || (this.time.now - start > 7000 + i * 14000 && lull()));
         if (this.lookDone) return;
         await ui.dialogue.play(group);
+        this.chatted = i + 1;
         if (i === 2 && this.stepped) await ui.dialogue.play(M.chatStepped);
       }
     })();
     if (AUTOPLAY) {
       (async () => {
         for (const id of ['lukewarm', 'clock', 'paperweight']) {
-          await this.until(() => idle() || this.lookDone);
-          if (this.lookDone) return;
           const [x, y, z] = at[id];
-          await this.lookAt({ x, y, z }, 1100);
-          await wait(this, 700);
-          await examine(id);
+          while (!seen.has(id) && !this.lookDone) {
+            await this.until(() => idle() || this.lookDone);
+            if (this.lookDone) return;
+            await this.lookAt({ x, y, z }, 1100);
+            await wait(this, 500);
+            await examine(id);
+          }
           await wait(this, 1500);
         }
       })();
     }
-    await this.until(() => (seen.size >= 3 && this.time.now - start > 30000) || this.time.now - start > 48000);
+    await this.until(() => (seen.size >= 2 && this.chatted >= 2 && this.time.now - start > 30000) || this.time.now - start > 60000);
     this.lookDone = true;
     await this.until(idle);
     stick.remove();
