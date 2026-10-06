@@ -218,7 +218,7 @@ export class BedsitScene extends Room {
 
     // Somebody wrote her name without being told it.
     this.setFree(false, false);
-    await this.walkPath(-0.6, 3.4, { speed: 1.1 });
+    await Promise.race([this.walkPath(-0.4, 3.0, { speed: 1.1 }), wait(this, 7000)]);
     await this.lookAt({ x: -W, y: 0.66, z: 3.7 }, 1000);
     await wait(this, 700);
     sfx.paperShuffle();
