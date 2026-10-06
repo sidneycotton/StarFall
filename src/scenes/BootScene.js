@@ -1,3 +1,4 @@
+import { CH4_READY } from '../config.js';
 import Phaser from 'phaser';
 import { ui } from '../ui/UI.js';
 import { narrative } from '../core/NarrativeState.js';
@@ -19,6 +20,7 @@ import { registerTram } from '../art/tram.js';
 import { registerSpan } from '../art/span.js';
 import { registerFive } from '../art/five.js';
 import { partStart, startPart } from './request/parts.js';
+import { serePart, startSere } from './sere/parts.js';
 
 // Paints every texture (there are no image files), waits for fonts, then
 // shows a quiet start prompt — audio needs a user gesture before sound can come first.
@@ -48,16 +50,19 @@ const START_SCENE = {
   ambush: partStart('ambush'),
   mine: partStart('mine'),
   title3: ['Title', { chapter: 3 }],
+  annex: serePart('annex'),
+  title4: ['Title', { chapter: 4 }],
 };
 
 const CHAPTER_TWO = ['vigil', 'tram', 'span', 'sky', 'vigilEnd', 'title2', 'record', 'duel'];
 const CHAPTER_THREE = ['crowd', 'bedsit', 'relay', 'ambush', 'mine', 'title3'];
+const CHAPTER_FOUR = ['annex', 'title4'];
 
 const CHECKPOINT_LABEL = {
   call: 'The Call', run: 'After', chamber: 'The Chamber',
   vigil: 'The Vigil', tram: 'Tram 6', span: 'The Centre Span', sky: 'The West Tower',
   record: 'Tram 6', duel: 'Tram 6',
-  crowd: 'The Crowd', bedsit: 'The Letter', relay: 'Relay 9', ambush: 'Relay 9', mine: 'Vesper General',
+  crowd: 'The Crowd', bedsit: 'The Letter', relay: 'Relay 9', ambush: 'Relay 9', mine: 'Vesper General', annex: 'The Annex',
 };
 
 export class BootScene extends Phaser.Scene {
@@ -94,6 +99,7 @@ export class BootScene extends Phaser.Scene {
         narrative.beginNewRun();
         if (CHAPTER_TWO.includes(debugStage)) narrative.beginChapterTwo();
         if (CHAPTER_THREE.includes(debugStage)) narrative.beginChapterThree();
+        if (CHAPTER_FOUR.includes(debugStage)) narrative.beginChapterFour();
         const [key, data] = START_SCENE[debugStage];
         this.scene.start(key, data);
       };
@@ -104,7 +110,8 @@ export class BootScene extends Phaser.Scene {
 
     const cp = narrative.data.checkpoint;
     const flags = narrative.data.flags;
-    const done = CHAPTER_THREE.includes(cp) ? flags.ch3Completed
+    const done = CHAPTER_FOUR.includes(cp) ? flags.ch4Completed
+      : CHAPTER_THREE.includes(cp) ? flags.ch3Completed
       : CHAPTER_TWO.includes(cp) ? flags.ch2Completed : flags.completed;
     const canContinue = Boolean(cp && cp !== 'wake' && CHECKPOINT_LABEL[cp] && !done);
     const chapters = [
@@ -114,6 +121,10 @@ export class BootScene extends Phaser.Scene {
     // Chapter Three opens once Chapter Two has been seen through.
     if (flags.ch2Seen || flags.ch3Seen) {
       chapters.push({ label: 'Chapter Three', go: () => begin(() => { narrative.beginChapterThree(); startPart(this, 'crowd'); }, true) });
+    }
+    // Chapter Four, once Chapter Three has been seen through.
+    if (CH4_READY && (flags.ch3Seen || flags.ch4Seen)) {
+      chapters.push({ label: 'Chapter Four', go: () => begin(() => { narrative.beginChapterFour(); startSere(this, 'annex'); }, true) });
     }
     const begin = async (fn, fresh) => {
       await audio.unlock();

@@ -28,8 +28,10 @@ import { AmbushScene } from './scenes/request/AmbushScene.js';
 import { CrowdScene } from './scenes/request/CrowdScene.js';
 import { MineScene } from './scenes/request/MineScene.js';
 import { BedsitScene } from './scenes/request/BedsitScene.js';
+import { AnnexScene } from './scenes/sere/AnnexScene.js';
 import { RelayScene } from './scenes/request/RelayScene.js';
 import { partStart } from './scenes/request/parts.js';
+import { serePart } from './scenes/sere/parts.js';
 
 // STARFALL. Entry point: game config, the DOM UI layer and the
 // few global behaviours (pause, restart) that sit above individual scenes.
@@ -53,7 +55,7 @@ const game = new Phaser.Game({
   audio: { noAudio: true },
   input: { gamepad: false },
   pipeline: { CinematicPipeline },
-  scene: [BootScene, PenthouseScene, SeerCallScene, ChamberScene, TitleScene, VigilScene, TramScene, SpanScene, SkyScene, RequestScene, CrowdScene, BedsitScene, RelayScene, AmbushScene, MineScene],
+  scene: [BootScene, PenthouseScene, SeerCallScene, ChamberScene, TitleScene, VigilScene, TramScene, SpanScene, SkyScene, RequestScene, CrowdScene, BedsitScene, RelayScene, AmbushScene, MineScene, AnnexScene],
 });
 
 ui.init(game);
@@ -78,7 +80,8 @@ bus.on('game:restart', (opts = {}) => {
   sound.stopAll(0.3);
   narrative.beginNewRun();
   if (chapter === 2) narrative.beginChapterTwo();
-  if (chapter >= 3) narrative.beginChapterThree();
+  if (chapter === 3) narrative.beginChapterThree();
+  if (chapter >= 4) narrative.beginChapterFour();
   game.scene.getScenes(false).forEach((s) => {
     if (s.scene.key === 'Boot' || !s.scene.isActive()) return;
     s.tweens.timeScale = 1;
@@ -87,7 +90,8 @@ bus.on('game:restart', (opts = {}) => {
   });
   if (audio.ctx) audio.ctx.resume();
   setTimeout(() => {
-    if (chapter >= 3) game.scene.start(...partStart('crowd'));
+    if (chapter >= 4) game.scene.start(...serePart('annex'));
+    else if (chapter >= 3) game.scene.start(...partStart('crowd'));
     else if (chapter === 2) game.scene.start('Vigil', {});
     else game.scene.start('Penthouse', { start: 'wake' });
   }, 400);

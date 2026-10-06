@@ -726,3 +726,47 @@ export function ringback({ rings = 2, gain = 0.035, pan = 0.25 } = {}) {
     }
   }
 }
+
+// ---------------------------------------------------------------------------
+// Chapter Four.
+
+// A camera shutter: two clicks a beat apart, and the flash charging.
+export function shutter({ gain = 0.08, pan = 0 } = {}) {
+  if (!ok()) return;
+  const t = A.now;
+  const dest = out(A.sfx, pan, 0.1);
+  [0, 0.07].forEach((dt) => {
+    const n = A.noiseSource(A.noise, false);
+    const f = A.filter('bandpass', 3200, 2);
+    const g = A.gain();
+    A.chain(n, f, g, dest);
+    A.env(g.gain, t + dt, gain, 0.001, 0.03);
+    n.start(t + dt); n.stop(t + dt + 0.08);
+  });
+  const o = A.osc('sine', 3400);
+  const og = A.gain();
+  A.chain(o, og, dest);
+  o.frequency.linearRampToValueAtTime(5200, t + 1.2);
+  A.env(og.gain, t + 0.15, gain * 0.05, 0.3, 0.9);
+  o.start(t + 0.15); o.stop(t + 1.4);
+}
+
+// A desk printer: a whine, a feed, three passes of the head.
+export function printer({ gain = 0.05, pan = 0.3 } = {}) {
+  if (!ok()) return;
+  const t = A.now;
+  const dest = out(A.sfx, pan, 0.08);
+  for (let i = 0; i < 3; i++) {
+    const n = A.noiseSource(A.noise, false);
+    const f = A.filter('bandpass', 900 + i * 120, 1.4);
+    const g = A.gain();
+    A.chain(n, f, g, dest);
+    A.env(g.gain, t + 0.4 + i * 0.55, gain, 0.05, 0.4, 0.05);
+    n.start(t + 0.4 + i * 0.55); n.stop(t + 1.0 + i * 0.55);
+  }
+  const o = A.osc('triangle', 180);
+  const og = A.gain();
+  A.chain(o, A.filter('lowpass', 900), og, dest);
+  A.env(og.gain, t, gain * 0.4, 0.2, 2.0, 0.3);
+  o.start(t); o.stop(t + 2.4);
+}

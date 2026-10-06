@@ -39,4 +39,7 @@ export const SPEAKERS = {
   radio: { name: 'Radio', style: 'mortal radio', sigil: null, voice: null },
   lodestarPhone: { name: 'Lodestar', style: 'mortal radio', sigil: null, voice: null },
   crowdChild: { name: '', style: 'mortal', sigil: null, voice: null },
+  // Chapter Four. Dowser's chapter.
+  dowserThought: { name: '', style: 'whisper', sigil: null, voice: null },
+  clerk: { name: 'Clerk', style: 'mortal', sigil: null, voice: null },
 };

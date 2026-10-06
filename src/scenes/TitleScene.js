@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { VIEW_W, VIEW_H } from '../config.js';
+import { VIEW_W, VIEW_H, CH4_READY } from '../config.js';
 import { ui } from '../ui/UI.js';
 import { narrative } from '../core/NarrativeState.js';
 import { audio } from '../audio/AudioEngine.js';
@@ -22,8 +22,11 @@ export class TitleScene extends Phaser.Scene {
     this.fx = new ScreenFX(this);
     this.fx.set({ grain: 0.05, aberration: 0.4, vignette: 0.6 });
     ui.resetTitle();
-    if (data.chapter === 3) {
-      ui.setTitle('Chapter Three', 'The Request', 3, { next: false });
+    if (data.chapter === 4) {
+      ui.setTitle('Chapter Four', 'Under the Sere', 4, { next: false });
+      narrative.completeChapterFour();
+    } else if (data.chapter === 3) {
+      ui.setTitle('Chapter Three', 'The Request', 3, { next: CH4_READY ? 'Chapter Four' : false });
       narrative.completeChapterThree();
     } else if (data.chapter === 2) {
       ui.setTitle('Chapter Two', 'The Starfall Record', 2, { next: 'Chapter Three' });

@@ -75,12 +75,19 @@ class NarrativeStateStore {
       everExaminedFigurine: this.data.flags.starFigurineExamined || this.data.flags.everExaminedFigurine,
       ch2Seen: this.data.flags.ch2Seen || 0,
       ch3Seen: this.data.flags.ch3Seen || 0,
+      ch4Seen: this.data.flags.ch4Seen || 0,
+      // Chapter Four remembers how Chapter Three went.
+      ch3SteppedForward: Boolean(this.data.flags.ch3SteppedForward),
+      ch3PaperweightPulled: Boolean(this.data.flags.ch3PaperweightPulled),
     };
     this.data = structuredClone(FRESH);
     this.data.playthroughs = keep.playthroughs;
     this.data.flags.everExaminedFigurine = Boolean(keep.everExaminedFigurine);
     this.data.flags.ch2Seen = keep.ch2Seen;
     this.data.flags.ch3Seen = keep.ch3Seen;
+    this.data.flags.ch4Seen = keep.ch4Seen;
+    this.data.flags.ch3SteppedForward = keep.ch3SteppedForward;
+    this.data.flags.ch3PaperweightPulled = keep.ch3PaperweightPulled;
     this.persist();
   }
 
@@ -113,6 +120,18 @@ class NarrativeStateStore {
     this.persist();
   }
 
+  beginChapterFour() {
+    this.data.flags.ch4Completed = false;
+    this.persist();
+  }
+
+  completeChapterFour() {
+    this.data.flags.ch4Completed = true;
+    this.data.flags.ch4Seen = (this.data.flags.ch4Seen || 0) + 1;
+    this.data.checkpoint = null;
+    this.persist();
+  }
+
   completeChapterThree() {
     this.data.flags.ch3Completed = true;
     this.data.flags.ch3Seen = (this.data.flags.ch3Seen || 0) + 1;
@@ -133,6 +152,7 @@ class NarrativeStateStore {
   get chapter() {
     if (CHECKPOINTS[this.data.checkpoint]) return CHECKPOINTS[this.data.checkpoint];
     const i = STAGES.indexOf(this.data.stage);
+    if (i >= STAGES.indexOf('annex')) return 4;
     if (i >= STAGES.indexOf('crowd')) return 3;
     return i >= STAGES.indexOf('vigil') ? 2 : 1;
   }

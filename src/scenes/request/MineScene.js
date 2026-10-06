@@ -290,7 +290,7 @@ export class MineScene extends Room {
       if (id === 'machine') sfx.metalSet({ pan: 0.5 });
       await ui.dialogue.play(linesFor(id));
       seen.add(id);
-      this.lastLook = this.time.now;
+      this.lastExamined = this.time.now;
       this.busy = false;
     };
     const at = {
@@ -309,11 +309,11 @@ export class MineScene extends Room {
     } });
 
     const start = this.time.now;
-    this.lastLook = start;
+    this.lastExamined = start;
     this.chatted = 0;
     const idle = () => !this.busy && !ui.dialogue.active;
     // They talk in the gaps: never straight over something you've just looked at.
-    const lull = () => idle() && this.time.now - this.lastLook > 3500;
+    const lull = () => idle() && this.time.now - this.lastExamined > 3500;
     const chat = (async () => {
       for (const [i, group] of M.chat.entries()) {
         await this.until(() => this.lookDone || (this.time.now - start > 7000 + i * 14000 && lull()));
