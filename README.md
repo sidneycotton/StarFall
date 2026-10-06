@@ -76,11 +76,13 @@ The night of the anniversary, in first person, as someone nobody looks at twice.
 
 1. **The crowd** — Vesper Plaza, before the screens change. Stand still long enough
    and the ground answers. Four strangers do something they can't explain.
-2. **The bedsit** — a card, a rejection, a phone, a mirror. Then paper under the door.
+2. **The bedsit** — a card, a rejection, a phone, a mirror, a radio, marks on the wall.
+   Then paper under the door.
 3. **Relay 9** — a disused substation at dusk. Four people come in past you and say
    their names to each other. Whether you are one of them is up to you.
 4. **The lights** — they go out one by one.
-5. **The waiting room** — every screen changes at once.
+5. **The waiting room** — four people in a row of chairs, and the end one. Then every
+   screen changes at once.
 
 ## Architecture
 

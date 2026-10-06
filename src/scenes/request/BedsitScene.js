@@ -104,6 +104,34 @@ export class BedsitScene extends Room {
     const sx = W - 0.04;
     this.reflection = this.v.poly([[sx, 0.95, MZ - 0.22], [sx, 1.3, MZ - 0.2], [sx, 1.42, MZ - 0.08], [sx, 1.72, MZ - 0.1], [sx, 1.78, MZ], [sx, 1.72, MZ + 0.1], [sx, 1.42, MZ + 0.08], [sx, 1.3, MZ + 0.2], [sx, 0.95, MZ + 0.22]], { fill: 0x3a3a44, alpha: 0.9 });
     this.MZ = MZ;
+    // A radio on a bracket by the window.
+    this.box(W - 0.24, W, 1.0, 1.03, 3.25, 3.75, { fill: 0x3a2a20, solid: false });
+    this.box(W - 0.2, W - 0.02, 1.03, 1.2, 3.32, 3.66, { fill: 0x5a4a3a, top: 0x6a5a48, solid: false });
+    this.face([[W - 0.205, 1.06, 3.36], [W - 0.205, 1.06, 3.5], [W - 0.205, 1.17, 3.5], [W - 0.205, 1.17, 3.36]], { fill: 0x2a2420 });
+    this.radioDial = this.face([[W - 0.205, 1.1, 3.54], [W - 0.205, 1.1, 3.62], [W - 0.205, 1.14, 3.62], [W - 0.205, 1.14, 3.54]], { fill: 0x6a5a30, lit: false });
+    // A newspaper cutting, pinned over the bed's foot: the Starfall photograph.
+    const CX = -W + 0.012;
+    this.face([[CX, 1.3, 1.0], [CX, 1.3, 1.4], [CX, 1.78, 1.4], [CX, 1.78, 1.0]], { fill: 0xc8c0ae, shade: 1.1 });
+    this.face([[CX + 0.002, 1.44, 1.04], [CX + 0.002, 1.44, 1.36], [CX + 0.002, 1.74, 1.36], [CX + 0.002, 1.74, 1.04]], { fill: 0x2a2a34 });
+    this.face([[CX + 0.004, 1.47, 1.04], [CX + 0.004, 1.47, 1.36], [CX + 0.004, 1.5, 1.36], [CX + 0.004, 1.5, 1.04]], { fill: 0x4a4a50 });
+    [[1.13, 1.64], [1.27, 1.61]].forEach(([z, y]) => this.face([[CX + 0.005, y - 0.018, z - 0.018], [CX + 0.005, y - 0.018, z + 0.018], [CX + 0.005, y + 0.018, z + 0.018], [CX + 0.005, y + 0.018, z - 0.018]], { fill: 0xf0ecd8, lit: false }));
+    [1.34, 1.37, 1.4].forEach((y) => this.face([[CX + 0.002, y, 1.06], [CX + 0.002, y, 1.34], [CX + 0.002, y + 0.012, 1.34], [CX + 0.002, y + 0.012, 1.06]], { fill: 0x6a6658 }));
+    // Pencil marks behind the head of the bed, in fives. The twelfth is drawn later.
+    const TX = -W + 0.012;
+    const mark = (i) => {
+      const z = 3.55 + Math.floor(i / 5) * 0.11 + (i % 5) * 0.018;
+      if (i % 5 === 4) return this.face([[TX, 0.6, z - 0.075], [TX, 0.6, z - 0.065], [TX, 0.72, z + 0.005], [TX, 0.72, z - 0.005]], { fill: 0x2a2826 });
+      return this.face([[TX, 0.6, z], [TX, 0.6, z + 0.006], [TX, 0.72, z + 0.006], [TX, 0.72, z]], { fill: 0x2a2826 });
+    };
+    for (let i = 0; i < 11; i++) mark(i);
+    this.twelfth = mark(11);
+    this.twelfth.visible = false;
+    // A coat on the hook by the door, a child's handprint on the cuff.
+    const KZ = 0.03;
+    this.face([[0.02, 1.68, KZ], [0.08, 1.68, KZ], [0.08, 1.74, KZ], [0.02, 1.74, KZ]], { fill: 0x8a7a50, shade: 1.2 });
+    this.face([[-0.2, 1.72, KZ + 0.01], [0.3, 1.72, KZ + 0.01], [0.38, 0.92, KZ + 0.01], [-0.28, 0.92, KZ + 0.01]], { fill: 0x2e3238 });
+    this.face([[0.24, 1.6, KZ + 0.02], [0.34, 1.58, KZ + 0.02], [0.4, 1.02, KZ + 0.02], [0.3, 1.0, KZ + 0.02]], { fill: 0x343840 });
+    this.face([[0.31, 1.02, KZ + 0.03], [0.37, 1.02, KZ + 0.03], [0.38, 1.08, KZ + 0.03], [0.32, 1.09, KZ + 0.03]], { fill: 0x5a4a34 });
     // The letter, once it comes.
     this.letterPoly = this.face([[DOOR.x - 0.12, 0.004, 0.08], [DOOR.x + 0.1, 0.004, 0.12], [DOOR.x + 0.08, 0.004, 0.42], [DOOR.x - 0.14, 0.004, 0.38]], { fill: 0xe8e0d0, ground: true, shade: 1.3 });
     this.letterPoly.visible = false;
@@ -121,6 +149,10 @@ export class BedsitScene extends Room {
     item('phone', 0.58, top, D - 0.35);
     item('mirror', W, 1.4, MZ, 1.5);
     item('window', 0.2, 1.6, D, 1.7);
+    item('radio', W - 0.1, 1.12, 3.5, 1.5);
+    item('cutting', -W, 1.55, 1.2, 1.6);
+    item('tally', -W, 0.66, 3.65, 1.6);
+    item('coat', 0.08, 1.3, 0.05, 1.5);
   }
 
   async examine(id) {
@@ -128,6 +160,13 @@ export class BedsitScene extends Room {
     this.busy = true;
     if (id === 'card' || id === 'rejection') sfx.paperShuffle();
     if (id === 'phone') sfx.glassClink({ pitch: 0.5, gain: 0.05 });
+    if (id === 'radio') {
+      ui.caption(CC.radio, 2000);
+      sfx.radio({ gain: 0.05 });
+      this.radioDial.base = 0xe8c060; this.radioDial.fill = 0xe8c060;
+      this.lightDirty = true;
+      await wait(this, 900);
+    }
     await ui.dialogue.play(B.items[id].lines);
     this.seen.add(id);
     this.busy = false;
@@ -147,10 +186,10 @@ export class BedsitScene extends Room {
     this.setFree(true, true);
     await ui.dialogue.play(B.open);
 
-    // Look around; after a while (or three things), something comes under the door.
+    // Look around; after a while (or four things), something comes under the door.
     const start = this.time.now;
     if (AUTOPLAY) this.autoLook();
-    await this.until(() => this.seen.size >= 3 || this.time.now - start > 70000);
+    await this.until(() => this.seen.size >= 4 || this.time.now - start > 110000);
     await this.until(() => !this.busy && !ui.dialogue.active);
     await wait(this, 1400);
     sfx.sheetPull();
@@ -176,14 +215,25 @@ export class BedsitScene extends Room {
     await ui.dialogue.play(B.letter.after);
     narrative.setFlag('ch3LetterRead', true);
     await wait(this, 800);
+
+    // Somebody wrote her name without being told it.
+    this.setFree(false, false);
+    await this.walkPath(-0.6, 3.4, { speed: 1.1 });
+    await this.lookAt({ x: -W, y: 0.66, z: 3.7 }, 1000);
+    await wait(this, 700);
+    sfx.paperShuffle();
+    this.twelfth.visible = true;
+    await wait(this, 900);
+    await ui.dialogue.play(B.tallyAfter);
+    await wait(this, 800);
   }
 
   // Under autoplay: walk to things and look at them.
   async autoLook() {
-    for (const id of ['card', 'mirror', 'window']) {
+    for (const id of ['card', 'radio', 'mirror', 'cutting', 'window']) {
       const s = this.spots.find((x) => x.id === id);
-      const tx = id === 'mirror' ? W - 0.8 : s.x;
-      const tz = id === 'mirror' ? this.MZ : D - 1.4;
+      const at = { mirror: [W - 0.8, this.MZ], radio: [W - 0.9, 3.0], cutting: [-0.5, 1.2] }[id] || [s.x, D - 1.4];
+      const [tx, tz] = at;
       await this.walkPath(tx, tz, { speed: 1.2 });
       await this.lookAt({ x: s.x, y: s.y, z: s.z }, 700);
       await wait(this, id === 'mirror' ? 2600 : 400);

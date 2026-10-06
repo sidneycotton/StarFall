@@ -36,6 +36,7 @@ export const SPEAKERS = {
   humdrum: { name: 'Humdrum', style: 'mortal', sigil: null, voice: null },
   lukewarm: { name: 'Lukewarm', style: 'mortal', sigil: null, voice: null },
   lodestar: { name: 'Lodestar', style: 'aureate', sigil: SIGILS.aureate, voice: null },
+  radio: { name: 'Radio', style: 'mortal radio', sigil: null, voice: null },
   lodestarPhone: { name: 'Lodestar', style: 'mortal radio', sigil: null, voice: null },
   crowdChild: { name: '', style: 'mortal', sigil: null, voice: null },
 };

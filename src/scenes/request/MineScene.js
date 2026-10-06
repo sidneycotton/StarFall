@@ -182,6 +182,14 @@ export class MineScene extends Room {
     // The television, high in the corner, and its light on the room.
     this.face([[TV.x - 0.82, TV.y - 0.06, TV.z + 0.05], [TV.x + 0.82, TV.y - 0.06, TV.z + 0.05], [TV.x + 0.82, TV.y + 0.98, TV.z + 0.05], [TV.x - 0.82, TV.y + 0.98, TV.z + 0.05]], { fill: 0x141418 });
     this.tv = this.figure('mn_tv_news', { x: TV.x, y: TV.y, z: TV.z, h: 0.9, lit: false });
+    // A clock over the hatch side, its second hand stuck.
+    const CZ = Z1 - 0.01;
+    const ring = (r, n = 16) => Array.from({ length: n }, (_, i) => [1.9 + Math.cos((i / n) * Math.PI * 2) * r, 2.15 + Math.sin((i / n) * Math.PI * 2) * r, CZ]);
+    this.face(ring(0.2), { fill: 0x2a2e30 });
+    this.face(ring(0.17).map(([x, y]) => [x, y, CZ - 0.005]), { fill: 0xe8e8e0, shade: 1.1 });
+    this.face([[1.89, 2.15, CZ - 0.01], [1.91, 2.15, CZ - 0.01], [1.97, 2.25, CZ - 0.01], [1.95, 2.26, CZ - 0.01]], { fill: 0x1a1a1a });
+    this.face([[1.895, 2.15, CZ - 0.01], [1.905, 2.15, CZ - 0.01], [1.905, 2.05, CZ - 0.01], [1.895, 2.05, CZ - 0.01]], { fill: 0x1a1a1a });
+    this.secondHand = this.face([[1.898, 2.15, CZ - 0.012], [1.902, 2.15, CZ - 0.012], [1.83, 2.02, CZ - 0.012], [1.826, 2.024, CZ - 0.012]], { fill: 0xa02020 });
     this.tvLight = this.light({ x: TV.x, y: TV.y, z: TV.z - 0.8, power: 0.5, radius: 4.5, color: 0x8aa0c0 });
     // The four.
     this.four = {};
@@ -224,6 +232,7 @@ export class MineScene extends Room {
     this.setFree(true, false);
     await wait(this, 1200);
     await ui.dialogue.play(M.waiting);
+    await this.lookAround();
     await wait(this, 1400);
 
     // Every screen, the same thing.
@@ -264,6 +273,78 @@ export class MineScene extends Room {
     await wait(this, 200);
     await this.fx.fadeTo(0, 900);
     await wait(this, 4200);
+  }
+
+  // From the end chair: the four, the room. They talk among themselves.
+  async lookAround() {
+    const seen = new Set();
+    const it = M.items;
+    const linesFor = (id) => {
+      if (id === 'paperweight' && !narrative.flag('ch3PaperweightPulled')) return it.paperweight.linesDropped;
+      if (id === 'lukewarm' && this.stepped) return it.lukewarm.linesStepped;
+      return it[id].lines;
+    };
+    const examine = async (id) => {
+      if (this.busy || ui.dialogue.active) return;
+      this.busy = true;
+      if (id === 'machine') sfx.metalSet({ pan: 0.5 });
+      await ui.dialogue.play(linesFor(id));
+      seen.add(id);
+      this.busy = false;
+    };
+    const at = {
+      clock: [1.9, 2.15, 5.1], hatch: [-3.4, 1.3, 3.0], machine: [2.6, 1.3, 4.05],
+    };
+    for (const id of Object.keys(this.four)) {
+      const p = this.four[id];
+      at[id] = [p.x, 1.0, p.z];
+    }
+    const spots = Object.entries(at).map(([id, [x, y, z]]) => this.spot({ id, x, y, z, label: it[id].label, reach: 5, use: () => examine(id) }));
+    ui.hint(M.lookHint, 4000);
+
+    // The second hand tries for the eight and falls back.
+    const stick = this.time.addEvent({ delay: 1000, loop: true, callback: () => {
+      this.secondHand.visible = !this.secondHand.visible || Math.random() < 0.5;
+    } });
+
+    const start = this.time.now;
+    const idle = () => !this.busy && !ui.dialogue.active;
+    const chat = (async () => {
+      for (const [i, group] of M.chat.entries()) {
+        await this.until(() => this.lookDone || (this.time.now - start > 7000 + i * 13000 && idle()));
+        if (this.lookDone) return;
+        await ui.dialogue.play(group);
+        if (i === 2 && this.stepped) await ui.dialogue.play(M.chatStepped);
+      }
+    })();
+    if (AUTOPLAY) {
+      (async () => {
+        for (const id of ['lukewarm', 'clock', 'paperweight']) {
+          await this.until(() => idle() || this.lookDone);
+          if (this.lookDone) return;
+          const [x, y, z] = at[id];
+          await this.lookAt({ x, y, z }, 1100);
+          await wait(this, 700);
+          await examine(id);
+          await wait(this, 1500);
+        }
+      })();
+    }
+    await this.until(() => (seen.size >= 3 && this.time.now - start > 30000) || this.time.now - start > 48000);
+    this.lookDone = true;
+    await this.until(idle);
+    stick.remove();
+    this.secondHand.visible = true;
+    spots.forEach((s) => this.removeSpot(s));
+    ui.hint('');
+    await chat.catch(() => {});
+  }
+
+  until(fn, ms = 1e9) {
+    return new Promise((resolve) => {
+      const t0 = this.time.now;
+      const ev = this.time.addEvent({ delay: 100, loop: true, callback: () => { if (fn() || this.time.now - t0 > ms) { ev.remove(); resolve(); } } });
+    });
   }
 
   sitDown() {

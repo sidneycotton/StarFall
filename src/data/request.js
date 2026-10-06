@@ -30,6 +30,7 @@ export const REQUEST = {
     leaving: '[ the door, closing behind her ]',
     car: '[ brakes; a car door ]',
     broadcast: '[ every screen changes at once ]',
+    radio: '[ a radio, between stations ]',
   },
 
   // 3.1 — Vesper Plaza, the vigil, the minutes before the screens cut out.
@@ -120,7 +121,39 @@ export const REQUEST = {
           { id: 'rq_i6', speaker: 'wallflowerThought', text: 'Every screen on the street is showing the sky from last night. Nobody can say what it was.' },
         ],
       },
+      radio: {
+        label: 'Radio',
+        lines: [
+          { id: 'rq_i7', speaker: 'radio', text: '—four incidents in Vesper Plaza during the vigil. A burst main, a hoarding, a lamp post, flooding at the old culvert.' },
+          { id: 'rq_i8', speaker: 'radio', text: 'No deaths. A girl of six was found unhurt under the statue. She says somebody pulled her out. Officers found nobody near her.' },
+          { id: 'rq_i9', speaker: 'wallflowerThought', text: 'I was near her. I had hold of her hand.' },
+        ],
+      },
+      cutting: {
+        label: 'Cutting',
+        lines: [
+          { id: 'rq_i10', speaker: 'wallflowerThought', text: 'The Starfall. Everyone has this picture; the Network gave it away. Star over the Lantern Bridge, and a second light the papers call a flaw in the lens.' },
+          { id: 'rq_i11', speaker: 'wallflowerThought', text: 'The longer I look, the less it looks like a flaw. It\'s facing her.' },
+        ],
+      },
+      tally: {
+        label: 'Marks on the wall',
+        lines: [
+          { id: 'rq_i12', speaker: 'wallflowerThought', text: 'A tally, behind the bed. One for every time somebody said my name without being told it.' },
+          { id: 'rq_i13', speaker: 'wallflowerThought', text: 'Eleven. Twenty-nine years.' },
+        ],
+      },
+      coat: {
+        label: 'Coat',
+        lines: [
+          { id: 'rq_i14', speaker: 'wallflowerThought', text: 'Last night\'s coat. A small muddy handprint on the cuff, where she held on.' },
+          { id: 'rq_i15', speaker: 'wallflowerThought', text: 'I haven\'t washed it. It\'s the only proof.' },
+        ],
+      },
     },
+    tallyAfter: [
+      { id: 'rq_l3', speaker: 'wallflowerThought', text: 'I made a twelfth mark. Then I sat on the bed and looked at it for a while.', auto: 4200 },
+    ],
     letterHint: 'Something under the door',
     letter: {
       label: 'Letter',
@@ -286,6 +319,56 @@ export const REQUEST = {
       { id: 'rq_g1', speaker: 'paperweight', text: 'Why us? We\'re nobody. We\'re a party trick and a plumber.', auto: 3200 },
       { id: 'rq_g2', speaker: 'dowser', text: 'Plumbing co-op.', auto: 1800 },
     ],
+    lookHint: 'Look around',
+    // The four, to each other.
+    chat: [
+      [
+        { id: 'rq_t1', speaker: 'lukewarm', text: 'Where\'s she gone? Lodestar.', auto: 2000 },
+        { id: 'rq_t2', speaker: 'humdrum', text: 'Parking.', auto: 1500 },
+        { id: 'rq_t3', speaker: 'paperweight', text: 'Forty minutes, parking.', auto: 2000 },
+      ],
+      [
+        { id: 'rq_t4', speaker: 'dowser', text: 'She wrote to all of us. By hand. Who does that?', auto: 2600 },
+        { id: 'rq_t5', speaker: 'paperweight', text: 'Somebody who knew where we live.', auto: 2200 },
+        { id: 'rq_t6', speaker: 'lukewarm', text: 'I\'m not hard to find. I\'m just not worth finding.', auto: 2800 },
+      ],
+      [
+        { id: 'rq_t7', speaker: 'humdrum', text: 'Did she look at any of you? Properly, I mean.', auto: 2600 },
+        { id: 'rq_t8', speaker: 'lukewarm', text: 'Not at me.', auto: 1600 },
+        { id: 'rq_t9', speaker: 'dowser', text: 'Not at anybody. Past us. Like we were a window.', auto: 3000 },
+      ],
+    ],
+    chatStepped: [
+      { id: 'rq_t10', speaker: 'wallflowerThought', text: 'At me.', auto: 1800 },
+    ],
+    items: {
+      dowser: { label: 'Dowser', lines: [
+        { id: 'rq_wr1', speaker: 'wallflowerThought', text: 'He has his good hand flat on the floor tiles. Feeling for water, he says. There\'s a lot of it, under a hospital.' },
+      ] },
+      paperweight: { label: 'Paperweight', lines: [
+        { id: 'rq_wr2', speaker: 'wallflowerThought', text: 'She keeps rubbing her arm where somebody had hold of her. She hasn\'t asked who. Neither have I.' },
+      ], linesDropped: [
+        { id: 'rq_wr3', speaker: 'wallflowerThought', text: 'Her leg\'s splinted to the knee. Nobody\'s come to look at it. Nobody\'s come to look at any of us.' },
+      ] },
+      humdrum: { label: 'Humdrum', lines: [
+        { id: 'rq_wr4', speaker: 'wallflowerThought', text: 'He\'s humming. The note the office door made before it gave. I don\'t think he knows he\'s doing it.' },
+      ] },
+      lukewarm: { label: 'Lukewarm', lines: [
+        { id: 'rq_wr5', speaker: 'wallflowerThought', text: 'Bruises round both wrists, where she was held up off the floor. I stood still and let her be counted.' },
+        { id: 'rq_wr6', speaker: 'wallflowerThought', text: 'I\'d do it again. I think I\'d do it again.' },
+      ], linesStepped: [
+        { id: 'rq_wr7', speaker: 'wallflowerThought', text: 'She keeps glancing at the end chair. At me. Then away, the way you check a stove you know you turned off.' },
+      ] },
+      clock: { label: 'Clock', lines: [
+        { id: 'rq_wr8', speaker: 'wallflowerThought', text: 'Ten past three. The second hand sticks on the seven and has to try again.' },
+      ] },
+      hatch: { label: 'Reception', lines: [
+        { id: 'rq_wr9', speaker: 'wallflowerThought', text: 'The nurse at the hatch took four names and slid it shut. I gave mine twice.' },
+      ] },
+      machine: { label: 'Vending machine', lines: [
+        { id: 'rq_wr10', speaker: 'wallflowerThought', text: 'It took my coin and gave me nothing. That seems fair.' },
+      ] },
+    },
     crawl: 'Parallax seen for the first time in seven years · on the anniversary of the Starfall',
     broadcast: [
       { id: 'rq_bc1', speaker: 'parallax', text: 'Vesper. You remember me.', voiceGain: 0.08 },
